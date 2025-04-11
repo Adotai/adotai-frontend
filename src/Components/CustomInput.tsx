@@ -11,16 +11,15 @@ import {
 } from 'react-native';
 import { Theme } from '../../constants/Themes';
 
-// Propriedades do CustomInput
 export type CustomInputProps = {
   label?: string;
-  value: string; // Tornado obrigatório para consistência
-  onChange: (text: string) => void; // Tornado obrigatório
+  value: string;
+  onChange: (text: string) => void; 
   type?: TextInputProps['keyboardType'];
   secureTextEntry?: boolean;
-  restrictNumeric?: boolean; // Restringe entrada apenas a números
-  containerStyle?: StyleProp<ViewStyle>; // Estilo externo
-  inputStyle?: StyleProp<TextStyle>; // Estilo do TextInput
+  restrictNumeric?: boolean; 
+  containerStyle?: StyleProp<ViewStyle>; 
+  inputStyle?: StyleProp<TextStyle>; 
 };
 
 export const CustomInput: React.FC<CustomInputProps> = ({
@@ -78,7 +77,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 18,
     fontFamily: 'Poppins-Bold',
-    color: Theme.TERTIARY,
+    color: Theme.PRIMARY,
   },
   inputContainer: {
     height: 50,

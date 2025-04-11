@@ -1,78 +1,51 @@
-import { StyleSheet, Text, View, Image } from 'react-native'
-import React from 'react'
-import { Theme } from '../../constants/Themes'
+import { StyleSheet, Text, View, Image, Dimensions, ScrollView } from 'react-native';
+import React from 'react';
+import { Theme } from '../../constants/Themes';
 import { CustomInput } from '../Components/CustomInput';
 import CustomButton from '../Components/CustomButton';
+import { StatusBar } from 'expo-status-bar';
 
-const UserSignUpScreen = () => {
+export default function UserSignUpScreen() {
+    const [name, setName] = React.useState('');
+    const [email, setEmail] = React.useState('');
+    const [phone, setPhone] = React.useState('');
+    const [cpf, setCpf] = React.useState('');
+    const [password, setPassword] = React.useState('');
+    const [confirmPassword, setConfirmPassword] = React.useState('');
+
     return (
         <View style={styles.container}>
-            <Image
-                style={styles.backgroundImage}
-                source={require('../../assets/background-home.png')}
-            />
+            <Image style={styles.backgroundImage} source={require('../../assets/background-home.png')} />
+            
             <View style={styles.overlay}>
-                <Image
-                    style={styles.logo}
-                    source={require('../../assets/adotai-logo-png.png')}
-                />
 
                 <View style={styles.formContainer}>
                     <Text style={styles.loginText}>Informações pessoais</Text>
+                    <ScrollView contentContainerStyle={{ flexGrow: 1, width: '100%' }} keyboardShouldPersistTaps="handled">
 
-                    <CustomInput
-                        label="Nome"
-                        value={''}
-                        onChange={() => { }}
-                    />
-                    <CustomInput
-                        label="E-mail"
-                        value={''}
-                        onChange={() => { }}
-                        secureTextEntry={true}
-                    />
-                    <CustomInput
-                        label="Telefone"
-                        value={''}
-                        onChange={() => { }}
-                        secureTextEntry={true}
-                    />
-                    <CustomInput
-                        label="CPF"
-                        value={''}
-                        onChange={() => { }}
-                        secureTextEntry={true}
-                    />
-                    <CustomInput
-                        label="Senha"
-                        value={''}
-                        onChange={() => { }}
-                        secureTextEntry={true}
-                    />
-                    <CustomInput
-                        label="Confirme sua Senha"
-                        value={''}
-                        onChange={() => { }}
-                        secureTextEntry={true}
-                    />
+                        <CustomInput label="Nome" value={name} onChange={setName} />
+                        <CustomInput label="E-mail" value={email} onChange={setEmail} />
+                        <CustomInput label="Telefone" value={phone} onChange={setPhone} />
+                        <CustomInput label="CPF" value={cpf} onChange={setCpf} />
+                        <CustomInput label="Senha" value={password} onChange={setPassword} secureTextEntry={true}/>
+                        <CustomInput label="Confirme sua Senha" value={confirmPassword} onChange={setConfirmPassword} secureTextEntry={true} />
 
-
+                    </ScrollView>
 
                     <CustomButton
                         title={'SEGUINTE'}
                         borderColor='transparent'
                         textColor={Theme.BACK}
                         color={Theme.TERTIARY}
-                        onPress={() => { }}
+                        onPress={() => {}}
                         disabled={false}  
-                        buttonStyle={{marginTop: 20}}/>
+                        buttonStyle={{ marginBottom: '5%' }}
+                    />
                 </View>
             </View>
         </View>
     );
 }
-
-export default UserSignUpScreen
 
 const styles = StyleSheet.create({
     container: {
@@ -82,38 +55,30 @@ const styles = StyleSheet.create({
         position: 'relative',
     },
     backgroundImage: {
-        width: "100%",
+        width: '100%',
         height: '100%',
         position: 'absolute',
     },
     overlay: {
         flex: 1,
-        alignItems: 'center',
         width: '100%',
+        bottom: 0,
+        position: 'absolute',
     },
-    logo: {
-        height: '18%',
-        width: '40%',
-    },
-    titleBold: {
-        fontFamily: 'Poppins-Bold',
-        fontSize: 24,
-        color: 'white',
-        textAlign: 'center',
-    },
-
     formContainer: {
         flex: 1,
-        width: '100%',
+        width: '100%', 
         backgroundColor: Theme.BACK,
-        justifyContent: 'center',
         alignItems: 'center',
         borderTopRightRadius: 20,
         borderTopLeftRadius: 20,
+        bottom: 0
     },
     loginText: {
         fontSize: 24,
         color: Theme.PRIMARY,
         fontFamily: 'Poppins-Bold',
+        marginTop: 20,
+        marginBottom: 20,
     },
-})
+});

@@ -8,6 +8,8 @@ import OnboardingScreen from './src/Screens/OnboardingScreen';
 import SignInScreen from './src/Screens/SignInScreen';
 import UserSignUpScreen from './src/Screens/UserSignUpScreen';
 import ONGSignUpScreen from './src/Screens/ONGSignUpScreen';
+import { Theme } from './constants/Themes';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 const Stack = createStackNavigator();
 
@@ -28,8 +30,10 @@ export default function App() {
   }
 
   return (
+    <SafeAreaProvider>
     <NavigationContainer>
-      <SafeAreaView style={{ flex: 1 }}>
+      <StatusBar hidden={false} translucent backgroundColor="transparent" />
+      <SafeAreaView style={styles.safeArea}>
         <Stack.Navigator initialRouteName="Onboarding">
           <Stack.Screen
             name="Onboarding"
@@ -53,8 +57,8 @@ export default function App() {
           />
         </Stack.Navigator>
       </SafeAreaView>
-      <StatusBar hidden={false} />
     </NavigationContainer>
+    </SafeAreaProvider>
   );
 }
 
@@ -64,4 +68,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  safeArea: {
+    flex: 1,
+ },
 });
