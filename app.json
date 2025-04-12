@@ -23,6 +23,9 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "USER_ROUTE": "http://10.0.2.2:8080"
     }
   }
 }

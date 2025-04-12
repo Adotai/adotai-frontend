@@ -5,11 +5,13 @@ import { useFonts } from 'expo-font';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import OnboardingScreen from './src/Screens/OnboardingScreen';
-import SignInScreen from './src/Screens/SignInScreen';
+import SignInScreen from './src/Screens/LoginScreen';
 import UserSignUpScreen from './src/Screens/User/UserSignUpScreen';
 import ONGSignUpScreen from './src/Screens/ONG/ONGSignUpScreen';
+import UserHomeScreen from './src/Screens/User/UserHomeScreen'; 
 import { Theme } from './constants/Themes';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import AddressScreen from './src/Screens/AddressScreen';
 
 const Stack = createStackNavigator();
 
@@ -53,6 +55,16 @@ export default function App() {
           <Stack.Screen
             name="ONGSignUp"
             component={ONGSignUpScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="UserHome"
+            component={UserHomeScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="Address"
+            component={AddressScreen}
             options={{ headerShown: false }}
           />
         </Stack.Navigator>

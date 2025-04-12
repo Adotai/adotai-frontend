@@ -4,8 +4,13 @@ import { Theme } from '../../../constants/Themes';
 import { CustomInput } from '../../Components/CustomInput';
 import CustomButton from '../../Components/CustomButton';
 import { StatusBar } from 'expo-status-bar';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { RootStackParamList } from '../../types';
 
 export default function UserSignUpScreen() {
+    
+    const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+    
     const [name, setName] = React.useState('');
     const [email, setEmail] = React.useState('');
     const [phone, setPhone] = React.useState('');
@@ -34,10 +39,18 @@ export default function UserSignUpScreen() {
 
                     <CustomButton
                         title={'SEGUINTE'}
-                        borderColor='transparent'
+                        borderColor="transparent"
                         textColor={Theme.BACK}
                         color={Theme.TERTIARY}
-                        onPress={() => {}}
+                        onPress={() =>
+                            navigation.navigate('Address', {
+                              name,
+                              email,
+                              telephone: phone,
+                              cpf,
+                              password,
+                            })
+                          }
                         disabled={false}  
                         buttonStyle={{ marginBottom: '5%' , marginTop: '5%'}}
                         />

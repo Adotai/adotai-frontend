@@ -3,4 +3,12 @@ export type RootStackParamList = {
     SignIn: undefined;
     UserSignUp: undefined;
     ONGSignUp: undefined;
+    UserHome: undefined;
+    Address: {
+        name: string;
+        email: string;
+        telephone: string;
+        cpf: string;
+        password: string;
+    }; 
   };
