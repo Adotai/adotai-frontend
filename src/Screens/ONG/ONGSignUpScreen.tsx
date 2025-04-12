@@ -1,8 +1,8 @@
 import { StyleSheet, Text, View, Image, ScrollView } from 'react-native'
 import React from 'react'
-import { CustomInput } from '../Components/CustomInput';
-import CustomButton from '../Components/CustomButton';
-import { Theme } from '../../constants/Themes';
+import { CustomInput } from '../../Components/CustomInput';
+import CustomButton from '../../Components/CustomButton';
+import { Theme } from '../../../constants/Themes';
 
 export default function ONGSignUpScreen() {
   const [name, setName] = React.useState('');
@@ -13,8 +13,8 @@ export default function ONGSignUpScreen() {
   const [confirmPassword, setConfirmPassword] = React.useState('');
   return (
     <View style={styles.container}>
-      <Image style={styles.backgroundImage} source={require('../../assets/background-home.png')} />
-
+      <Image style={styles.backgroundImage} source={require('../../../assets/background-home.png')} />
+      
       <View style={styles.overlay}>
 
         <View style={styles.formContainer}>
@@ -24,9 +24,9 @@ export default function ONGSignUpScreen() {
             <CustomInput label="Nome da ONG" value={name} onChange={setName} />
             <CustomInput label="CNPJ" value={cpf} onChange={setCpf} />
             <CustomInput label="E-mail" value={email} onChange={setEmail} />
+            <CustomInput label="Telefone" value={phone} onChange={setPhone} />
             <CustomInput label="Senha" value={password} onChange={setPassword} secureTextEntry={true} />
             <CustomInput label="Confirme sua Senha" value={confirmPassword} onChange={setConfirmPassword} secureTextEntry={true} />
-            <CustomInput label="Telefone" value={phone} onChange={setPhone} />
           </ScrollView>
 
           <CustomButton
@@ -36,7 +36,7 @@ export default function ONGSignUpScreen() {
             color={Theme.TERTIARY}
             onPress={() => { }}
             disabled={false}
-            buttonStyle={{ marginBottom: '5%' }}
+            buttonStyle={{ marginBottom: '5%' , marginTop: '5%'}}
           />
         </View>
       </View>

@@ -6,8 +6,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import OnboardingScreen from './src/Screens/OnboardingScreen';
 import SignInScreen from './src/Screens/SignInScreen';
-import UserSignUpScreen from './src/Screens/UserSignUpScreen';
-import ONGSignUpScreen from './src/Screens/ONGSignUpScreen';
+import UserSignUpScreen from './src/Screens/User/UserSignUpScreen';
+import ONGSignUpScreen from './src/Screens/ONG/ONGSignUpScreen';
 import { Theme } from './constants/Themes';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 

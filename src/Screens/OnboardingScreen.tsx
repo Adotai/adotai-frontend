@@ -22,7 +22,6 @@ const OnboardingScreen = () => {
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-      {/* Deixa o conteúdo entrar atrás da status bar */}
       <StatusBar translucent backgroundColor="transparent" barStyle="light-content" />
 
       <Image style={styles.background} source={require('../../assets/background-home.png')} />

@@ -1,8 +1,8 @@
 import { StyleSheet, Text, View, Image, Dimensions, ScrollView } from 'react-native';
 import React from 'react';
-import { Theme } from '../../constants/Themes';
-import { CustomInput } from '../Components/CustomInput';
-import CustomButton from '../Components/CustomButton';
+import { Theme } from '../../../constants/Themes';
+import { CustomInput } from '../../Components/CustomInput';
+import CustomButton from '../../Components/CustomButton';
 import { StatusBar } from 'expo-status-bar';
 
 export default function UserSignUpScreen() {
@@ -15,7 +15,7 @@ export default function UserSignUpScreen() {
 
     return (
         <View style={styles.container}>
-            <Image style={styles.backgroundImage} source={require('../../assets/background-home.png')} />
+            <Image style={styles.backgroundImage} source={require('../../../assets/background-home.png')} />
             
             <View style={styles.overlay}>
 
@@ -39,8 +39,8 @@ export default function UserSignUpScreen() {
                         color={Theme.TERTIARY}
                         onPress={() => {}}
                         disabled={false}  
-                        buttonStyle={{ marginBottom: '5%' }}
-                    />
+                        buttonStyle={{ marginBottom: '5%' , marginTop: '5%'}}
+                        />
                 </View>
             </View>
         </View>
