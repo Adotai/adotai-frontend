@@ -53,7 +53,7 @@ export default function AddressScreen({ route, navigation }: any) {
 
   return (
     <View style={styles.container}>
-      <Image style={styles.backgroundImage} source={require('../../assets/background-home.png')} />
+      <Image style={styles.backgroundImage} source={require('../../assets/images/background-home.png')} />
 
       <View style={styles.overlay}>
         <View style={styles.formContainer}>

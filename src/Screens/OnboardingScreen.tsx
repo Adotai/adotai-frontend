@@ -24,10 +24,10 @@ const OnboardingScreen = () => {
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <StatusBar translucent backgroundColor="transparent" barStyle="light-content" />
 
-      <Image style={styles.background} source={require('../../assets/background-home.png')} />
+      <Image style={styles.background} source={require('../../assets/images/background-home.png')} />
 
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-        <Image style={styles.logo} source={require('../../assets/adotai-logo-png.png')} />
+        <Image style={styles.logo} source={require('../../assets/images/adotai-logo-png.png')} />
 
         <Text style={styles.text}>Juntos podemos dar uma nova chance aos animais.</Text>
 

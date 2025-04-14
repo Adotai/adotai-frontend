@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image, Dimensions, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, Image, Dimensions, ScrollView, Alert } from 'react-native';
 import React from 'react';
 import { Theme } from '../../../constants/Themes';
 import { CustomInput } from '../../Components/CustomInput';
@@ -20,7 +20,7 @@ export default function UserSignUpScreen() {
 
     return (
         <View style={styles.container}>
-            <Image style={styles.backgroundImage} source={require('../../../assets/background-home.png')} />
+            <Image style={styles.backgroundImage} source={require('../../../assets/images/background-home.png')} />
             
             <View style={styles.overlay}>
 
@@ -42,15 +42,35 @@ export default function UserSignUpScreen() {
                         borderColor="transparent"
                         textColor={Theme.BACK}
                         color={Theme.TERTIARY}
-                        onPress={() =>
+                        onPress={() => {
+                            if (!name || !email || !phone || !cpf || !password || !confirmPassword) {
+                              Alert.alert('Erro', 'Todos os campos são obrigatórios.');
+                              return;
+                            }
+                        
+                            if (password !== confirmPassword) {
+                              Alert.alert('Erro', 'As senhas não coincidem.');
+                              return;
+                            }
+                        
+                            if (!/^\S+@\S+\.\S+$/.test(email)) {
+                              Alert.alert('Erro', 'Formato de e-mail inválido.');
+                              return;
+                            }
+                        
+                            if (!/^\d{11}$/.test(cpf.replace(/\D/g, ''))) {
+                              Alert.alert('Erro', 'CPF inválido. Certifique-se de que possui 11 dígitos.');
+                              return;
+                            }
+                        
                             navigation.navigate('Address', {
                               name,
                               email,
                               telephone: phone,
                               cpf,
                               password,
-                            })
-                          }
+                            });
+                          }}
                         disabled={false}  
                         buttonStyle={{ marginBottom: '5%' , marginTop: '5%'}}
                         />

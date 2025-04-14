@@ -28,8 +28,8 @@ export default function SignInScreen() {
 
   return (
     <View style={styles.container}>
-      <Image style={styles.backgroundImage} source={require('../../assets/background-home.png')} />
-      <Image style={styles.logo} source={require('../../assets/adotai-logo-png.png')} />
+      <Image style={styles.backgroundImage} source={require('../../assets/images/background-home.png')} />
+      <Image style={styles.logo} source={require('../../assets/images/adotai-logo-png.png')} />
       <Text style={styles.subTitle}>Entre para fazer a diferença na vida de um animal!</Text>
 
       <View style={styles.overlay}>
