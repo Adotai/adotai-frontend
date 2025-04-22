@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image, ScrollView, Alert } from 'react-native'
+import { StyleSheet, Text, View, Image, ScrollView, Alert, ImageBackground } from 'react-native'
 import React from 'react'
 import { CustomInput } from '../../Components/CustomInput';
 import CustomButton from '../../Components/CustomButton';
@@ -17,7 +17,7 @@ export default function ONGSignUpScreen() {
   const [confirmPassword, setConfirmPassword] = React.useState('');
   return (
     <View style={styles.container}>
-      <Image style={styles.backgroundImage} source={require('../../../assets/images/background-home.png')} />
+      <ImageBackground style={styles.backgroundImage} source={require('../../../assets/images/background-home.png')} />
       
       <View style={styles.overlay}>
 
