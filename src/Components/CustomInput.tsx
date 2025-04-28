@@ -89,7 +89,6 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    paddingLeft: 10,
-    color: 'black',
+    color: Theme.TEXT_FONT,
   },
 });

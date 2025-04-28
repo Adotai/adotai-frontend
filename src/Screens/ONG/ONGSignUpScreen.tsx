@@ -65,6 +65,7 @@ export default function ONGSignUpScreen() {
                 telephone: phone,
                 cpf,
                 password,
+                fromOng: true,
               });
             }}
             disabled={false}

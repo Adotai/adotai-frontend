@@ -19,6 +19,8 @@ import UserONGScreen from './src/Screens/User/UserONGScreen';
 import UserAnimalsScreen from './src/Screens/User/UserAnimalsScreen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SplashScreen from 'expo-splash-screen';
+import ONGDetailsScreen from './src/Screens/ONG/ONGDetailsScreen';
+import ONGHomeScreen from './src/Screens/ONG/ONGHomeScreen';
 
 
 const Stack = createStackNavigator();
@@ -95,47 +97,105 @@ export default function App() {
             <Stack.Screen
               name="Onboarding"
               component={OnboardingScreen}
-              options={{ headerShown: false }}
-            />
+              options={{
+                headerShown: true,
+                headerTransparent: true,
+                headerTitle: '',
+                headerTintColor: '#FFFFFF',
+              }} />
             <Stack.Screen
               name="SignIn"
               component={SignInScreen}
-              options={{ headerShown: false }}
-            />
+              options={{
+                headerShown: true,
+                headerTransparent: true,
+                headerTitle: '',
+                headerTintColor: '#FFFFFF',
+              }} />
             <Stack.Screen
               name="UserSignUp"
               component={UserSignUpScreen}
-              options={{ headerShown: false }}
-            />
+              options={{
+                headerShown: true,
+                headerTransparent: true,
+                headerTitle: '',
+                headerTintColor: '#FFFFFF',
+              }} />
             <Stack.Screen
               name="ONGSignUp"
               component={ONGSignUpScreen}
-              options={{ headerShown: false }}
-            />
+              options={{
+                headerShown: true,
+                headerTransparent: true,
+                headerTitle: '',
+                headerTintColor: '#FFFFFF',
+              }} />
             <Stack.Screen
               name="UserHome"
               component={UserHomeScreen}
-              options={{ headerShown: false }}
-            />
+              options={{
+                headerShown: false,
+                headerTransparent: true,
+                headerTitle: '',
+                headerTintColor: '#FFFFFF',
+              }} />
             <Stack.Screen
               name="UserProfile"
               component={UserProfileScreen}
-              options={{ headerShown: false }}
-            />
+              options={{
+                headerShown: false,
+                headerTransparent: true,
+                headerTitle: '',
+                headerTintColor: '#FFFFFF',
+              }} />
             <Stack.Screen
               name="Address"
               component={AddressScreen}
-              options={{ headerShown: false }}
-            />
+              options={{
+                headerShown: true,
+                headerTransparent: true,
+                headerTitle: '',
+                headerTintColor: '#FFFFFF',
+              }} />
             <Stack.Screen
               name="UserONG"
               component={UserONGScreen}
-              options={{ headerShown: false }}
-              />
+              options={{
+                headerShown: true,
+                headerTransparent: true,
+                headerTitle: '',
+                headerTintColor: '#FFFFFF',
+              }}
+            />
             <Stack.Screen
               name="UserAnimals"
               component={UserAnimalsScreen}
-              options={{ headerShown: false }}
+              options={{
+                headerShown: true,
+                headerTransparent: true,
+                headerTitle: '',
+                headerTintColor: '#FFFFFF',
+              }}
+            />
+            <Stack.Screen
+              name="ONGDetails"
+              component={ONGDetailsScreen}
+              options={{
+                headerShown: true,
+                headerTransparent: true,
+                headerTitle: '',
+                headerTintColor: '#FFFFFF',
+              }}
+            />
+            <Stack.Screen
+              name="ONGHome"
+              component={ONGHomeScreen}
+              options={{
+                headerShown: true,
+                headerTransparent: true,
+                headerTitle: '',
+                headerTintColor: '#FFFFFF',
+              }}
             />
           </Stack.Navigator>
         </SafeAreaView>
@@ -152,5 +212,5 @@ const styles = StyleSheet.create({
   },
   safeArea: {
     flex: 1,
- },
+  },
 });

@@ -9,7 +9,9 @@ const COLORS = {
 
     PASTEL: "#D0D8E9",
 
-    BACK: '#FCFCFC'
+    BACK: '#FCFCFC',
+  
+    TEXT_FONT: "#000000",
 
   };
   

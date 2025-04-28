@@ -10,5 +10,6 @@ export type RootStackParamList = {
         telephone: string;
         cpf: string;
         password: string;
+        fromOng: boolean;
     }; 
   };

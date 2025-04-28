@@ -7,7 +7,7 @@ import { CustomInput } from '../Components/CustomInput';
 import { handleSignUp } from '../actions/userActions';
 
 export default function AddressScreen({ route, navigation }: any) {
-  const { name, email, telephone, cpf, password } = route.params || {};
+  const { name, email, telephone, cpf, password, fromOng } = route.params || {};
 
   if (!name || !email || !telephone || !cpf || !password) {
     Alert.alert('Error', 'Missing user information. Please go back and fill in all fields.');
@@ -29,7 +29,6 @@ export default function AddressScreen({ route, navigation }: any) {
 
   //const houseTypes = ['Casa', 'Apartamento', 'Comercial'];
 
-
   const handleRegister = async () => {
     if (!cep || !state || !city || !address || !number) {
       Alert.alert('Error', 'Please fill in all fields.');
@@ -45,10 +44,28 @@ export default function AddressScreen({ route, navigation }: any) {
     });
 
     if (success) {
-      navigation.navigate('UserHome'); 
+      navigation.navigate('UserHome');
     } else {
       Alert.alert('Error', 'Failed to register user.');
     }
+  };
+
+  const handleOngNext = () => {
+    navigation.navigate('ONGDetails', {
+      name,
+      email,
+      telephone,
+      cnpj: cpf, 
+      password,
+      pix: '',  
+      address: {
+        street: address,
+        number: parseInt(number, 10),
+        city,
+        state,
+        zipCode: cep,
+      },
+    });
   };
 
   return (
@@ -93,15 +110,27 @@ export default function AddressScreen({ route, navigation }: any) {
             </View> */}
           </ScrollView>
 
-          <CustomButton
-            title={'CADASTRAR'}
-            borderColor="transparent"
-            textColor={Theme.BACK}
-            color={Theme.TERTIARY}
-            onPress={handleRegister}
-            disabled={false}
-            buttonStyle={{ marginBottom: '5%', marginTop: '5%' }}
-          />
+          {fromOng ? (
+            <CustomButton
+              title={'SEGUINTE'}
+              borderColor="transparent"
+              textColor={Theme.BACK}
+              color={Theme.TERTIARY}
+              onPress={handleOngNext}
+              disabled={false}
+              buttonStyle={{ marginBottom: '5%', marginTop: '5%' }}
+            />
+          ) : (
+            <CustomButton
+              title={'CADASTRAR'}
+              borderColor="transparent"
+              textColor={Theme.BACK}
+              color={Theme.TERTIARY}
+              onPress={handleRegister}
+              disabled={false}
+              buttonStyle={{ marginBottom: '5%', marginTop: '5%' }}
+            />
+          )}
         </View>
       </View>
     </View>
