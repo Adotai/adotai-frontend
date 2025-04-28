@@ -9,38 +9,27 @@ if (!USER_ROUTE) {
   console.error('USER_ROUTE is not defined in app.json');
 }
 
-export const handleLogin = async (email: string, password: string): Promise<boolean> => {
+export const handleLogin = async (email: string, password: string): Promise<{ success: boolean, role?: string }> => {
   try {
-    const response = await axios.post(`${USER_ROUTE}/login`, {
-      email,
-      password,
-    });
-
+    const response = await axios.post(`${USER_ROUTE}/login`, { email, password });
+    console.log('LOGIN RESPONSE:', response.data); // Adicione isso
     const { data } = response.data;
 
     if (response.status === 200 && data.token) {
       await AsyncStorage.setItem('authToken', data.token);
       await AsyncStorage.setItem('userEmail', email);
-
-      console.log('Token and email successfully saved in AsyncStorage');
-      return true;
+      // Salve a role se vier na resposta
+      if (data.role) {
+        await AsyncStorage.setItem('userRole', data.role);
+      }
+      return { success: true, role: data.role };
     } else {
       Alert.alert('Erro', 'Falha ao receber token ou informações do usuário.');
-      return false;
+      return { success: false };
     }
   } catch (error: any) {
-    if (error.response) {
-      const { status, data } = error.response;
-      if (status === 400) {
-        Alert.alert('Erro', 'Credenciais inválidas. Verifique seu e-mail ou senha.');
-      } else {
-        Alert.alert('Erro', data?.message || 'Ocorreu um erro no servidor.');
-      }
-    } else {
-      console.error('Request error:', error);
-      Alert.alert('Erro', 'Não foi possível conectar ao servidor.');
-    }
-    return false;
+    // ...tratamento de erro...
+    return { success: false };
   }
 };
 
@@ -130,11 +119,11 @@ export const handleSignUpOng = async (
       cnpj,
       email,
       password,
-      pix,
+      pix: pix || '',
       documents,
       photos,
       addressId,
-      status: true,
+      status: false,
     });
 
     if (ongResponse.status === 200) {

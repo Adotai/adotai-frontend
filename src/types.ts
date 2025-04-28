@@ -12,4 +12,5 @@ export type RootStackParamList = {
         password: string;
         fromOng: boolean;
     }; 
+    AdminScreen: undefined;
   };

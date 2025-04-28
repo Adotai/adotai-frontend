@@ -21,6 +21,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SplashScreen from 'expo-splash-screen';
 import ONGDetailsScreen from './src/Screens/ONG/ONGDetailsScreen';
 import ONGHomeScreen from './src/Screens/ONG/ONGHomeScreen';
+import AdminAcceptScreen from './src/Screens/Admin/AdminAcceptScreen';
 
 
 const Stack = createStackNavigator();
@@ -190,6 +191,16 @@ export default function App() {
             <Stack.Screen
               name="ONGHome"
               component={ONGHomeScreen}
+              options={{
+                headerShown: true,
+                headerTransparent: true,
+                headerTitle: '',
+                headerTintColor: '#FFFFFF',
+              }}
+            />
+            <Stack.Screen
+              name="AdminScreen"
+              component={AdminAcceptScreen}
               options={{
                 headerShown: true,
                 headerTransparent: true,

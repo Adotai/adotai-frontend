@@ -20,9 +20,13 @@ export default function SignInScreen() {
       return;
     }
 
-    const success = await handleLogin(email, password); // Call the login function
-    if (success) {
-      navigation.navigate('UserHome'); // Navigate to UserHomeScreen on success
+    const result = await handleLogin(email, password); // result deve ser { success, role }
+    if (result.success) {
+      if (result.role === 'admin') {
+        navigation.navigate('AdminScreen'); // ou o nome exato da rota na sua stack
+      } else {
+        navigation.navigate('UserHome');
+      }
     }
   };
 
