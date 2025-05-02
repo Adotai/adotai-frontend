@@ -13,4 +13,7 @@ export type RootStackParamList = {
         fromOng: boolean;
     }; 
     AdminScreen: undefined;
+    ONGInfos: {
+        ong: object
+    }
   };

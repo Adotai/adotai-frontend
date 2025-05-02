@@ -144,3 +144,46 @@ export const handleSignUpOng = async (
     return false;
   }
 };
+
+export const fetchOngs = async (): Promise<any[]> => {
+  try {
+    const token = await AsyncStorage.getItem('authToken');
+    const response = await axios.get(`${USER_ROUTE}/ongs`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data.data || [];
+  } catch (error) {
+    console.error('Erro ao buscar ONGs:', error);
+    throw error;
+  }
+};
+
+// Aceitar ONG (mudar status para true)
+export const acceptOng = async (id: number): Promise<boolean> => {
+  try {
+    const token = await AsyncStorage.getItem('authToken');
+    await axios.patch(`${USER_ROUTE}/ongs/${id}/status`, { status: true }, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return true;
+  } catch (error) {
+    console.error('Erro ao aceitar ONG:', error);
+    return false;
+  }
+};
+
+// Deletar ONG
+export const deleteOng = async (id: number): Promise<boolean> => {
+  try {
+    const token = await AsyncStorage.getItem('authToken');
+    await axios.delete(`${USER_ROUTE}/ongs/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return true;
+  } catch (error) {
+    console.error('Erro ao deletar ONG:', error);
+    return false;
+  }
+};
