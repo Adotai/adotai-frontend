@@ -72,6 +72,7 @@ function UserHomeScreen() {
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = React.useState(false);
+  const [userRole, setUserRole] = React.useState<string | null>(null);
   const [fontsLoaded, error] = useFonts({
     'Poppins-Bold': require('./assets/fonts/Poppins-Bold.ttf'),
     'Poppins-Regular': require('./assets/fonts/Poppins-Regular.ttf'),
@@ -80,22 +81,32 @@ export default function App() {
   });
 
   useEffect(() => {
-    const checkToken = async () => {
+    const checkTokenAndRole = async () => {
       const token = await AsyncStorage.getItem('authToken');
+      const role = await AsyncStorage.getItem('userRole');
       setIsAuthenticated(!!token);
+      setUserRole(role);
     };
-    checkToken();
+    checkTokenAndRole();
     if (fontsLoaded || error) SplashScreen.hideAsync();
   }, [fontsLoaded, error]);
 
   if (!fontsLoaded && !error) return null;
+
+  // Defina a tela inicial conforme a role
+  let initialRoute = "Onboarding";
+  if (isAuthenticated) {
+    if (userRole === "admin") initialRoute = "AdminScreen";
+    else if (userRole === "ong") initialRoute = "ONGHome";
+    else initialRoute = "UserHome";
+  }
 
   return (
     <SafeAreaProvider>
       <NavigationContainer>
         <StatusBar hidden={false} translucent backgroundColor="transparent" />
         <SafeAreaView style={styles.safeArea}>
-          <Stack.Navigator initialRouteName={isAuthenticated ? "UserHome" : "Onboarding"}>
+          <Stack.Navigator initialRouteName={initialRoute}>
             <Stack.Screen
               name="Onboarding"
               component={OnboardingScreen}
@@ -164,9 +175,9 @@ export default function App() {
               component={UserONGScreen}
               options={{
                 headerShown: true,
-                headerTransparent: true,
-                headerTitle: '',
-                headerTintColor: '#FFFFFF',
+                headerTintColor: Theme.PRIMARY,
+                headerLeft: () => null,
+                gestureEnabled: false,  
               }}
             />
             <Stack.Screen
@@ -204,9 +215,9 @@ export default function App() {
               component={AdminAcceptScreen}
               options={{
                 headerShown: true,
-                headerTransparent: true,
-                headerTitle: '',
-                headerTintColor: '#FFFFFF',
+                headerTintColor: Theme.PRIMARY,
+                headerLeft: () => null,
+                gestureEnabled: false,  
               }}
             />
             <Stack.Screen

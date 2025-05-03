@@ -16,4 +16,5 @@ export type RootStackParamList = {
     ONGInfos: {
         ong: object
     }
+    ONGHome: undefined;
   };

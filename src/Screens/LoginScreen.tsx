@@ -23,7 +23,9 @@ export default function SignInScreen() {
     const result = await handleLogin(email, password); // result deve ser { success, role }
     if (result.success) {
       if (result.role === 'admin') {
-        navigation.navigate('AdminScreen'); // ou o nome exato da rota na sua stack
+        navigation.navigate('AdminScreen');
+      } else if (result.role === 'ong') {
+        navigation.navigate('ONGHome');
       } else {
         navigation.navigate('UserHome');
       }

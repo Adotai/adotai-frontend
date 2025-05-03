@@ -10,13 +10,16 @@ export default function OngCard({ ong, onPress }: { ong: any; onPress: () => voi
     return (
         <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.8}>
             {firstPhoto ? (
-                <View style={{ width: '30%', height: 100 }}>
+                <View style={{ width: '30%', height: 120 }}>
                     <Image source={{ uri: firstPhoto }} style={styles.image} />
                 </View>
             ) : (
                 <View style={styles.placeholder}><Text style={{color: '#888'}}>Sem foto</Text></View>
             )}
-            <Text style={styles.name}>{ong.name}</Text>
+            <View style={{marginLeft: '5%',justifyContent: 'center', alignItems: 'flex-start'}}>
+                <Text style={styles.name}>{ong.name}</Text>
+                <Text style={styles.city}>{ong.address.city}, {ong.address.state}</Text>
+            </View>
         </TouchableOpacity>
     );
 }
@@ -29,28 +32,33 @@ const styles = StyleSheet.create({
         marginBottom: 16,
         borderRadius: 10,
         overflow: 'hidden',
-        backgroundColor: '#eee',
+        backgroundColor: '#f8f8f8',
         elevation: 2,
     },
     image: {
         width: '100%',
         height: '100%',
-        borderRadius: 10,
+        borderTopLeftRadius: 12,
+        borderBottomLeftRadius: 12,
     },
     placeholder: {
         width: '30%', 
-        height: 100 ,
+        height: 120 ,
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: Theme.INPUT,
-        borderRadius: 10,
+        borderTopLeftRadius: 12,
+        borderBottomLeftRadius: 12
         
     },
     name: {
         fontSize: 18,
-        fontWeight: 'bold',
-        width: '40%',
-        marginLeft: '2%'
+        fontFamily: 'Poppins-Bold',
     },
+    city:{
+        fontFamily: 'Poppins-SemiBold',
+        color: Theme.TERTIARY,
+        fontSize: 16,
+    }
 
 });
