@@ -23,7 +23,7 @@ import ONGDetailsScreen from './src/Screens/ONG/ONGDetailsScreen';
 import ONGHomeScreen from './src/Screens/ONG/ONGHomeScreen';
 import AdminAcceptScreen from './src/Screens/Admin/AdminAcceptScreen';
 import ONGInfosScreen from './src/Screens/Admin/ONGlnfosScreen';
-
+import ONGCreateAnimalsScreen from './src/Screens/ONG/ONGCreateAnimalsScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -41,7 +41,7 @@ function UserHomeScreen() {
               case 'Animais':
                 return 'paw-outline';
               case 'Profile':
-                return 'person-outline';
+                return 'person-circle-outline';
               case 'ONGs':
                 return 'globe-outline';
               default:
@@ -54,11 +54,7 @@ function UserHomeScreen() {
         tabBarInactiveTintColor: 'gray',
         tabBarBackgroundColor: Theme.PRIMARY,
         tabBarLabelStyle: {
-          fontSize: 14,
-          fontFamily: 'Poppins-Bold',
-        },
-        tabBarStyle: {
-          height: 60,
+          fontFamily: 'Poppins-SemiBold',
         },
         headerShown: false,
       })}
@@ -208,6 +204,17 @@ export default function App() {
                 headerTransparent: true,
                 headerTitle: '',
                 headerTintColor: '#FFFFFF',
+              }}
+            />
+            <Stack.Screen
+              name="CreateAnimal"
+              component={ONGCreateAnimalsScreen}
+              options={{
+                headerShown: true,
+                headerTitle: 'Cadastrar Animal',
+                headerTintColor: '#AD334A',
+                headerTitleAlign: 'center',
+                headerTransparent: false,
               }}
             />
             <Stack.Screen
