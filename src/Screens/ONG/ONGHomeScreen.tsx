@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import ONGProfileScreen from './ONGProfileScreen';
 import ONGAnimalsScreen from './ONGAnimalsScreen';
+import { Theme } from '../../../constants/Themes';
 
 // Tela fictícia para pessoas interessadas
 function InterestedPeopleScreen() {
@@ -21,15 +22,30 @@ export default function ONGHomeScreen() {
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarIcon: ({ color, size }) => {
-          let iconName: keyof typeof Ionicons.glyphMap = 'help-circle-outline';
-          if (route.name === 'Interessados') iconName = 'people-outline';
-          else if (route.name === 'Animais') iconName = 'paw-outline';
-          else if (route.name === 'Perfil') iconName = 'person-circle-outline';
-          return <Ionicons name={iconName} size={size} color={color} />;
+          const iconName = (() => {
+            switch (route.name) {
+              case 'Interessados':
+                return 'people-outline';
+              case 'Animais':
+                return 'paw-outline';
+              case 'Perfil':
+                return 'person-circle-outline';
+              default:
+                return 'help-circle-outline';
+            }
+        })();
+         return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: '#AD334A',
+        tabBarActiveTintColor: Theme.PRIMARY,
         tabBarInactiveTintColor: 'gray',
         headerShown: false,
+        tabBarLabelStyle: {
+          fontSize: 14,
+          fontFamily: 'Poppins-SemiBold',
+        },
+        tabBarStyle: {
+          height: 60,
+        },
       })}
     >
       <Tab.Screen

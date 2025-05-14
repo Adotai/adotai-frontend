@@ -18,4 +18,7 @@ export type RootStackParamList = {
     }
     ONGHome: undefined;
     CreateAnimal: undefined;
+    UserONGDetail: {
+        ong: object
+    };
   };

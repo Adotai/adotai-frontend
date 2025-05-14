@@ -10,7 +10,7 @@ import OnboardingScreen from './src/Screens/OnboardingScreen';
 import SignInScreen from './src/Screens/LoginScreen';
 import UserSignUpScreen from './src/Screens/User/UserSignUpScreen';
 import ONGSignUpScreen from './src/Screens/ONG/ONGSignUpScreen';
-//import UserHomeScreen from './src/Screens/User/UserHomeScreen'; 
+import UserHomeScreen from './src/Screens/User/UserHomeScreen'; 
 import { Theme } from './constants/Themes';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import AddressScreen from './src/Screens/AddressScreen';
@@ -24,47 +24,13 @@ import ONGHomeScreen from './src/Screens/ONG/ONGHomeScreen';
 import AdminAcceptScreen from './src/Screens/Admin/AdminAcceptScreen';
 import ONGInfosScreen from './src/Screens/Admin/ONGlnfosScreen';
 import ONGCreateAnimalsScreen from './src/Screens/ONG/ONGCreateAnimalsScreen';
+import UserONGDetailScreen from './src/Screens/User/UserONGDetailScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
 SplashScreen.preventAutoHideAsync();
 
-
-function UserHomeScreen() {
-  return (
-    <Tab.Navigator
-      screenOptions={({ route }) => ({
-        tabBarIcon: ({ color, size }) => {
-          const iconName = (() => {
-            switch (route.name) {
-              case 'Animais':
-                return 'paw-outline';
-              case 'Profile':
-                return 'person-circle-outline';
-              case 'ONGs':
-                return 'globe-outline';
-              default:
-                return 'help-circle-outline';
-            }
-          })();
-          return <Ionicons name={iconName} size={size} color={color} />;
-        },
-        tabBarActiveTintColor: Theme.PRIMARY,
-        tabBarInactiveTintColor: 'gray',
-        tabBarBackgroundColor: Theme.PRIMARY,
-        tabBarLabelStyle: {
-          fontFamily: 'Poppins-SemiBold',
-        },
-        headerShown: false,
-      })}
-    >
-      <Tab.Screen name="ONGs" component={UserONGScreen} />
-      <Tab.Screen name="Animais" component={UserAnimalsScreen} />
-      <Tab.Screen name="Profile" component={UserProfileScreen} />
-    </Tab.Navigator>
-  );
-}
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = React.useState(false);
@@ -230,6 +196,16 @@ export default function App() {
             <Stack.Screen
               name="ONGInfos"
               component={ONGInfosScreen}
+              options={{
+                headerShown: true,
+                headerTransparent: true,
+                headerTitle: '',
+                headerTintColor: '#FFFFFF',
+              }}
+            />
+            <Stack.Screen
+              name="UserONGDetail"
+              component={UserONGDetailScreen}
               options={{
                 headerShown: true,
                 headerTransparent: true,

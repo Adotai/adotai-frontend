@@ -22,6 +22,10 @@ export const handleLogin = async (email: string, password: string): Promise<{ su
       if (data.role) {
         await AsyncStorage.setItem('userRole', data.role);
       }
+      // Salva o id da ONG se vier na resposta
+      if (data.ongId) {
+        await AsyncStorage.setItem('ongId', String(data.ongId));
+      }
       return { success: true, role: data.role };
     } else {
       Alert.alert('Erro', 'Falha ao receber token ou informações do usuário.');
@@ -128,6 +132,7 @@ export const handleSignUpOng = async (
 
     if (ongResponse.status === 200) {
       Alert.alert('Sucesso', 'ONG cadastrada com sucesso!');
+      await AsyncStorage.setItem('ongId', String(ongResponse.data.data.id));
       return true;
     } else {
       Alert.alert('Erro', 'Falha ao cadastrar ONG.');
@@ -185,5 +190,72 @@ export const deleteOng = async (id: number): Promise<boolean> => {
   } catch (error) {
     console.error('Erro ao deletar ONG:', error);
     return false;
+  }
+};
+
+export const createAnimal = async (animal: {
+  ongId: number;
+  name: string;
+  gender: string;
+  color: { name: string };
+  breed: { name: string; speciesDescription: string };
+  species: { description: string };
+  age: number;
+  health: string;
+  status: boolean;
+  vaccinated: boolean;
+  neutered: boolean;
+  dewormed: boolean;
+  temperament: string;
+}) => {
+  try {
+    const token = await AsyncStorage.getItem('authToken');
+    const id = await AsyncStorage.getItem('ongId');
+    console.log('ongId salvo:', id);
+    const response = await axios.post(`${USER_ROUTE.replace('/ongs', '')}/animal`, animal, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+    return response.data;
+  } catch (error: any) {
+    if (error.response) {
+      Alert.alert('Erro', error.response.data?.message || 'Erro ao criar animal.');
+    } else {
+      Alert.alert('Erro', 'Não foi possível conectar ao servidor.');
+    }
+    throw error;
+  }
+};
+
+export const getLoggedOngId = async (): Promise<number | null> => {
+  try {
+    const email = await AsyncStorage.getItem('userEmail');
+    if (!email) return null;
+
+    const token = await AsyncStorage.getItem('authToken');
+    const response = await axios.get(`${USER_ROUTE}/ongs`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const ongs = response.data.data;
+    const ong = ongs.find((o: any) => o.email === email);
+    return ong ? ong.id : null;
+  } catch (error) {
+    console.error('Erro ao buscar id da ONG logada:', error);
+    return null;
+  }
+};
+
+export const fetchAnimals = async (): Promise<any[]> => {
+  try {
+    const token = await AsyncStorage.getItem('authToken');
+    const response = await axios.get(`${USER_ROUTE}/animal`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data.data || [];
+  } catch (error) {
+    console.error('Erro ao buscar animais:', error);
+    return [];
   }
 };

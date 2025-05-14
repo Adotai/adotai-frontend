@@ -3,10 +3,16 @@ import { FlatList, RefreshControl, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { fetchOngs } from '../../actions/userActions';
 import OngCard from '../../Components/OngCard';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '../../types';
+
+type UserONGScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 
 export default function UserONGScreen() {
   const [ongs, setOngs] = useState<any[]>([]);
   const [refreshing, setRefreshing] = useState(false);
+  const navigation = useNavigation<UserONGScreenNavigationProp>();
 
   const loadOngs = async () => {
     try {
@@ -42,7 +48,7 @@ export default function UserONGScreen() {
         data={ongs}
         keyExtractor={ong => ong.id?.toString() || Math.random().toString()}
         renderItem={({ item: ong }) => (
-          <OngCard ong={ong} onPress={() => {}} />
+          <OngCard ong={ong} onPress={() => navigation.navigate('UserONGDetail', { ong })} />
         )}
         contentContainerStyle={{ paddingBottom: 20 }}
         refreshControl={

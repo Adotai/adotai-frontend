@@ -50,8 +50,8 @@ const styles = StyleSheet.create({
     buttonText: {
         textAlign:'center',
         textAlignVertical: 'center',
-        fontSize: 24,
-        fontFamily: "Poppins-Bold",
+        fontSize: 20,
+        fontFamily: "Poppins-SemiBold",
     },
     disabledButton: {
         opacity: 0.5,
