@@ -1,5 +1,6 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, GestureResponderEvent, TextStyle, ViewStyle } from 'react-native';
+import { Theme } from '../../constants/Themes';
 
 interface CustomButtonProps {
     onPress: (event: GestureResponderEvent) => void;
@@ -17,7 +18,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
     title,
     color = '#2196F3',
     textColor = 'white',
-    borderColor = 'white',
+    borderColor = Theme.PRIMARY,
     disabled = false, // Definindo valor padrão como false
     textStyle,
     buttonStyle, // Novo: Permitir estilo customizado para o botão
@@ -50,7 +51,7 @@ const styles = StyleSheet.create({
     buttonText: {
         textAlign:'center',
         textAlignVertical: 'center',
-        fontSize: 20,
+        fontSize: 18,
         fontFamily: "Poppins-SemiBold",
     },
     disabledButton: {

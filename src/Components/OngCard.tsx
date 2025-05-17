@@ -1,7 +1,9 @@
 import React from 'react';
-import { TouchableOpacity, Image, Text, View, StyleSheet, Pressable } from 'react-native';
+import { TouchableOpacity, Image, Text, View, StyleSheet, Pressable, Dimensions } from 'react-native';
 import { Theme } from '../../constants/Themes';
+import { Ionicons } from '@expo/vector-icons';
 
+const { width, height } = Dimensions.get('window');
 
 
 export default function OngCard({ ong, onPress }: { ong: any; onPress: () => void }) {
@@ -10,15 +12,21 @@ export default function OngCard({ ong, onPress }: { ong: any; onPress: () => voi
     return (
         <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.8}>
             {firstPhoto ? (
-                <View style={{ width: '30%', height: 120 }}>
                     <Image source={{ uri: firstPhoto }} style={styles.image} />
-                </View>
             ) : (
-                <View style={styles.placeholder}><Text style={{color: '#888'}}>Sem foto</Text></View>
+                <View style={styles.placeholder}>
+                    <Text style={{color: '#888'}}>Sem foto</Text>
+                </View>
             )}
-            <View style={{marginLeft: '5%',justifyContent: 'center', alignItems: 'flex-start'}}>
+            <View style={{flexDirection: 'row', alignItems: 'center' , justifyContent: 'space-between', width:'100%'}}>
+            <View style={{ padding: 16, alignSelf: 'flex-start'}}>
                 <Text style={styles.name}>{ong.name}</Text>
+                <Text numberOfLines={2} style={styles.description}>dasdadsadasdsadasdasdasdasd{ong.description}</Text>
                 <Text style={styles.city}>{ong.address.city}, {ong.address.state}</Text>
+            </View>
+            <TouchableOpacity style={{ padding: 12 }}>
+                <Ionicons name="chevron-forward" size={28} color={Theme.PRIMARY} />
+            </TouchableOpacity>
             </View>
         </TouchableOpacity>
     );
@@ -27,38 +35,42 @@ export default function OngCard({ ong, onPress }: { ong: any; onPress: () => voi
 const styles = StyleSheet.create({
     card: {
         flex: 1,
-        flexDirection: 'row',
         alignItems: 'center',
         marginBottom: 16,
         borderRadius: 10,
         overflow: 'hidden',
         backgroundColor: '#f8f8f8',
         elevation: 2,
+        width: '100%',
     },
     image: {
         width: '100%',
-        height: '100%',
-        borderTopLeftRadius: 12,
-        borderBottomLeftRadius: 12,
+        height: height * 0.18,
+        borderRadius: 10
+
     },
     placeholder: {
-        width: '30%', 
-        height: 120 ,
+        width: '100%',
+        height: height * 0.18,
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: Theme.INPUT,
-        borderTopLeftRadius: 12,
-        borderBottomLeftRadius: 12
+        borderRadius: 10
         
     },
     name: {
         fontSize: 18,
-        fontFamily: 'Poppins-Bold',
+        fontFamily: 'Poppins-SemiBold',
     },
     city:{
-        fontFamily: 'Poppins-SemiBold',
-        color: Theme.TERTIARY,
+        fontFamily: 'Poppins-Regular',
         fontSize: 16,
-    }
+    },
+    description: {
+        fontFamily: 'Poppins-Regular',
+        fontSize: 14,
+        color: '#888',
+        width: width * 0.47,
+    },
 
 });

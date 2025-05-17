@@ -1,10 +1,24 @@
-import { StyleSheet, Text, View, Image, ScrollView, Alert } from 'react-native';
+import { StyleSheet, Text, View, Image, ScrollView, Alert, Dimensions } from 'react-native';
 import React from 'react';
 import { Picker } from '@react-native-picker/picker';
 import CustomButton from '../Components/CustomButton';
 import { Theme } from '../../constants/Themes';
-import { CustomInput } from '../Components/CustomInput';
+import { TextInput } from 'react-native-paper'; // Troque CustomInput por TextInput do paper
 import { handleSignUp } from '../actions/userActions';
+
+
+const { width, height } = Dimensions.get('window');
+
+const inputTheme = {
+  colors: {
+    primary: Theme.PRIMARY,
+    text: '#222',
+    placeholder: Theme.PRIMARY,
+    background: '#fff',
+    outline: '#ccc'
+  },
+  roundness: 10,
+};
 
 export default function AddressScreen({ route, navigation }: any) {
   const { name, email, telephone, cpf, password, fromOng } = route.params || {};
@@ -26,8 +40,6 @@ export default function AddressScreen({ route, navigation }: any) {
     'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ',
     'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'
   ];
-
-  //const houseTypes = ['Casa', 'Apartamento', 'Comercial'];
 
   const handleRegister = async () => {
     if (!cep || !state || !city || !address || !number) {
@@ -75,10 +87,17 @@ export default function AddressScreen({ route, navigation }: any) {
       <View style={styles.overlay}>
         <View style={styles.formContainer}>
           <Text style={styles.loginText}>Detalhes de Endereço</Text>
-          <ScrollView contentContainerStyle={{ flexGrow: 1, width: '100%' }} keyboardShouldPersistTaps="handled">
-            <CustomInput label="CEP" value={cep} onChange={setCep} />
+          <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
+            <TextInput
+              label="CEP"
+              mode="outlined"
+              value={cep}
+              onChangeText={setCep}
+              style={styles.input}
+              theme={inputTheme}
+              keyboardType="numeric"
+            />
 
-            <Text style={styles.label}>Estado</Text>
             <View style={styles.pickerContainer}>
               <Picker
                 selectedValue={state}
@@ -92,45 +111,42 @@ export default function AddressScreen({ route, navigation }: any) {
               </Picker>
             </View>
 
-            <CustomInput label="Cidade" value={city} onChange={setCity} />
-            <CustomInput label="Endereço" value={address} onChange={setAddress} />
-            <CustomInput label="Número" value={number} onChange={setNumber} />
-            {/* <Text style={styles.label}>Tipo de imóvel</Text>
-            <View style={styles.pickerContainer}>
-              <Picker
-                selectedValue={houseType}
-                onValueChange={(itemValue) => setHouseType(itemValue)}
-                style={styles.picker}
-              >
-                <Picker.Item label="Selecione o tipo de imóvel" value="" />
-                {houseTypes.map((type) => (
-                  <Picker.Item key={type} label={type} value={type} />
-                ))}
-              </Picker>
-            </View> */}
+            <TextInput
+              label="Cidade"
+              mode="outlined"
+              value={city}
+              onChangeText={setCity}
+              style={styles.input}
+              theme={inputTheme}
+            />
+            <TextInput
+              label="Endereço"
+              mode="outlined"
+              value={address}
+              onChangeText={setAddress}
+              style={styles.input}
+              theme={inputTheme}
+            />
+            <TextInput
+              label="Número"
+              mode="outlined"
+              value={number}
+              onChangeText={setNumber}
+              style={styles.input}
+              theme={inputTheme}
+              keyboardType="numeric"
+            />
           </ScrollView>
 
-          {fromOng ? (
             <CustomButton
-              title={'SEGUINTE'}
-              borderColor="transparent"
-              textColor={Theme.BACK}
-              color={Theme.TERTIARY}
-              onPress={handleOngNext}
-              disabled={false}
-              buttonStyle={{ marginBottom: '5%', marginTop: '5%' }}
+            title={fromOng ? 'Seguinte' : 'Cadastrar'}
+            borderColor="transparent"
+            textColor={Theme.BACK}
+            color={Theme.PRIMARY}
+            onPress={fromOng ? handleOngNext : handleRegister}
+            disabled={false}
+            buttonStyle={{ marginBottom: '5%', marginTop: '5%', width: width * 0.85, alignSelf: 'center' }}
             />
-          ) : (
-            <CustomButton
-              title={'CADASTRAR'}
-              borderColor="transparent"
-              textColor={Theme.BACK}
-              color={Theme.TERTIARY}
-              onPress={handleRegister}
-              disabled={false}
-              buttonStyle={{ marginBottom: '5%', marginTop: '5%' }}
-            />
-          )}
         </View>
       </View>
     </View>
@@ -163,6 +179,8 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
     borderTopLeftRadius: 20,
     bottom: 0,
+    paddingTop: 20,
+    paddingBottom: 20,
   },
   loginText: {
     fontSize: 24,
@@ -175,7 +193,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: Theme.PRIMARY,
     fontFamily: 'Poppins-Bold',
-      },
+  },
   pickerContainer: {
     borderWidth: 2,
     borderColor: Theme.INPUT,
@@ -184,7 +202,14 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   picker: {
-    height: 50,
+    height: height * 0.06,
     width: '100%',
+  },
+  input: {
+    marginBottom: 12,
+    width: width * 0.85,
+    backgroundColor: '#fff',
+    alignSelf: 'center',
+    borderRadius: 10,
   },
 });

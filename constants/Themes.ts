@@ -1,5 +1,5 @@
 const COLORS = {
-    PRIMARY: "#AD334A",
+    PRIMARY: "#D13D50",
   
     SECONDARY: "#EDE1E2",
   
@@ -12,6 +12,8 @@ const COLORS = {
     BACK: '#FCFCFC',
   
     TEXT_FONT: "#000000",
+
+    GREY: "#EAEAEC"
 
   };
   

@@ -4,13 +4,13 @@
     "slug": "adotai-frontend",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/adotai-logo.png",
+    "icon": "./assets/images/adotai-logo-png.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/images/adotai-logo.png",
+      "image": "./assets/images/adotai-logo-png.png",
       "resizeMode": "contain",
-      "backgroundColor": "#AD334A"
+      "backgroundColor": "#D13D50"
     },
     "ios": {
       "supportsTablet": true,
@@ -18,8 +18,8 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adotai-logo.png",
-        "backgroundColor": "#AD334A"
+        "foregroundImage": "./assets/images/adotai-logo-png.png",
+        "backgroundColor": "#D13D50"
       },
       "package": "com.adotai.mobile"           
     },

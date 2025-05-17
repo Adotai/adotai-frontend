@@ -25,38 +25,52 @@ const OnboardingScreen = () => {
       <StatusBar translucent backgroundColor="transparent" barStyle="light-content" />
 
       <Image style={styles.background} source={require('../../assets/images/background-home.png')} />
+      <Image style={styles.logo} source={require('../../assets/images/adotai-logo-png.png')} />
+      <Text style={styles.text}>Juntos podemos dar uma nova chance aos animais.</Text>
 
-      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-        <Image style={styles.logo} source={require('../../assets/images/adotai-logo-png.png')} />
+      <View style={styles.overlay}>
+        <View style={styles.overlay}>
+          <View style={styles.formContainer}>
+            <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+            <View>
+              <Text style={styles.text2}>Já é um adotante?</Text>
+              <CustomButton
+                title="Entrar"
+                color={Theme.PRIMARY}
+                textColor={Theme.BACK}
+                onPress={() => navigation.navigate('SignIn')}
+                buttonStyle={{marginBottom: '5%', width: width * 0.85}}
+                borderColor="transparent"
+              />
+            </View>
+            <View>
+              <Text style={styles.text2}>É novo por aqui?</Text>
+              <CustomButton
+                title="Cadastrar"
+                borderColor='transparent'
+                color={Theme.GREY}
+                textColor={Theme.PRIMARY}	
+                onPress={() => navigation.navigate('UserSignUp')}
+                buttonStyle={{marginBottom: '5%', width: width * 0.85}}
+                
+              />
+            </View>
+            <View>
+              <Text style={styles.text2}>É uma ONG interessada?</Text>
+              <CustomButton
+                title="Cadastro de ONG"
+                color={'transparent'}
+                borderColor={Theme.PRIMARY}
+                textColor={Theme.PRIMARY}
+                buttonStyle={{marginBottom: '5%', width: width * 0.85}}
+                onPress={() => navigation.navigate('ONGSignUp')}
+              />
+            </View>
+            </ScrollView>
+          </View>
+        </View>
+      </View>
 
-        <Text style={styles.text}>Juntos podemos dar uma nova chance aos animais.</Text>
-
-        <Text style={styles.text2}>Já possui cadastro?</Text>
-        <CustomButton
-          title="ENTRAR"
-          color={Theme.SECONDARY}
-          textColor={Theme.PRIMARY}
-          onPress={() => navigation.navigate('SignIn')}
-          borderColor="transparent"
-        />
-
-        <Text style={styles.text2}>Ainda não é um adotante?</Text>
-        <CustomButton
-          title="CADASTRAR"
-          color={Theme.TERTIARY}
-          textColor={Theme.SECONDARY}
-          onPress={() => navigation.navigate('UserSignUp')}
-          borderColor="transparent"
-        />
-
-        <Text style={styles.text2}>É uma ONG interessada?</Text>
-        <CustomButton
-          title="CADASTRO DE ONG"
-          color="transparent"
-          textColor={Theme.SECONDARY}
-          onPress={() => navigation.navigate('ONGSignUp')}
-        />
-      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -65,6 +79,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Theme.PRIMARY,
+    alignItems: 'center',
+
   },
   background: {
     position: 'absolute',
@@ -74,28 +90,42 @@ const styles = StyleSheet.create({
   content: {
     flexGrow: 1,
     justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingBottom: 40,
+    alignItems: 'center'
   },
   logo: {
-    height: height * 0.3,
-    width: width * 0.6,
-    marginBottom: 20,
+    height: height * 0.2,
+    width: width * 0.5,
+    marginTop: height * 0.1,
+    marginBottom: height * 0.05,
   },
   text: {
-    fontFamily: 'Poppins-Bold',
-    fontSize: 24,
-    color: Theme.SECONDARY,
+    fontFamily: 'Poppins-Regular',
+    fontSize: 16,
+    color: 'white',
     textAlign: 'center',
     marginTop: 20,
+    padding: 32
   },
   text2: {
-    fontFamily: 'Poppins-Bold',
-    color: Theme.SECONDARY,
-    fontSize: 16,
-    paddingVertical: 10,
-    textAlign: 'center',
+    fontFamily: 'Poppins-Regular',
+    color: Theme.PRIMARY,
+    fontSize: 12,
+  },
+  overlay: {
+    flex: 1,
+    width: '100%',
+    bottom: 0,
+    position: 'absolute',
+    justifyContent: 'flex-end',
+  },
+  formContainer: {
+    width: '100%',
+    backgroundColor: 'white',
+    alignItems: 'center',
+    borderTopRightRadius: 20,
+    borderTopLeftRadius: 20,
+    paddingBottom: 24,
+    paddingTop: 24,
   },
 });
 

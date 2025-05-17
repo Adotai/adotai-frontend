@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image, Alert } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image, Alert, Dimensions } from 'react-native';
 import React, { useState } from 'react';
 import { Picker } from '@react-native-picker/picker';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -8,8 +8,10 @@ import * as ImagePicker from 'expo-image-picker';
 import CustomButton from '../../Components/CustomButton';
 import { Ionicons } from '@expo/vector-icons';
 import { uploadFileToStorage } from '../../services/uploadFileToStorage';
-import { CustomInput } from '../../Components/CustomInput';
-import { handleSignUpOng } from '../../actions/userActions'; // IMPORTANTE: importar aqui
+import { TextInput } from 'react-native-paper'; // Troque CustomInput por TextInput do paper
+import { handleSignUpOng } from '../../actions/userActions';
+
+const { width, height } = Dimensions.get('window');
 
 function FileUploadInput({ label, file, setFile }: { label: string, file: any, setFile: (file: any) => void }) {
   const handlePickFile = async () => {
@@ -64,7 +66,7 @@ function ImageUploadInput({ label, images, setImages }: { label: string, images:
     <View>
       <Text style={styles.label}>{label}</Text>
       <TouchableOpacity style={styles.uploadContainer} onPress={handlePickImage} disabled={images.length >= 3}>
-        <View style={[styles.uploadBox, { height: 200, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap' }]}>
+        <View style={[styles.uploadBox, { height: height * 0.1, flexDirection: 'row', alignContent:'center', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap' }]}>
           {images.length === 0 ? (
             <Text style={styles.uploadText}>Selecionar fotos</Text>
           ) : (
@@ -86,7 +88,6 @@ function ImageUploadInput({ label, images, setImages }: { label: string, images:
   );
 }
 
-// --- TELA PRINCIPAL ---
 const animalTypes = ['Cães', 'Gatos', 'Cães e Gatos', 'Outros'];
 
 export default function ONGDetailsScreen({ route, navigation }: any) {
@@ -172,11 +173,18 @@ export default function ONGDetailsScreen({ route, navigation }: any) {
       <View style={styles.overlay}>
         <View style={styles.formContainer}>
           <Text style={styles.loginText}>Detalhes da ONG</Text>
-          <ScrollView contentContainerStyle={{ flexGrow: 1, width: '100%' }} keyboardShouldPersistTaps="handled">
+          <ScrollView contentContainerStyle={{ flexGrow: 1}} keyboardShouldPersistTaps="handled">
 
-            <CustomInput label="Chave PIX" value={pix} onChange={setPix} />
+            <TextInput
+              label="Chave PIX"
+              mode="outlined"
+              value={pix}
+              onChangeText={setPix}
+              style={styles.input}
+              theme={inputTheme}
+              autoCapitalize="none"
+            />
 
-            <Text style={styles.label}>Tipo de animais</Text>
             <View style={styles.pickerContainer}>
               <Picker
                 selectedValue={animalType}
@@ -195,13 +203,13 @@ export default function ONGDetailsScreen({ route, navigation }: any) {
             <ImageUploadInput label="Fotos do Local (até 3 fotos)" images={localImages} setImages={setLocalImages} />
 
             <CustomButton
-              title={'CADASTRAR'}
+              title={'Cadastrar'}
               borderColor="transparent"
               textColor={Theme.BACK}
-              color={Theme.TERTIARY}
+              color={Theme.PRIMARY}
               onPress={handleSubmit}
               disabled={false}
-              buttonStyle={{ marginBottom: '5%', marginTop: '5%' }}
+              buttonStyle={{ marginBottom: '5%', marginTop: '5%', width: width * 0.85 }}
             />
           </ScrollView>
         </View>
@@ -209,6 +217,17 @@ export default function ONGDetailsScreen({ route, navigation }: any) {
     </View>
   );
 }
+
+const inputTheme = {
+  colors: {
+    primary: Theme.PRIMARY,
+    text: '#222',
+    placeholder: Theme.PRIMARY,
+    background: '#fff',
+    outline: '#ccc'
+  },
+  roundness: 10,
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -245,9 +264,9 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   label: {
-    fontSize: 18,
+    fontSize: 13,
     color: Theme.PRIMARY,
-    fontFamily: 'Poppins-Bold',
+    fontFamily: 'Poppins-Regular',
     alignSelf: 'flex-start',
   },
   pickerContainer: {
@@ -257,10 +276,9 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     backgroundColor: 'white',
     width: 350,
-    overflow: 'hidden',
   },
   picker: {
-    height: 50,
+    height: height * 0.06,
     width: '100%',
   },
   uploadContainer: {
@@ -272,7 +290,6 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderRadius: 10,
     borderColor: Theme.INPUT,
-    backgroundColor: '#F7F7F7',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -286,5 +303,11 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     resizeMode: 'cover',
     marginBottom: 4,
+  },
+  input: {
+    marginBottom: 12,
+    width: width * 0.85,
+    alignSelf: 'center',
+    borderRadius: 10,
   },
 });

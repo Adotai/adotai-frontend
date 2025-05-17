@@ -63,7 +63,7 @@ export default function ONGHomeScreen() {
             <Ionicons
               name="add-circle-outline"
               size={26}
-              color="#AD334A"
+              color={Theme.PRIMARY}
               style={{ marginRight: 16 }}
               onPress={() => navigation.navigate('CreateAnimal')}
             />

@@ -239,7 +239,9 @@ const styles = StyleSheet.create({
     borderColor: Theme.INPUT,
   },
   acceptButton: {
-    backgroundColor: '#33AD37',
+    backgroundColor: '#D5EBD6',
+    borderColor: '#33AD37',
+    borderWidth: 2,
     width: '50%',
     borderRadius: 12,
     height: 50,
@@ -247,12 +249,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   acceptText: {
-    color: '#fff',
+    color: '#33AD37',
     fontSize: 18,
-    fontFamily: 'Poppins-Bold',
+    fontFamily: 'Poppins-SemiBold',
   },
   rejectButton: {
-    backgroundColor: '#D22F2F',
+    borderColor: Theme.PRIMARY,
+    borderWidth: 2,
     width: '50%',
     borderRadius: 12,
     height: 50,
@@ -260,8 +263,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   rejectText: {
-    color: '#fff',
+    color: Theme.PRIMARY,
     fontSize: 18,
-    fontFamily: 'Poppins-Bold',
+    fontFamily: 'Poppins-SemiBold',
   },
 });

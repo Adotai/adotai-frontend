@@ -1,12 +1,23 @@
 import { ScrollView, StyleSheet, Text, View, Image, Dimensions, Alert } from 'react-native';
 import React from 'react';
 import { Theme } from '../../constants/Themes';
-import { CustomInput } from '../Components/CustomInput';
+import { TextInput } from 'react-native-paper'; // Troque CustomInput por TextInput do paper
 import CustomButton from '../Components/CustomButton';
-import { NavigationProp, useNavigation } from '@react-navigation/native'; // Import navigation hook
-import { RootStackParamList } from '../types'; // Import the route types
-import { handleLogin } from '../actions/userActions'; // Import the login function
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { RootStackParamList } from '../types';
+import { handleLogin } from '../actions/userActions';
+
 const { width, height } = Dimensions.get('window');
+
+const inputTheme = {
+  colors: {
+    primary: Theme.PRIMARY,
+    text: '#222',
+    placeholder: Theme.PRIMARY,
+    outline: '#ccc',
+  },
+  roundness: 10,
+};
 
 export default function SignInScreen() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -20,7 +31,7 @@ export default function SignInScreen() {
       return;
     }
 
-    const result = await handleLogin(email, password); // result deve ser { success, role }
+    const result = await handleLogin(email, password);
     if (result.success) {
       if (result.role === 'admin') {
         navigation.navigate('AdminScreen');
@@ -41,27 +52,42 @@ export default function SignInScreen() {
       <View style={styles.overlay}>
         <View style={styles.formContainer}>
           <Text style={styles.loginText}>Login</Text>
-          <ScrollView contentContainerStyle={{ flexGrow: 1, width: '100%' }} keyboardShouldPersistTaps="handled">
-            <CustomInput label="E-mail" value={email} onChange={setEmail} />
-            <CustomInput label="Senha" value={password} onChange={setPassword} secureTextEntry={true} />
-            <Text style={[styles.titleBold, { color: Theme.PRIMARY, fontSize: 16, marginBottom: 10 }]}>
-              Esqueceu a senha?
-            </Text>
-          </ScrollView>
+            <TextInput
+              label="E-mail"
+              mode="outlined"
+              value={email}
+              onChangeText={setEmail}
+              style={styles.input}
+              theme={inputTheme}
+              autoCapitalize="none"
+              keyboardType="email-address"
+              autoComplete="email"
+            />
+            <TextInput
+              label="Senha"
+              mode="outlined"
+              value={password}
+              onChangeText={setPassword}
+              style={styles.input} 
+              theme={inputTheme}
+              secureTextEntry
+              autoCapitalize="none"
+              autoComplete="password"
+            />
 
           <CustomButton
-            title={'ENTRAR'}
+            title={'Entrar'}
             borderColor="transparent"
             textColor={Theme.BACK}
-            color={Theme.TERTIARY}
+            color={Theme.PRIMARY}
             onPress={onLoginPress}
-            buttonStyle={{ marginBottom: '5%' }}
+            buttonStyle={{ marginBottom: '10%', width: width * 0.85, marginTop: '2%' }}
           />
         </View>
       </View>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   titleBold: {
@@ -71,11 +97,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   subTitle: {
-    fontFamily: 'Poppins-Bold',
-    fontSize: 24,
+    fontFamily: 'Poppins-Regular',
+    fontSize: 16,
     color: 'white',
     textAlign: 'center',
-    marginBottom: 400,
+    marginBottom: '80%',
     paddingHorizontal: 20,
   },
   container: {
@@ -103,6 +129,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
     borderTopLeftRadius: 20,
     bottom: 0,
+    
   },
   loginText: {
     fontSize: 24,
@@ -115,5 +142,12 @@ const styles = StyleSheet.create({
     height: height * 0.3,
     width: width * 0.6,
     marginBottom: 20,
+  },
+  input: {
+    marginBottom: '5%',
+    width: width * 0.85,          
+    backgroundColor: '#fff',
+    alignSelf: 'center',
+    borderRadius: 10, 
   },
 });

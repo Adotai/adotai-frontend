@@ -9,12 +9,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const inputTheme = {
   colors: {
-    primary: Theme.TERTIARY,
+    primary: Theme.PRIMARY,
     text: '#222',
     placeholder: Theme.PRIMARY,
     background: '#fff',
     outline: '#ccc'
   },
+    roundness: 10,
 };
 
 export default function ONGCreateAnimalsScreen({ navigation }: any) {

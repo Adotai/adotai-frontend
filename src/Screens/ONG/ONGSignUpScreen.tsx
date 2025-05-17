@@ -1,64 +1,131 @@
-import { StyleSheet, Text, View, Image, ScrollView, Alert, ImageBackground } from 'react-native'
-import React from 'react'
-import { CustomInput } from '../../Components/CustomInput';
+import { StyleSheet, Text, View, ImageBackground, ScrollView, Alert, Dimensions } from 'react-native';
+import React from 'react';
+import { TextInput } from 'react-native-paper';
 import CustomButton from '../../Components/CustomButton';
 import { Theme } from '../../../constants/Themes';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../../types';
 
+const { width, height } = Dimensions.get('window');
+
+const inputTheme = {
+  colors: {
+    primary: Theme.PRIMARY,
+    text: '#222',
+    placeholder: Theme.PRIMARY,
+    background: '#fff',
+    outline: '#ccc'
+  },
+  roundness: 10,
+};
+
 export default function ONGSignUpScreen() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  
+
   const [name, setName] = React.useState('');
   const [email, setEmail] = React.useState('');
   const [phone, setPhone] = React.useState('');
   const [cpf, setCpf] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [confirmPassword, setConfirmPassword] = React.useState('');
+
   return (
     <View style={styles.container}>
       <ImageBackground style={styles.backgroundImage} source={require('../../../assets/images/background-home.png')} />
-      
-      <View style={styles.overlay}>
 
+      <View style={styles.overlay}>
         <View style={styles.formContainer}>
           <Text style={styles.loginText}>Cadastro ONG</Text>
           <ScrollView contentContainerStyle={{ flexGrow: 1, width: '100%' }} keyboardShouldPersistTaps="handled">
-
-            <CustomInput label="Nome da ONG" value={name} onChange={setName} />
-            <CustomInput label="CNPJ" value={cpf} onChange={setCpf} />
-            <CustomInput label="E-mail" value={email} onChange={setEmail} />
-            <CustomInput label="Telefone" value={phone} onChange={setPhone} />
-            <CustomInput label="Senha" value={password} onChange={setPassword} secureTextEntry={true} />
-            <CustomInput label="Confirme sua Senha" value={confirmPassword} onChange={setConfirmPassword} secureTextEntry={true} />
+            <TextInput
+              label="Nome da ONG"
+              mode="outlined"
+              value={name}
+              onChangeText={setName}
+              style={styles.input}
+              theme={inputTheme}
+              autoCapitalize="words"
+            />
+            <TextInput
+              label="CNPJ"
+              mode="outlined"
+              value={cpf}
+              onChangeText={setCpf}
+              style={styles.input}
+              theme={inputTheme}
+              keyboardType="numeric"
+            />
+            <TextInput
+              label="E-mail"
+              mode="outlined"
+              value={email}
+              onChangeText={setEmail}
+              style={styles.input}
+              theme={inputTheme}
+              autoCapitalize="none"
+              keyboardType="email-address"
+              autoComplete="email"
+            />
+            <TextInput
+              label="Telefone"
+              mode="outlined"
+              value={phone}
+              onChangeText={setPhone}
+              style={styles.input}
+              theme={inputTheme}
+              keyboardType="phone-pad"
+              autoComplete="tel"
+            />
+            <TextInput
+              label="Senha"
+              mode="outlined"
+              value={password}
+              onChangeText={setPassword}
+              style={styles.input}
+              theme={inputTheme}
+              secureTextEntry
+              autoCapitalize="none"
+              autoComplete="password"
+            />
+            <TextInput
+              label="Confirme sua Senha"
+              mode="outlined"
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              style={styles.input}
+              theme={inputTheme}
+              secureTextEntry
+              autoCapitalize="none"
+              autoComplete="password"
+            />
           </ScrollView>
 
           <CustomButton
-            title={'SEGUINTE'}
+            title={'Seguinte'}
             borderColor="transparent"
             textColor={Theme.BACK}
-            color={Theme.TERTIARY}
+            color={Theme.PRIMARY}
             onPress={() => {
               if (!name || !email || !phone || !cpf || !password || !confirmPassword) {
                 Alert.alert('Erro', 'Todos os campos são obrigatórios.');
                 return;
               }
-          
+
               if (password !== confirmPassword) {
                 Alert.alert('Erro', 'As senhas não coincidem.');
                 return;
               }
-          
+
               if (!/^\S+@\S+\.\S+$/.test(email)) {
                 Alert.alert('Erro', 'Formato de e-mail inválido.');
                 return;
               }
-          
+
               if (!/^\d{14}$/.test(cpf.replace(/\D/g, ''))) {
                 Alert.alert('Erro', 'CNPJ inválido. Certifique-se de que possui 14 dígitos.');
                 return;
               }
-          
+
               navigation.navigate('Address', {
                 name,
                 email,
@@ -69,7 +136,7 @@ export default function ONGSignUpScreen() {
               });
             }}
             disabled={false}
-            buttonStyle={{ marginBottom: '5%', marginTop: '5%' }}
+            buttonStyle={{ marginBottom: '5%', marginTop: '5%', width: width * 0.85,alignSelf: 'center' }}
           />
         </View>
       </View>
@@ -102,7 +169,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderTopRightRadius: 20,
     borderTopLeftRadius: 20,
-    bottom: 0
+    bottom: 0,
+    paddingTop: 20,
+    paddingBottom: 20,
   },
   loginText: {
     fontSize: 24,
@@ -110,5 +179,12 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins-Bold',
     marginTop: 20,
     marginBottom: 20,
+  },
+  input: {
+    marginBottom: 12,
+    width: width * 0.85,
+    backgroundColor: '#fff',
+    alignSelf: 'center',
+    borderRadius: 10,
   },
 });
