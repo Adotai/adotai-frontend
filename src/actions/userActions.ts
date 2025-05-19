@@ -9,31 +9,33 @@ if (!USER_ROUTE) {
   console.error('USER_ROUTE is not defined in app.json');
 }
 
-export const handleLogin = async (email: string, password: string): Promise<{ success: boolean, role?: string }> => {
+export const handleLogin = async (email: string, password: string): Promise<{ success: boolean, role?: string, error?: string }> => {
   try {
     const response = await axios.post(`${USER_ROUTE}/login`, { email, password });
-    console.log('LOGIN RESPONSE:', response.data); // Adicione isso
     const { data } = response.data;
 
     if (response.status === 200 && data.token) {
       await AsyncStorage.setItem('authToken', data.token);
       await AsyncStorage.setItem('userEmail', email);
-      // Salve a role se vier na resposta
       if (data.role) {
         await AsyncStorage.setItem('userRole', data.role);
       }
-      // Salva o id da ONG se vier na resposta
       if (data.ongId) {
         await AsyncStorage.setItem('ongId', String(data.ongId));
       }
       return { success: true, role: data.role };
     } else {
-      Alert.alert('Erro', 'Falha ao receber token ou informações do usuário.');
-      return { success: false };
+      return { success: false, error: 'Falha ao receber token ou informações do usuário.' };
     }
   } catch (error: any) {
-    // ...tratamento de erro...
-    return { success: false };
+    if (error.response) {
+      // Erro do backend (ex: senha errada)
+      const msg = error.response.data?.message || 'E-mail ou senha incorretos.';
+      return { success: false, error: msg };
+    } else {
+      // Erro de rede
+      return { success: false, error: 'Erro de conexão. Verifique sua internet.' };
+    }
   }
 };
 
@@ -169,7 +171,7 @@ export const fetchOngs = async (): Promise<any[]> => {
 export const acceptOng = async (id: number): Promise<boolean> => {
   try {
     const token = await AsyncStorage.getItem('authToken');
-    await axios.patch(`${USER_ROUTE}/ongs/${id}/status`, { status: true }, {
+    await axios.put(`${USER_ROUTE}/ongs/${id}`, {}, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return true;

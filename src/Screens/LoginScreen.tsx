@@ -27,10 +27,10 @@ export default function SignInScreen() {
 
   const onLoginPress = async () => {
     if (!email || !password) {
-      Alert.alert('Error', 'Please fill in both email and password.');
+      Alert.alert('Erro', 'Preencha e-mail e senha.');
       return;
     }
-
+  
     const result = await handleLogin(email, password);
     if (result.success) {
       if (result.role === 'admin') {
@@ -40,6 +40,8 @@ export default function SignInScreen() {
       } else {
         navigation.navigate('UserHome');
       }
+    } else {
+      Alert.alert('Erro', result.error || 'Não foi possível fazer login.');
     }
   };
 
