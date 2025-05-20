@@ -1,61 +1,52 @@
-import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity, Dimensions } from 'react-native'
+import { StyleSheet, Text, View, Image, ScrollView, SafeAreaView, Dimensions } from 'react-native'
 import React from 'react'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
+import DogCard from '../../Components/DogCard'
+import { fetchAnimals, fetchOngs } from '../../actions/userActions'
 
 const { width, height } = Dimensions.get('window');
 
-const mockAnimals = [
-  {
-    id: 1,
-    name: 'Carlos',
-    breed: 'Corgi',
-    age: '2 anos',
-    image: 'https://images.unsplash.com/photo-1518717758536-85ae29035b6d',
-    location: 'Campinas/SP',
-  },
-  {
-    id: 2,
-    name: 'Luna',
-    breed: 'Golden Retriever',
-    age: '1 ano',
-    image: 'https://images.unsplash.com/photo-1558788353-f76d92427f16',
-    location: 'Campinas, SP',
-  },
-  {
-    id: 3,
-    name: 'Max',
-    breed: 'Poodle',
-    age: '3 anos',
-    image: 'https://images.unsplash.com/photo-1518715308788-3005759c61d4',
-    location: 'Ribeirão Preto, SP',
-  },
-];
-
 export default function UserAnimalsScreen() {
+  const [animals, setAnimals] = React.useState<any[]>([]);
+  const [ongs, setOngs] = React.useState<any[]>([]);
+
+  React.useEffect(() => {
+    const load = async () => {
+      const [animalsData, ongsData] = await Promise.all([
+        fetchAnimals(),
+        fetchOngs()
+      ]);
+      setAnimals(animalsData);
+      setOngs(ongsData);
+    };
+    load();
+  }, []);
+
+  // Função para buscar a ONG pelo ongId do animal
+  const getOngLocation = (ongId: number) => {
+    const ong = ongs.find(o => o.id === ongId);
+    if (ong && ong.address) {
+      return `${ong.address.city}, ${ong.address.state}`;
+    }
+    return '';
+  };
+
   return (
     <SafeAreaView style={styles.container}>
-      <Image style={{ width: width * 0.5, height: height*0.05, marginVertical: 16 }} source={require('../../../assets/images/adotai-text.png')} />
+      <Image style={{ width: width * 0.5, height: height * 0.05, marginVertical: 16 }} source={require('../../../assets/images/adotai-text.png')} />
       <ScrollView contentContainerStyle={styles.listContainer}>
-        {mockAnimals.map(animal => (
-          <TouchableOpacity key={animal.id} style={styles.card} activeOpacity={0.8}>
-            <Image source={{ uri: animal.image }} style={styles.image} />
-            <LinearGradient
-              colors={['transparent', 'rgba(0,0,0,0.7)']}
-              style={styles.gradient}
-            />
-            <View style={styles.infoRow}>
-              <View style={styles.infoText}>
-                <Text style={styles.name}>{animal.name}</Text>
-                <Text style={styles.location}>{animal.location}</Text>
-              </View>
-              <TouchableOpacity>
-              <Ionicons name="heart-outline" size={32} color="#fff" style={styles.heartIcon} />
-              </TouchableOpacity>
-            </View>
-          </TouchableOpacity>
+        {animals.map(animal => (
+          <DogCard
+            key={animal.id}
+            name={animal.name}
+            image={animal.photos && animal.photos.length > 0 ? animal.photos[0].photoUrl : ''}
+            location={getOngLocation(animal.ongId)}
+            onPress={() => {}}
+            onLikePress={() => {}}
+          />
         ))}
+        {animals.length === 0 && (
+          <Text style={{ textAlign: 'center', marginTop: 32 }}>Nenhum animal encontrado.</Text>
+        )}
       </ScrollView>
     </SafeAreaView>
   )

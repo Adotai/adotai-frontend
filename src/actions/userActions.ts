@@ -195,40 +195,20 @@ export const deleteOng = async (id: number): Promise<boolean> => {
   }
 };
 
-export const createAnimal = async (animal: {
-  ongId: number;
-  name: string;
-  gender: string;
-  color: { name: string };
-  breed: { name: string; speciesDescription: string };
-  species: { description: string };
-  age: number;
-  health: string;
-  status: boolean;
-  vaccinated: boolean;
-  neutered: boolean;
-  dewormed: boolean;
-  temperament: string;
-}) => {
-  try {
-    const token = await AsyncStorage.getItem('authToken');
-    const id = await AsyncStorage.getItem('ongId');
-    console.log('ongId salvo:', id);
-    const response = await axios.post(`${USER_ROUTE.replace('/ongs', '')}/animal`, animal, {
+export const createAnimal = async (animalObj: any): Promise<any> => {
+  const token = await AsyncStorage.getItem('authToken');
+  if (!token) throw new Error('Token não encontrado');
+  const response = await axios.post(
+    `${USER_ROUTE}/animal`,
+    animalObj,
+    {
       headers: {
         Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-    });
-    return response.data;
-  } catch (error: any) {
-    if (error.response) {
-      Alert.alert('Erro', error.response.data?.message || 'Erro ao criar animal.');
-    } else {
-      Alert.alert('Erro', 'Não foi possível conectar ao servidor.');
+        'Content-Type': 'application/json'
+      }
     }
-    throw error;
-  }
+  );
+  return response.data;
 };
 
 export const getLoggedOngId = async (): Promise<number | null> => {

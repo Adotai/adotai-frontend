@@ -1,11 +1,14 @@
 import React from 'react';
-import { View, StyleSheet, Alert, ScrollView, Switch, Text } from 'react-native';
+import { View, StyleSheet, Alert, ScrollView, Switch, Text, TouchableOpacity, Image } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { createAnimal, getLoggedOngId } from '../../actions/userActions';
 import { Button, TextInput } from 'react-native-paper';
 import CustomButton from '../../Components/CustomButton';
 import { Theme } from '../../../constants/Themes';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as ImagePicker from 'expo-image-picker';
+import { Ionicons } from '@expo/vector-icons';
+import { uploadFileToStorage } from '../../services/uploadFileToStorage';
 
 const inputTheme = {
   colors: {
@@ -17,6 +20,47 @@ const inputTheme = {
   },
     roundness: 10,
 };
+
+function ImageUploadInput({ images, setImages }: { images: any[], setImages: (imgs: any[]) => void }) {
+  const handlePickImage = async () => {
+    if (images.length >= 3) return;
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsMultipleSelection: true,
+      quality: 0.7,
+      selectionLimit: 3 - images.length,
+    });
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      const newImages = [...images, ...result.assets].slice(0, 3);
+      setImages(newImages);
+    }
+  };
+  const handleRemove = (idx: number) => {
+    setImages(images.filter((_, i) => i !== idx));
+  };
+  return (
+    <View style={{ marginBottom: 16 }}>
+      <Text style={{ color: Theme.PRIMARY, marginBottom: 4 }}>Fotos do Animal (até 3)</Text>
+      <TouchableOpacity style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 12, alignItems: 'center', flexDirection: 'row', flexWrap: 'wrap' }} onPress={handlePickImage} disabled={images.length >= 3}>
+        {images.length === 0 ? (
+          <Text style={{ color: '#888' }}>Selecionar fotos</Text>
+        ) : (
+          images.map((img, idx) => (
+            <View key={idx} style={{ margin: 8, alignItems: 'center' }}>
+              <Image source={{ uri: img.uri }} style={{ width: 60, height: 60, borderRadius: 8, marginBottom: 4 }} />
+              <TouchableOpacity onPress={() => handleRemove(idx)}>
+                <Ionicons name="close-circle" size={20} color="#d33" />
+              </TouchableOpacity>
+            </View>
+          ))
+        )}
+        {images.length < 3 && (
+          <Ionicons name="add-circle-outline" size={32} color="#888" style={{ marginLeft: 8 }} />
+        )}
+      </TouchableOpacity>
+    </View>
+  );
+}
 
 export default function ONGCreateAnimalsScreen({ navigation }: any) {
   const [name, setName] = React.useState('');
@@ -32,6 +76,8 @@ export default function ONGCreateAnimalsScreen({ navigation }: any) {
   const [neutered, setNeutered] = React.useState(false);
   const [dewormed, setDewormed] = React.useState(false);
   const [ongId, setOngId] = React.useState<number | null>(null);
+  const [images, setImages] = React.useState<any[]>([]);
+  const [animalImages, setAnimalImages] = React.useState<any[]>([]);
 
   React.useEffect(() => {
     const fetchOngId = async () => {
@@ -43,7 +89,28 @@ export default function ONGCreateAnimalsScreen({ navigation }: any) {
 
   const handleCreate = async () => {
     try {
-      console.log('ongId:', ongId);
+      if (animalImages.length === 0) {
+        Alert.alert('Erro', 'Adicione pelo menos uma foto do animal.');
+        return;
+      }
+  
+      // Use o nome do animal e timestamp para criar um path único
+      const animalId = `${name.replace(/\s/g, '_')}_${Date.now()}`;
+      let imageUrls: string[] = [];
+  
+      for (let i = 0; i < animalImages.length; i++) {
+        const img = animalImages[i];
+        if (img?.uri) {
+          const url = await uploadFileToStorage(
+            img.uri,
+            `animals/${animalId}/fotos/${Date.now()}_${i}.jpg`
+          );
+          imageUrls.push(url);
+        }
+      }
+  
+      const photos = imageUrls.map((url) => ({ photoUrl: url }));
+  
       const animalObj = {
         ongId: ongId ?? 0,
         name,
@@ -58,13 +125,15 @@ export default function ONGCreateAnimalsScreen({ navigation }: any) {
         neutered,
         dewormed,
         temperament: temperament || 'FRIENDLY',
+        photos, // <-- Envie as fotos aqui!
       };
-      console.log('Enviando:', animalObj);
+  
       await createAnimal(animalObj);
       Alert.alert('Sucesso', 'Animal criado com sucesso!');
       navigation.goBack();
     } catch (e) {
       console.log('Erro ao criar animal:', e);
+      Alert.alert('Erro', 'Falha ao criar animal.');
     }
   };
 
@@ -171,6 +240,7 @@ export default function ONGCreateAnimalsScreen({ navigation }: any) {
             <Picker.Item label="Desconhecido" value="unknown" />
           </Picker>
         </View>
+       <ImageUploadInput images={animalImages} setImages={setAnimalImages} />
 
         <View style={styles.switchRow}>
           <Text style={styles.switchLabel}>Vacinado</Text>
