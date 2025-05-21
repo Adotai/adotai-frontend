@@ -2,8 +2,12 @@ import React from 'react';
 import { View, Text, StyleSheet, FlatList } from 'react-native';
 import { fetchAnimals } from '../../actions/userActions';
 import DogCard from '../../Components/DogCard';
+import { RootStackParamList } from '../../types';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
 
-export default function ONGAnimalsScreen() {
+export default function ONGAnimalsScreen({ }) {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  
   const [animals, setAnimals] = React.useState<any[]>([]);
   const [refreshing, setRefreshing] = React.useState(false);
 
@@ -32,7 +36,7 @@ export default function ONGAnimalsScreen() {
             name={item.name}
             image={item.photos && item.photos.length > 0 ? item.photos[0].photoUrl : ''}
             location={item.species || ''}
-            onPress={() => {}}
+            onPress={() => navigation.navigate('ONGAnimalDetails', { animal: item })}
           />
         )}
         ListEmptyComponent={<Text>Nenhum animal encontrado.</Text>}

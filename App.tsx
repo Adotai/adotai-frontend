@@ -25,6 +25,7 @@ import AdminAcceptScreen from './src/Screens/Admin/AdminAcceptScreen';
 import ONGInfosScreen from './src/Screens/Admin/ONGlnfosScreen';
 import ONGCreateAnimalsScreen from './src/Screens/ONG/ONGCreateAnimalsScreen';
 import UserONGDetailScreen from './src/Screens/User/UserONGDetailScreen';
+import ONGAnimalDetails from './src/Screens/ONG/ONGAnimalDetails';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -213,6 +214,16 @@ export default function App() {
                 headerTintColor: '#FFFFFF',
               }}
             />
+            <Stack.Screen
+              name="ONGAnimalDetails"
+              component={ONGAnimalDetails}
+              options={{
+                headerShown: true,
+                headerTitle: 'Detalhes do Animal',
+                headerTintColor: Theme.PRIMARY,
+                headerTitleAlign: 'center',
+              }}
+/>
           </Stack.Navigator>
         </SafeAreaView>
       </NavigationContainer>

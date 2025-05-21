@@ -40,14 +40,14 @@ function ImageUploadInput({ images, setImages }: { images: any[], setImages: (im
   };
   return (
     <View style={{ marginBottom: 16 }}>
-      <Text style={{ color: Theme.PRIMARY, marginBottom: 4 }}>Fotos do Animal (até 3)</Text>
-      <TouchableOpacity style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 12, alignItems: 'center', flexDirection: 'row', flexWrap: 'wrap' }} onPress={handlePickImage} disabled={images.length >= 3}>
+      <Text style={{  fontFamily: 'Poppins-Regular' , fontSize: 14, color: Theme.PRIMARY}}>Fotos do Animal (até 3)</Text>
+      <TouchableOpacity style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 10, padding: 12, justifyContent:'center', alignItems: 'center', flexDirection: 'row', flexWrap: 'wrap' }} onPress={handlePickImage} disabled={images.length >= 3}>
         {images.length === 0 ? (
           <Text style={{ color: '#888' }}>Selecionar fotos</Text>
         ) : (
           images.map((img, idx) => (
             <View key={idx} style={{ margin: 8, alignItems: 'center' }}>
-              <Image source={{ uri: img.uri }} style={{ width: 60, height: 60, borderRadius: 8, marginBottom: 4 }} />
+              <Image source={{ uri: img.uri }} style={{ width: 60, height: 60, borderRadius: 10, marginBottom: 4 }} />
               <TouchableOpacity onPress={() => handleRemove(idx)}>
                 <Ionicons name="close-circle" size={20} color="#d33" />
               </TouchableOpacity>
@@ -272,7 +272,7 @@ export default function ONGCreateAnimalsScreen({ navigation }: any) {
       </ScrollView>
       <CustomButton
         title="Cadastrar"
-        color={Theme.TERTIARY}
+        color={Theme.PRIMARY}
         onPress={handleCreate}
         buttonStyle={{ margin: 24 }}
 
@@ -310,7 +310,7 @@ const styles = StyleSheet.create({
   pickerWrapper: {
     borderWidth: 1,
     borderColor: '#ccc',
-    borderRadius: 6,
+    borderRadius: 10,
     marginBottom: 12,
     overflow: 'hidden',
     backgroundColor: '#fff',

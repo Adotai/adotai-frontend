@@ -21,4 +21,7 @@ export type RootStackParamList = {
     UserONGDetail: {
         ong: object
     };
-  };
+    ONGAnimalDetails: { 
+        animal: object
+    };
+}
