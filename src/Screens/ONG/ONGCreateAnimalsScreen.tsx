@@ -40,10 +40,9 @@ function ImageUploadInput({ images, setImages }: { images: any[], setImages: (im
   };
   return (
     <View style={{ marginBottom: 16 }}>
-      <Text style={{  fontFamily: 'Poppins-Regular' , fontSize: 14, color: Theme.PRIMARY}}>Fotos do Animal (até 3)</Text>
       <TouchableOpacity style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 10, padding: 12, justifyContent:'center', alignItems: 'center', flexDirection: 'row', flexWrap: 'wrap' }} onPress={handlePickImage} disabled={images.length >= 3}>
         {images.length === 0 ? (
-          <Text style={{ color: '#888' }}>Selecionar fotos</Text>
+          <Text style={{ color: '#888' }}>Selecionar até 3 fotos</Text>
         ) : (
           images.map((img, idx) => (
             <View key={idx} style={{ margin: 8, alignItems: 'center' }}>

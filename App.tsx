@@ -10,7 +10,7 @@ import OnboardingScreen from './src/Screens/OnboardingScreen';
 import SignInScreen from './src/Screens/LoginScreen';
 import UserSignUpScreen from './src/Screens/User/UserSignUpScreen';
 import ONGSignUpScreen from './src/Screens/ONG/ONGSignUpScreen';
-import UserHomeScreen from './src/Screens/User/UserHomeScreen'; 
+import UserHomeScreen from './src/Screens/User/UserHomeScreen';
 import { Theme } from './constants/Themes';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import AddressScreen from './src/Screens/AddressScreen';
@@ -26,6 +26,7 @@ import ONGInfosScreen from './src/Screens/Admin/ONGlnfosScreen';
 import ONGCreateAnimalsScreen from './src/Screens/ONG/ONGCreateAnimalsScreen';
 import UserONGDetailScreen from './src/Screens/User/UserONGDetailScreen';
 import ONGAnimalDetails from './src/Screens/ONG/ONGAnimalDetails';
+import UserAnimalDetailsScreen from './src/Screens/User/UserAnimalDetailsScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -67,7 +68,7 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <NavigationContainer>
-        <StatusBar hidden={false} translucent backgroundColor="transparent" />
+        <StatusBar hidden={false} backgroundColor="white" />
         <SafeAreaView style={styles.safeArea}>
           <Stack.Navigator initialRouteName={initialRoute}>
             <Stack.Screen
@@ -140,7 +141,7 @@ export default function App() {
                 headerShown: true,
                 headerTintColor: Theme.PRIMARY,
                 headerLeft: () => null,
-                gestureEnabled: false,  
+                gestureEnabled: false,
               }}
             />
             <Stack.Screen
@@ -191,7 +192,7 @@ export default function App() {
                 headerShown: true,
                 headerTintColor: Theme.PRIMARY,
                 headerLeft: () => null,
-                gestureEnabled: false,  
+                gestureEnabled: false,
               }}
             />
             <Stack.Screen
@@ -219,11 +220,21 @@ export default function App() {
               component={ONGAnimalDetails}
               options={{
                 headerShown: true,
-                headerTitle: 'Detalhes do Animal',
-                headerTintColor: Theme.PRIMARY,
-                headerTitleAlign: 'center',
+                headerTransparent: true,
+                headerTitle: '',
+                headerTintColor: '#FFFFFF',
               }}
-/>
+            />
+            <Stack.Screen
+              name="UserAnimalDetails"
+              component={UserAnimalDetailsScreen}
+              options={{
+                headerShown: true,
+                headerTransparent: true,
+                headerTitle: '',
+                headerTintColor: '#FFFFFF',
+              }}
+            />
           </Stack.Navigator>
         </SafeAreaView>
       </NavigationContainer>

@@ -58,7 +58,7 @@ export default function SignInScreen() {
               label="E-mail"
               mode="outlined"
               value={email}
-              onChangeText={setEmail}
+              onChangeText={text => setEmail(text.replace(/\s/g, ''))} // Bloqueia espaços
               style={styles.input}
               theme={inputTheme}
               autoCapitalize="none"
@@ -69,7 +69,7 @@ export default function SignInScreen() {
               label="Senha"
               mode="outlined"
               value={password}
-              onChangeText={setPassword}
+              onChangeText={text => setPassword(text.replace(/\s/g, ''))} // Bloqueia espaços
               style={styles.input} 
               theme={inputTheme}
               secureTextEntry

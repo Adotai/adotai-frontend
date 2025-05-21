@@ -10,10 +10,9 @@ interface DogCardProps {
   image: string;
   location: string;
   onPress?: () => void;
-  onLikePress?: () => void;
 }
 
-export default function DogCard({ name, image, location, onPress, onLikePress }: DogCardProps) {
+export default function DogCard({ name, image, location, onPress }: DogCardProps) {
   return (
     <TouchableOpacity style={styles.card} activeOpacity={0.8} onPress={onPress}>
       <Image source={{ uri: image }} style={styles.image} />

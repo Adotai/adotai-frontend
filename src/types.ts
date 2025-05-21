@@ -24,4 +24,8 @@ export type RootStackParamList = {
     ONGAnimalDetails: { 
         animal: object
     };
+    UserAnimalDetails: { 
+        animal: object,
+        city: string
+    };
 }

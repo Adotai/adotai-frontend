@@ -7,13 +7,15 @@ const COLORS = {
 
     INPUT: "#E2E2E2",
 
-    PASTEL: "#D0D8E9",
+    PASTEL: "#F2D0D4",
 
     BACK: '#FCFCFC',
   
     TEXT_FONT: "#000000",
 
-    GREY: "#EAEAEC"
+    GREY: "#EAEAEC",
+
+    CARD: '#F8f8f8'
 
   };
   

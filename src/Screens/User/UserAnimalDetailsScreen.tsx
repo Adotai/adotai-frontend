@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, Image, StyleSheet, Dimensions, Pressable, ScrollView } from 'react-native';
 import { Theme } from '../../../constants/Themes';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
-export default function ONGAnimalDetails({ route }: any) {
-  const { animal } = route.params;
+export default function UserAnimalDetailsScreen({ route }: any) {
+  const { animal, city } = route.params;
   const { width } = Dimensions.get('window');
   const [current, setCurrent] = useState(0);
 
@@ -18,13 +19,13 @@ export default function ONGAnimalDetails({ route }: any) {
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <ScrollView style={{ flex: 1 }}>
       <View style={{ width, height: 300, position: 'relative', alignSelf: 'center', justifyContent: 'center', alignItems: 'center' }}>
         {photos.length > 0 ? (
           <>
             <Image
               source={{ uri: photos[current]?.photoUrl }}
-              style={{ width, height: 300, borderBottomLeftRadius:12, borderBottomRightRadius:12 }}
+              style={{ width, height: 300, borderBottomLeftRadius: 12, borderBottomRightRadius: 12 }}
             />
             <Pressable
               style={{ position: 'absolute', left: 0, top: 0, width: width / 2, height: 300 }}
@@ -54,17 +55,31 @@ export default function ONGAnimalDetails({ route }: any) {
           </View>
         )}
       </View>
-      <Text style={styles.name}>{animal.name}</Text>
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 24 }}>
-        <View style={styles.info}>
-          <View style={styles.row}>
-            <Text style={styles.label}>Espécie:</Text>
-            <Text style={styles.value}>{animal.species}</Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.label}>Raça:</Text>
+      <View style={{ flex: 1, backgroundColor: Theme.CARD}} >
+
+        <View style={[styles.info, { marginTop: 8 }]}>
+          <Text style={styles.name}>{animal.name}</Text>
+          <View style={[{ flexDirection: 'row', padding: 16, paddingBottom: 0, paddingTop: 0}]}>  
+            <Ionicons name="paw-outline" size={24} color={'#555'}  />
+            <Text style={[styles.value, { marginLeft: 8 }]}>{animal.species}</Text>
+            <Text style={styles.value}> - </Text>
             <Text style={styles.value}>{animal.breed}</Text>
           </View>
+          <View style={[{ paddingLeft: 16, flexDirection:'row'}]}>
+           <Ionicons
+              name={animal.gender === 'male' ? 'male' : 'female'}
+              size={24}
+              color={'#555'}
+            />
+            <Text style={[styles.value, { marginLeft: 8 }]}>{animal.gender === 'male' ? 'Macho' : 'Fêmea'}</Text>
+          </View>
+          <View style={{ flexDirection: 'row', alignItems: 'center', paddingLeft: 16, paddingBottom: 16 }}>
+            <Ionicons name="location-outline" size={24} color={'#555'} style={{ marginRight: 8 }} />
+            <Text style={[styles.value]}>{city}</Text>
+          </View>
+        </View>
+
+        <View style={styles.info}>
           <View style={styles.row}>
             <Text style={styles.label}>Cor:</Text>
             <Text style={styles.value}>{animal.color}</Text>
@@ -72,10 +87,6 @@ export default function ONGAnimalDetails({ route }: any) {
           <View style={styles.row}>
             <Text style={styles.label}>Idade:</Text>
             <Text style={styles.value}>{animal.age} anos</Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.label}>Sexo:</Text>
-            <Text style={styles.value}>{animal.gender === 'male' ? 'Macho' : 'Fêmea'}</Text>
           </View>
           <View style={styles.row}>
             <Text style={styles.label}>Saúde:</Text>
@@ -98,8 +109,8 @@ export default function ONGAnimalDetails({ route }: any) {
             <Text style={styles.value}>{animal.temperament}</Text>
           </View>
         </View>
-      </ScrollView>
-    </View>
+      </View>
+    </ScrollView>
   );
 }
 
@@ -125,22 +136,30 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   info: {
-    padding: 16,
+    margin: 8,
+    marginTop: 0,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    elevation: 6,
+    shadowColor: '#000',
+    shadowOpacity: 0.04,
+    shadowRadius: 25,
+    shadowOffset: { width: 0, height: 4 },
   },
   name: {
     fontSize: 22,
-    color: Theme.PRIMARY,
-    padding: 8,
+    color: 'black',
+    fontFamily: 'Poppins-SemiBold',
+    padding: 16,
     paddingBottom: 0,
-    paddingLeft: 16,
-    fontFamily: 'Poppins-Bold',
+
   },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
     height: 50,
-    borderBottomWidth: 1,
     borderColor: Theme.INPUT,
+    paddingLeft: 16
   },
   label: {
     fontSize: 16,
@@ -149,9 +168,8 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins-Bold',
   },
   value: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#555',
-    flexShrink: 1,
     fontFamily: 'Poppins-Regular',
   },
 });

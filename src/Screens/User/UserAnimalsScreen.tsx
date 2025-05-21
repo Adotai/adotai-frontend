@@ -2,10 +2,14 @@ import { StyleSheet, Text, View, Image, ScrollView, SafeAreaView, Dimensions } f
 import React from 'react'
 import DogCard from '../../Components/DogCard'
 import { fetchAnimals, fetchOngs } from '../../actions/userActions'
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { RootStackParamList } from '../../types';
 
 const { width, height } = Dimensions.get('window');
 
 export default function UserAnimalsScreen() {
+   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  
   const [animals, setAnimals] = React.useState<any[]>([]);
   const [ongs, setOngs] = React.useState<any[]>([]);
 
@@ -32,7 +36,7 @@ export default function UserAnimalsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Image style={{ width: width * 0.5, height: height * 0.05, marginVertical: 16 }} source={require('../../../assets/images/adotai-text.png')} />
+      <Image style={{ width: width * 0.5, height: height * 0.05, marginVertical: 16, marginTop: 40 }} source={require('../../../assets/images/adotai-text.png')} />
       <ScrollView contentContainerStyle={styles.listContainer}>
         {animals.map(animal => (
           <DogCard
@@ -40,8 +44,7 @@ export default function UserAnimalsScreen() {
             name={animal.name}
             image={animal.photos && animal.photos.length > 0 ? animal.photos[0].photoUrl : ''}
             location={getOngLocation(animal.ongId)}
-            onPress={() => {}}
-            onLikePress={() => {}}
+            onPress={() => navigation.navigate('UserAnimalDetails', { animal,  city: getOngLocation(animal.ongId) })}
           />
         ))}
         {animals.length === 0 && (
