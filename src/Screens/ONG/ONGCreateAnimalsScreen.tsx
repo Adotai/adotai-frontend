@@ -77,6 +77,7 @@ export default function ONGCreateAnimalsScreen({ navigation }: any) {
   const [ongId, setOngId] = React.useState<number | null>(null);
   const [images, setImages] = React.useState<any[]>([]);
   const [animalImages, setAnimalImages] = React.useState<any[]>([]);
+  const [animalDescription, setAnimalDescription] = React.useState('');
 
   React.useEffect(() => {
     const fetchOngId = async () => {
@@ -124,7 +125,8 @@ export default function ONGCreateAnimalsScreen({ navigation }: any) {
         neutered,
         dewormed,
         temperament: temperament || 'FRIENDLY',
-        photos, // <-- Envie as fotos aqui!
+        photos, 
+        animalDescription,
       };
   
       await createAnimal(animalObj);
@@ -147,17 +149,17 @@ export default function ONGCreateAnimalsScreen({ navigation }: any) {
           style={styles.input}
           theme={inputTheme}
         />
-        <View style={styles.pickerWrapper}>
-          <Picker
-            selectedValue={species}
-            onValueChange={setSpecies}
-            style={styles.picker}
-            dropdownIconColor={Theme.TERTIARY}
-          >
-            <Picker.Item label="Cão" value="Dog" />
-            <Picker.Item label="Gato" value="Cat" />
-          </Picker>
-        </View>
+        <TextInput
+          label="Descrição"
+          mode="outlined"
+          value={animalDescription}
+          onChangeText={setAnimalDescription}
+          style={styles.input}
+          theme={inputTheme}
+          multiline
+          numberOfLines={4}
+        />
+      
         <TextInput
           label="Raça"
           mode="outlined"
@@ -175,6 +177,26 @@ export default function ONGCreateAnimalsScreen({ navigation }: any) {
           style={styles.input}
           theme={inputTheme}
         />
+        <TextInput
+          label="Idade"
+          mode="outlined"
+          value={age}
+          onChangeText={setAge}
+          keyboardType="numeric"
+          style={styles.input}
+          theme={inputTheme}
+        />
+         <View style={styles.pickerWrapper}>
+          <Picker
+            selectedValue={species}
+            onValueChange={setSpecies}
+            style={styles.picker}
+            dropdownIconColor={Theme.TERTIARY}
+          >
+            <Picker.Item label="Cão" value="Dog" />
+            <Picker.Item label="Gato" value="Cat" />
+          </Picker>
+        </View>
         <View style={styles.pickerWrapper}>
           <Picker
             selectedValue={gender}
@@ -186,15 +208,7 @@ export default function ONGCreateAnimalsScreen({ navigation }: any) {
             <Picker.Item label="Fêmea" value="female" />
           </Picker>
         </View>
-        <TextInput
-          label="Idade"
-          mode="outlined"
-          value={age}
-          onChangeText={setAge}
-          keyboardType="numeric"
-          style={styles.input}
-          theme={inputTheme}
-        />
+        
         <View style={styles.pickerWrapper}>
           <Picker
             selectedValue={size}
@@ -240,13 +254,13 @@ export default function ONGCreateAnimalsScreen({ navigation }: any) {
           </Picker>
         </View>
        <ImageUploadInput images={animalImages} setImages={setAnimalImages} />
-
+       
         <View style={styles.switchRow}>
           <Text style={styles.switchLabel}>Vacinado</Text>
           <Switch
             value={vaccinated}
             onValueChange={setVaccinated}
-            thumbColor={vaccinated ? Theme.TERTIARY : undefined}
+            thumbColor={vaccinated ? Theme.TERTIARY : Theme.INPUT}
             trackColor={{ false: '#ccc', true: Theme.PRIMARY }}
           />
         </View>
@@ -255,7 +269,7 @@ export default function ONGCreateAnimalsScreen({ navigation }: any) {
           <Switch
             value={neutered}
             onValueChange={setNeutered}
-            thumbColor={neutered ? Theme.TERTIARY : undefined}
+            thumbColor={neutered ? Theme.TERTIARY : Theme.INPUT}
             trackColor={{ false: '#ccc', true: Theme.PRIMARY }}
           />
         </View>
@@ -264,7 +278,7 @@ export default function ONGCreateAnimalsScreen({ navigation }: any) {
           <Switch
             value={dewormed}
             onValueChange={setDewormed}
-            thumbColor={dewormed ? Theme.TERTIARY : undefined}
+            thumbColor={dewormed ? Theme.TERTIARY : Theme.INPUT}
             trackColor={{ false: '#ccc', true: Theme.PRIMARY }}
           />
         </View>

@@ -26,6 +26,8 @@ export type RootStackParamList = {
     };
     UserAnimalDetails: { 
         animal: object,
-        city: string
+        city: string,
+        ongName: string,
+        ongs: object[]
     };
 }

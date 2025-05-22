@@ -34,6 +34,11 @@ export default function UserAnimalsScreen() {
     return '';
   };
 
+  const getOngName = (ongId: number) => {
+  const ong = ongs.find(o => o.id === ongId);
+  return ong ? ong.name : '';
+};
+
   return (
     <SafeAreaView style={styles.container}>
       <Image style={{ width: width * 0.5, height: height * 0.05, marginVertical: 16, marginTop: 40 }} source={require('../../../assets/images/adotai-text.png')} />
@@ -44,7 +49,7 @@ export default function UserAnimalsScreen() {
             name={animal.name}
             image={animal.photos && animal.photos.length > 0 ? animal.photos[0].photoUrl : ''}
             location={getOngLocation(animal.ongId)}
-            onPress={() => navigation.navigate('UserAnimalDetails', { animal,  city: getOngLocation(animal.ongId) })}
+            onPress={() => navigation.navigate('UserAnimalDetails', { animal,  city: getOngLocation(animal.ongId), ongName: getOngName(animal.ongId), ongs})}
           />
         ))}
         {animals.length === 0 && (

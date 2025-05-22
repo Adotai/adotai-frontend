@@ -1,11 +1,20 @@
 import React, { useState } from 'react';
-import { View, Text, Image, StyleSheet, Dimensions, Pressable, ScrollView } from 'react-native';
+import { View, Text, Image, StyleSheet, Dimensions, Pressable, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { Theme } from '../../../constants/Themes';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '../../types';
+import CustomButton from '../../Components/CustomButton';
+
 
 export default function UserAnimalDetailsScreen({ route }: any) {
-  const { animal, city } = route.params;
-  const { width } = Dimensions.get('window');
+
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
+
+  const { animal, city, ongName, ongs } = route.params;
+  const ong = ongs?.find((o: any) => o.name === ongName || o.id === animal.ongId);
+  const { width, height } = Dimensions.get('window');
   const [current, setCurrent] = useState(0);
 
   const photos = animal.photos || [];
@@ -20,22 +29,22 @@ export default function UserAnimalDetailsScreen({ route }: any) {
 
   return (
     <ScrollView style={{ flex: 1 }}>
-      <View style={{ width, height: 300, position: 'relative', alignSelf: 'center', justifyContent: 'center', alignItems: 'center' }}>
+      <View style={{ width, height: height * 0.55, position: 'relative', alignSelf: 'center', justifyContent: 'center', alignItems: 'center' }}>
         {photos.length > 0 ? (
           <>
             <Image
               source={{ uri: photos[current]?.photoUrl }}
-              style={{ width, height: 300, borderBottomLeftRadius: 12, borderBottomRightRadius: 12 }}
+              style={{ width, height: "100%", }}
             />
             <Pressable
-              style={{ position: 'absolute', left: 0, top: 0, width: width / 2, height: 300 }}
+              style={{ position: 'absolute', left: 0, top: 0, width: width / 2, height: '100%' }}
               onPress={handlePrev}
             />
             <Pressable
-              style={{ position: 'absolute', right: 0, top: 0, width: width / 2, height: 300 }}
+              style={{ position: 'absolute', right: 0, top: 0, width: width / 2, height: '100%' }}
               onPress={handleNext}
             />
-            <View style={[styles.progressBarContainer, { position: 'absolute', bottom: 12, left: 0, right: 0 }]}>
+            <View style={[styles.progressBarContainer, { position: 'absolute', bottom: 64, left: 0, right: 0 }]}>
               {photos.map((_: any, idx: number) => (
                 <View
                   key={idx}
@@ -50,23 +59,22 @@ export default function UserAnimalDetailsScreen({ route }: any) {
             </View>
           </>
         ) : (
-          <View style={{ backgroundColor: Theme.INPUT, width: '100%', height: 300, justifyContent: 'center', alignItems: 'center', borderRadius: 12 }}>
+          <View style={{ width: '100%', height: height * 0.5, justifyContent: 'center', alignItems: 'center', borderRadius: 12 }}>
             <Text style={{ color: '#888', fontSize: 18 }}>Nenhuma foto disponível</Text>
           </View>
         )}
       </View>
-      <View style={{ flex: 1, backgroundColor: Theme.CARD}} >
-
-        <View style={[styles.info, { marginTop: 8 }]}>
+      <View style={{ flex: 1 }} >
+        <View style={[styles.info, { marginTop: -50 }]}>
           <Text style={styles.name}>{animal.name}</Text>
-          <View style={[{ flexDirection: 'row', padding: 16, paddingBottom: 0, paddingTop: 0}]}>  
-            <Ionicons name="paw-outline" size={24} color={'#555'}  />
+          <View style={[{ flexDirection: 'row', padding: 16, paddingBottom: 8, paddingTop: 0 }]}>
+            <Ionicons name="paw-outline" size={24} color={'#555'} />
             <Text style={[styles.value, { marginLeft: 8 }]}>{animal.species}</Text>
             <Text style={styles.value}> - </Text>
             <Text style={styles.value}>{animal.breed}</Text>
           </View>
-          <View style={[{ paddingLeft: 16, flexDirection:'row'}]}>
-           <Ionicons
+          <View style={[{ paddingLeft: 16, paddingBottom: 8, flexDirection: 'row' }]}>
+            <Ionicons
               name={animal.gender === 'male' ? 'male' : 'female'}
               size={24}
               color={'#555'}
@@ -79,7 +87,27 @@ export default function UserAnimalDetailsScreen({ route }: any) {
           </View>
         </View>
 
-        <View style={styles.info}>
+        {/* <View style= {{width: width*0.9, alignSelf:'center', backgroundColor: Theme.INPUT, height: 1}}></View> */}
+        <TouchableOpacity onPress={() => {
+          if (ong) {
+            navigation.navigate('UserONGDetail', { ong });
+          } else {
+            Alert.alert('ONG não encontrada', 'A ONG associada a este animal não foi encontrada.');
+          }
+        }} style={[styles.info, { flexDirection: 'row', alignItems: 'center' }]}>
+          <Ionicons name="business-outline" size={22} color={'#555'} style={{ padding: 16 }} />
+          <Text style={[styles.value, { width: '75%' }]}>{ongName}</Text>
+          <Ionicons name="chevron-forward" size={22} color={Theme.PRIMARY} style={{ marginRight: 0 }} />
+        </TouchableOpacity>
+
+
+
+        <View style={[styles.info, { paddingLeft: 16, paddingTop: 16, paddingBottom: 16 }]}>
+          <Text style={{ fontFamily: 'Poppins-Bold', fontSize: 20, color: Theme.PRIMARY }}>Sobre o Animal</Text>
+          <View style={[styles.row, { flexDirection: 'column'}]}>
+            <Text style={[styles.label]}>Descrição do animal:</Text>
+            <Text style={styles.value}>{animal.animalDescription}</Text>
+          </View>
           <View style={styles.row}>
             <Text style={styles.label}>Cor:</Text>
             <Text style={styles.value}>{animal.color}</Text>
@@ -93,6 +121,14 @@ export default function UserAnimalDetailsScreen({ route }: any) {
             <Text style={styles.value}>{animal.health}</Text>
           </View>
           <View style={styles.row}>
+            <Text style={styles.label}>Temperamento:</Text>
+            <Text style={styles.value}>{animal.temperament}</Text>
+          </View>
+             <View style={styles.row}>
+            <Text style={styles.label}>Porte:</Text>
+            <Text style={styles.value}>{animal.size}</Text>
+          </View>
+          <View style={styles.row}>
             <Text style={styles.label}>Vacinado:</Text>
             <Text style={styles.value}>{animal.vaccinated ? 'Sim' : 'Não'}</Text>
           </View>
@@ -104,11 +140,13 @@ export default function UserAnimalDetailsScreen({ route }: any) {
             <Text style={styles.label}>Vermifugado:</Text>
             <Text style={styles.value}>{animal.dewormed ? 'Sim' : 'Não'}</Text>
           </View>
-          <View style={styles.row}>
-            <Text style={styles.label}>Temperamento:</Text>
-            <Text style={styles.value}>{animal.temperament}</Text>
-          </View>
         </View>
+        <CustomButton
+          color={Theme.PRIMARY}
+          title='Entrar em contato'
+          onPress={() => { }}
+          buttonStyle={{ alignSelf: 'center', marginVertical: 16, width: width * 0.95 }}
+        />
       </View>
     </ScrollView>
   );
@@ -125,26 +163,22 @@ const styles = StyleSheet.create({
     height: 7,
     borderRadius: 3,
     marginHorizontal: 3,
-    borderWidth: 1,
     borderColor: Theme.INPUT,
     width: 60,
   },
   progressBarActive: {
-    backgroundColor: Theme.INPUT,
+    backgroundColor: Theme.PRIMARY,
   },
   progressBarInactive: {
-    backgroundColor: 'transparent',
+    backgroundColor: Theme.BACK,
   },
   info: {
-    margin: 8,
     marginTop: 0,
-    backgroundColor: '#fff',
+    margin: 8,
+    elevation: 3,
+    padding: 8,
     borderRadius: 10,
-    elevation: 6,
-    shadowColor: '#000',
-    shadowOpacity: 0.04,
-    shadowRadius: 25,
-    shadowOffset: { width: 0, height: 4 },
+    backgroundColor: Theme.CARD
   },
   name: {
     fontSize: 22,
@@ -156,16 +190,13 @@ const styles = StyleSheet.create({
   },
   row: {
     flexDirection: 'row',
-    alignItems: 'center',
-    height: 50,
-    borderColor: Theme.INPUT,
-    paddingLeft: 16
+    padding: 4,
+    paddingLeft: 0
   },
   label: {
-    fontSize: 16,
-    color: '#555',
+    fontSize: 14,
     marginRight: 4,
-    fontFamily: 'Poppins-Bold',
+    fontFamily: 'Poppins-SemiBold'
   },
   value: {
     fontSize: 14,
