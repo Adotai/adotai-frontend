@@ -4,11 +4,31 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Theme } from '../../../constants/Themes';
 import { Ionicons } from '@expo/vector-icons';
+import { fetchLoggedUser } from '../../actions/userActions';
 
 const { width, height } = Dimensions.get('window');
 
 
 export default function UserProfileScreen({ navigation }: any) {
+
+  const [userName, setUserName] = React.useState<string>('');
+  const [userCity, setUserCity] = React.useState<string>('');
+  const [userState, setUserState] = React.useState<string>('');
+
+
+React.useEffect(() => {
+  const loadUser = async () => {
+    const userData = await fetchLoggedUser();
+    if (userData) {
+      setUserName(userData.name || '');
+      setUserCity(userData.city || '');
+      setUserState(userData.state || '');
+    }
+  };
+  loadUser();
+}, []);
+
+
   const handleLogout = async () => {
     await AsyncStorage.removeItem('authToken');
     await AsyncStorage.removeItem('userEmail');
@@ -22,6 +42,8 @@ export default function UserProfileScreen({ navigation }: any) {
     <SafeAreaView style={{ flex: 1 }}>
       <Image style={{ position: 'absolute', width: '100%', height: '100%' }} source={require('../../../assets/images/background-home.png')} />
       <View style={styles.overlay}>
+        <Text style={{position:'relative', margin: 32, marginBottom:0 ,fontFamily: 'Poppins-SemiBold', color: 'white', fontSize: 32}}>{userName}</Text>
+        <Text style={{position:'relative', margin: 32, marginTop: 0,  fontFamily: 'Poppins-Regular', color: Theme.INPUT, fontSize: 16}}>{userCity}, {userState}</Text>
         <View style={styles.formContainer}>
           <TouchableOpacity style={styles.option} onPress={() => { }}>
             <View style={styles.iconContainer}>

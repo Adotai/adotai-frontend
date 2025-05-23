@@ -24,8 +24,6 @@ export default function ONGHomeScreen() {
         tabBarIcon: ({ color, size }) => {
           const iconName = (() => {
             switch (route.name) {
-              case 'Interessados':
-                return 'people-outline';
               case 'Animais':
                 return 'paw-outline';
               case 'Perfil':
@@ -48,10 +46,7 @@ export default function ONGHomeScreen() {
         },
       })}
     >
-      <Tab.Screen
-        name="Interessados"
-        component={InterestedPeopleScreen}
-      />
+ 
       <Tab.Screen
         name="Animais"
         component={ONGAnimalsScreen}

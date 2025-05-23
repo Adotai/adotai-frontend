@@ -7,7 +7,7 @@ const COLORS = {
 
     INPUT: "#E2E2E2",
 
-    PASTEL: "#F2D0D4",
+    PASTEL: "#F9E8EA",
 
     BACK: '#FCFCFC',
   

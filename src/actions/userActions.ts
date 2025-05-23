@@ -243,3 +243,44 @@ export const fetchAnimals = async (): Promise<any[]> => {
     return [];
   }
 };
+
+export const fetchAnimalsByState = async (uf: string): Promise<any[]> => {
+  try {
+    const token = await AsyncStorage.getItem('authToken');
+    const response = await axios.get(`${USER_ROUTE}/animal/${uf}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data.data || [];
+  } catch (error: any) {
+    if (error.response?.status === 404) {
+      // Estado sem animais — retorna array vazio sem logar erro
+      return [];
+    }
+    console.error('Erro ao buscar animais por estado:', error);
+    return [];
+  }
+};
+
+export const fetchLoggedUser = async (): Promise<{ name?: string, city?: string, state?: string } | null> => {
+  try {
+    const token = await AsyncStorage.getItem('authToken');
+    const email = await AsyncStorage.getItem('userEmail');
+    if (!token || !email) return null;
+
+    const response = await axios.get(`${USER_ROUTE}/users`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    const user = response.data.data?.find((u: any) => u.email === email);
+    if (!user) return null;
+
+    return {
+      name: user.name,
+      city: user.address?.city,
+      state: user.address?.state
+    };
+  } catch (err) {
+    console.error('Erro ao buscar dados do usuário:', err);
+    return null;
+  }
+};

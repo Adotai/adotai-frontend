@@ -95,9 +95,11 @@ export default function UserAnimalDetailsScreen({ route }: any) {
             Alert.alert('ONG não encontrada', 'A ONG associada a este animal não foi encontrada.');
           }
         }} style={[styles.info, { flexDirection: 'row', alignItems: 'center' }]}>
-          <Ionicons name="business-outline" size={22} color={'#555'} style={{ padding: 16 }} />
-          <Text style={[styles.value, { width: '75%' }]}>{ongName}</Text>
-          <Ionicons name="chevron-forward" size={22} color={Theme.PRIMARY} style={{ marginRight: 0 }} />
+          <View style= {{ backgroundColor: Theme.PASTEL, borderRadius: 10, margin: 8, padding: 16}}>
+          <Ionicons name="globe-outline" size={22} color={Theme.PRIMARY} style={{ }} />
+          </View>
+          <Text style={[styles.value, { color:'black', width: '75%' }]}>{ongName}</Text>
+          <Ionicons name="chevron-forward" size={22} color={Theme.PRIMARY} style={{ }} />
         </TouchableOpacity>
 
 

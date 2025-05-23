@@ -36,8 +36,8 @@ export default function UserONGScreen() {
   }, []);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff', paddingHorizontal: 10}}>
-      <Image style={{ width: width * 0.5, height: height*0.05, marginVertical: 16 }} source={require('../../../assets/images/adotai-text.png')} />
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff'}}>
+      <Image style={{ width: width * 0.5, height: height*0.06, marginLeft: 10, marginVertical: 16 }} source={require('../../../assets/images/adotai-text.png')} />
       
       <FlatList
         data={ongs}

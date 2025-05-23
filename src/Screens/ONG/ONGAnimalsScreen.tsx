@@ -1,19 +1,26 @@
 import React from 'react';
 import { View, Text, StyleSheet, FlatList } from 'react-native';
-import { fetchAnimals } from '../../actions/userActions';
+import { fetchAnimals, getLoggedOngId } from '../../actions/userActions';
 import DogCard from '../../Components/DogCard';
 import { RootStackParamList } from '../../types';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 
 export default function ONGAnimalsScreen({ }) {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  
   const [animals, setAnimals] = React.useState<any[]>([]);
   const [refreshing, setRefreshing] = React.useState(false);
 
   const load = async () => {
-    const data = await fetchAnimals();
-    setAnimals(data);
+    const ongId = await getLoggedOngId();
+    if (ongId) {
+      // Busca todos os animais (ou use o fetch atual)
+      const allAnimals = await fetchAnimals(); 
+      // Filtra só os da ONG logada
+      const filtered = allAnimals.filter(animal => animal.ongId === ongId );
+      setAnimals(filtered);
+    } else {
+      setAnimals([]);
+    }
   };
 
   React.useEffect(() => {

@@ -21,7 +21,7 @@ export default function OngCard({ ong, onPress }: { ong: any; onPress: () => voi
             <View style={{flexDirection: 'row', alignItems: 'center' , justifyContent: 'space-between', width:'100%'}}>
             <View style={{ padding: 16, alignSelf: 'flex-start'}}>
                 <Text style={styles.name}>{ong.name}</Text>
-                <Text numberOfLines={2} style={styles.description}>dasdadsadasdsadasdasdasdasd{ong.description}</Text>
+                <Text numberOfLines={2} style={styles.description}>{ong.description}</Text>
                 <Text style={styles.city}>{ong.address.city}, {ong.address.state}</Text>
             </View>
             <TouchableOpacity style={{ padding: 12 }}>
@@ -40,8 +40,10 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         overflow: 'hidden',
         backgroundColor: '#f8f8f8',
-        elevation: 2,
-        width: '100%',
+        elevation: 5,
+        marginTop: 8,
+        width: '95%',
+        alignSelf: 'center'
     },
     image: {
         width: '100%',
