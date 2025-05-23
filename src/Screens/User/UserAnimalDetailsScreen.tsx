@@ -69,7 +69,7 @@ export default function UserAnimalDetailsScreen({ route }: any) {
           <Text style={styles.name}>{animal.name}</Text>
           <View style={[{ flexDirection: 'row', padding: 16, paddingBottom: 8, paddingTop: 0 }]}>
             <Ionicons name="paw-outline" size={24} color={'#555'} />
-            <Text style={[styles.value, { marginLeft: 8 }]}>{animal.species}</Text>
+            <Text style={[styles.value, { marginLeft: 8 }]}>{animal.species === 'DOG' ? 'Cachorro' : 'Gato'}</Text>
             <Text style={styles.value}> - </Text>
             <Text style={styles.value}>{animal.breed}</Text>
           </View>
@@ -118,15 +118,34 @@ export default function UserAnimalDetailsScreen({ route }: any) {
           </View>
           <View style={styles.row}>
             <Text style={styles.label}>Saúde:</Text>
-            <Text style={styles.value}>{animal.health}</Text>
+            <Text style={styles.value}>
+              {animal.health === 'healthy' && 'Saudável'}
+              {animal.health === 'sick' && 'Doente'}
+              {animal.health === 'disabled' && 'Deficiente'}
+              {animal.health === 'recovering' && 'Recuperando'}
+              {animal.health === 'unknown' && 'Indefinido'}
+            </Text>
           </View>
           <View style={styles.row}>
             <Text style={styles.label}>Temperamento:</Text>
-            <Text style={styles.value}>{animal.temperament}</Text>
+            <Text style={styles.value}>
+              {animal.temperament === 'calm' && 'Calmo'}
+              {animal.temperament === 'playful' && 'Brincalhão'}
+              {animal.temperament === 'aggressive' && 'Agressivo'}
+              {animal.temperament === 'shy' && 'Tímido'}
+              {animal.temperament === 'protective' && 'Protetor'}
+              {animal.temperament === 'sociable' && 'Sociável'}
+              {animal.temperament === 'independent' && 'Independente'}
+              {animal.temperament === 'unknown' && 'Indefinido'}
+            </Text>
           </View>
              <View style={styles.row}>
             <Text style={styles.label}>Porte:</Text>
-            <Text style={styles.value}>{animal.size}</Text>
+            <Text style={styles.value}>
+              {animal.size === 'medio' && 'Médio'}
+              {animal.size === 'pequeno' && 'Pequeno'}
+              {animal.size === 'grande' && 'Grande'}
+            </Text>
           </View>
           <View style={styles.row}>
             <Text style={styles.label}>Vacinado:</Text>

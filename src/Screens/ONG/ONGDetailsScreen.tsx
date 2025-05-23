@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image, Alert, Dimensions } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image, Alert, Dimensions, KeyboardAvoidingView, Platform } from 'react-native';
 import React, { useState } from 'react';
 import { Picker } from '@react-native-picker/picker';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -24,7 +24,7 @@ function FileUploadInput({ label, file, setFile }: { label: string, file: any, s
     }
   };
   return (
-    <View style={{ width: 350, marginBottom: 15 }}>
+    <View style={{ width: width * 0.85, marginBottom: 15 }}>
       <Text style={styles.label}>{label}</Text>
       <TouchableOpacity style={styles.uploadBox} onPress={handlePickFile}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
@@ -66,7 +66,7 @@ function ImageUploadInput({ label, images, setImages }: { label: string, images:
     <View>
       <Text style={styles.label}>{label}</Text>
       <TouchableOpacity style={styles.uploadContainer} onPress={handlePickImage} disabled={images.length >= 3}>
-        <View style={[styles.uploadBox, { height: height * 0.1, flexDirection: 'row', alignContent:'center', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap' }]}>
+        <View style={[styles.uploadBox, { height: height * 0.1, flexDirection: 'row', alignContent: 'center', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap' }]}>
           {images.length === 0 ? (
             <Text style={styles.uploadText}>Selecionar fotos</Text>
           ) : (
@@ -92,7 +92,7 @@ const animalTypes = ['Cães', 'Gatos', 'Cães e Gatos', 'Outros'];
 
 export default function ONGDetailsScreen({ route, navigation }: any) {
   const { name, email, telephone, cnpj, password, address } = route.params || {};
-    // TODO: Antes de permitir o cadastro e upload dos arquivos,
+  // TODO: Antes de permitir o cadastro e upload dos arquivos,
   // faça uma validação para checar se já existe uma ONG com esses dados (ex: CNPJ ou email).
   // Só permita o cadastro e upload se não existir.
   // Exemplo:
@@ -104,6 +104,7 @@ export default function ONGDetailsScreen({ route, navigation }: any) {
 
   const [animalType, setAnimalType] = useState('');
   const [pix, setPix] = useState('');
+  const [description, setDescription] = useState('');
   const [ataFile, setAtaFile] = useState<any>(null);
   const [estatutoFile, setEstatutoFile] = useState<any>(null);
   const [localImages, setLocalImages] = useState<any[]>([]);
@@ -154,12 +155,13 @@ export default function ONGDetailsScreen({ route, navigation }: any) {
           boardMeeting: ataUrl,
         },
         photos,
-        address
+        address,
+        description
       );
 
       if (success) {
-        Alert.alert('Sucesso', 'ONG cadastrada com sucesso!');
-        navigation.navigate('ONGHome');
+        Alert.alert('Validação Necessária', 'ONG cadastrada com sucesso e enviada para validação do administrador.');
+        navigation.navigate('Onboarding');
       }
     } catch (err) {
       Alert.alert('Erro', 'Falha ao cadastrar ONG.');
@@ -168,18 +170,34 @@ export default function ONGDetailsScreen({ route, navigation }: any) {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Image style={styles.backgroundImage} source={require('../../../assets/images/background-home.png')} />
-      <View style={styles.overlay}>
-        <View style={styles.formContainer}>
-          <Text style={styles.loginText}>Detalhes da ONG</Text>
-          <ScrollView contentContainerStyle={{ flexGrow: 1}} keyboardShouldPersistTaps="handled">
-
+      <View style={styles.formCard}>
+        <Text style={styles.loginText}>Detalhes da ONG</Text>
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
+        >
+          <ScrollView
+            contentContainerStyle={{ paddingBottom: 32 }}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+          >
             <TextInput
               label="Chave PIX"
               mode="outlined"
               value={pix}
               onChangeText={setPix}
+              style={styles.input}
+              theme={inputTheme}
+              autoCapitalize="none"
+            />
+            <TextInput
+              label="Descrição"
+              mode="outlined"
+              value={description}
+              onChangeText={setDescription}
               style={styles.input}
               theme={inputTheme}
               autoCapitalize="none"
@@ -201,7 +219,6 @@ export default function ONGDetailsScreen({ route, navigation }: any) {
             <FileUploadInput label="Ata da Assembleia da Atual Diretoria" file={ataFile} setFile={setAtaFile} />
             <FileUploadInput label="Estatuto Social" file={estatutoFile} setFile={setEstatutoFile} />
             <ImageUploadInput label="Fotos do Local (até 3 fotos)" images={localImages} setImages={setLocalImages} />
-
             <CustomButton
               title={'Cadastrar'}
               borderColor="transparent"
@@ -209,12 +226,12 @@ export default function ONGDetailsScreen({ route, navigation }: any) {
               color={Theme.PRIMARY}
               onPress={handleSubmit}
               disabled={false}
-              buttonStyle={{ marginBottom: '5%', marginTop: '5%', width: width * 0.85 }}
+              buttonStyle={{ width: width * 0.85 }}
             />
           </ScrollView>
-        </View>
+        </KeyboardAvoidingView>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -232,29 +249,24 @@ const inputTheme = {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'relative',
   },
   backgroundImage: {
     width: '100%',
-    height: '100%',
+    height: height,
     position: 'absolute',
+    top: 0,
+    left: 0,
   },
-  overlay: {
-    flex: 1,
-    width: '100%',
-    bottom: 0,
-    position: 'absolute',
-  },
-  formContainer: {
-    flex: 1,
-    width: '100%',
-    backgroundColor: Theme.BACK,
+  formCard: {
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
     alignItems: 'center',
-    borderTopRightRadius: 20,
-    borderTopLeftRadius: 20,
-    bottom: 0,
+    position: 'absolute',
+    width: '100%',
+    bottom: 0
   },
   loginText: {
     fontSize: 24,
@@ -270,19 +282,18 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   pickerContainer: {
-    borderWidth: 2,
+    borderWidth: 1.5,
     borderColor: Theme.INPUT,
     borderRadius: 10,
     marginBottom: 15,
     backgroundColor: 'white',
-    width: 350,
+    width: width * 0.85,
   },
   picker: {
-    height: height * 0.06,
     width: '100%',
   },
   uploadContainer: {
-    width: 350,
+    width: width * 0.85,
     marginBottom: 15,
   },
   uploadBox: {
@@ -292,6 +303,7 @@ const styles = StyleSheet.create({
     borderColor: Theme.INPUT,
     justifyContent: 'center',
     alignItems: 'center',
+    width: '100%',
   },
   uploadText: {
     color: '#888',
@@ -309,5 +321,6 @@ const styles = StyleSheet.create({
     width: width * 0.85,
     alignSelf: 'center',
     borderRadius: 10,
+    backgroundColor: '#fff',
   },
 });

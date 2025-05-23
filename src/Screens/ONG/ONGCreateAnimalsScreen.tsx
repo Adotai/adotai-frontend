@@ -119,6 +119,7 @@ export default function ONGCreateAnimalsScreen({ navigation }: any) {
         breed: { name: breed, speciesDescription: species },
         species: { description: species },
         age: Number(age),
+        size,
         health: health || 'GOOD',
         status: true,
         vaccinated,
@@ -216,10 +217,9 @@ export default function ONGCreateAnimalsScreen({ navigation }: any) {
             style={styles.picker}
             dropdownIconColor={Theme.TERTIARY}
           >
-            <Picker.Item label="Pequeno" value="PEQUENO" />
-            <Picker.Item label="Médio" value="MÉDIO" />
-            <Picker.Item label="Grande" value="GRANDE" />
-            <Picker.Item label="Extra Grande" value="EXTRA_GRANDE" />
+            <Picker.Item label="Pequeno" value="pequeno" />
+            <Picker.Item label="Médio" value="medio" />
+            <Picker.Item label="Grande" value="grande" />
           </Picker>
         </View>
         <View style={styles.pickerWrapper}>

@@ -107,7 +107,8 @@ export const handleSignUpOng = async (
     city: string;
     state: string;
     zipCode: string;
-  }
+  },
+  description: string
 ): Promise<boolean> => {
   try {
     const addressResponse = await axios.post(`${USER_ROUTE}/address`, address);
@@ -130,6 +131,7 @@ export const handleSignUpOng = async (
       photos,
       addressId,
       status: false,
+      description
     });
 
     if (ongResponse.status === 200) {

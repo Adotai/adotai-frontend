@@ -35,7 +35,7 @@ export default function ONGAnimalsScreen({ }) {
           <DogCard
             name={item.name}
             image={item.photos && item.photos.length > 0 ? item.photos[0].photoUrl : ''}
-            location={item.species || ''}
+            location={item.species === 'DOG' ? 'Cachorro' : 'Gato'}
             onPress={() => navigation.navigate('ONGAnimalDetails', { animal: item })}
           />
         )}
@@ -50,7 +50,7 @@ export default function ONGAnimalsScreen({ }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 24,
+    padding: 8,
     backgroundColor: '#fff',
   },
 });

@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image, ScrollView, Alert, Dimensions } from 'react-native';
+import { StyleSheet, Text, View, Image, ScrollView, Alert, Dimensions, KeyboardAvoidingView, Platform } from 'react-native';
 import React from 'react';
 import { Picker } from '@react-native-picker/picker';
 import CustomButton from '../Components/CustomButton';
@@ -67,9 +67,9 @@ export default function AddressScreen({ route, navigation }: any) {
       name,
       email,
       telephone,
-      cnpj: cpf, 
+      cnpj: cpf,
       password,
-      pix: '',  
+      pix: '',
       address: {
         street: address,
         number: parseInt(number, 10),
@@ -87,66 +87,72 @@ export default function AddressScreen({ route, navigation }: any) {
       <View style={styles.overlay}>
         <View style={styles.formContainer}>
           <Text style={styles.loginText}>Detalhes de Endereço</Text>
-          <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
-            <TextInput
-              label="CEP"
-              mode="outlined"
-              value={cep}
-              onChangeText={setCep}
-              style={styles.input}
-              theme={inputTheme}
-              keyboardType="numeric"
-            />
+          <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
+          >
+            <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
+              <TextInput
+                label="CEP"
+                mode="outlined"
+                value={cep}
+                onChangeText={setCep}
+                style={styles.input}
+                theme={inputTheme}
+                keyboardType="numeric"
+              />
 
-            <View style={styles.pickerContainer}>
-              <Picker
-                selectedValue={state}
-                onValueChange={(itemValue) => setState(itemValue)}
-                style={styles.picker}
-              >
-                <Picker.Item label="Selecione um estado" value="" />
-                {states.map((state) => (
-                  <Picker.Item key={state} label={state} value={state} />
-                ))}
-              </Picker>
-            </View>
+              <View style={styles.pickerContainer}>
+                <Picker
+                  selectedValue={state}
+                  onValueChange={(itemValue) => setState(itemValue)}
+                  style={styles.picker}
+                >
+                  <Picker.Item label="Selecione um estado" value="" />
+                  {states.map((state) => (
+                    <Picker.Item key={state} label={state} value={state} />
+                  ))}
+                </Picker>
+              </View>
 
-            <TextInput
-              label="Cidade"
-              mode="outlined"
-              value={city}
-              onChangeText={setCity}
-              style={styles.input}
-              theme={inputTheme}
-            />
-            <TextInput
-              label="Endereço"
-              mode="outlined"
-              value={address}
-              onChangeText={setAddress}
-              style={styles.input}
-              theme={inputTheme}
-            />
-            <TextInput
-              label="Número"
-              mode="outlined"
-              value={number}
-              onChangeText={setNumber}
-              style={styles.input}
-              theme={inputTheme}
-              keyboardType="numeric"
-            />
-          </ScrollView>
+              <TextInput
+                label="Cidade"
+                mode="outlined"
+                value={city}
+                onChangeText={setCity}
+                style={styles.input}
+                theme={inputTheme}
+              />
+              <TextInput
+                label="Endereço"
+                mode="outlined"
+                value={address}
+                onChangeText={setAddress}
+                style={styles.input}
+                theme={inputTheme}
+              />
+              <TextInput
+                label="Número"
+                mode="outlined"
+                value={number}
+                onChangeText={setNumber}
+                style={styles.input}
+                theme={inputTheme}
+                keyboardType="numeric"
+              />
+              <CustomButton
+                title={fromOng ? 'Seguinte' : 'Cadastrar'}
+                borderColor="transparent"
+                textColor={Theme.BACK}
+                color={Theme.PRIMARY}
+                onPress={fromOng ? handleOngNext : handleRegister}
+                disabled={false}
+                buttonStyle={{ marginBottom: '5%', marginTop: '5%', width: width * 0.85, alignSelf: 'center' }}
+              />
+            </ScrollView>
+          </KeyboardAvoidingView>
 
-            <CustomButton
-            title={fromOng ? 'Seguinte' : 'Cadastrar'}
-            borderColor="transparent"
-            textColor={Theme.BACK}
-            color={Theme.PRIMARY}
-            onPress={fromOng ? handleOngNext : handleRegister}
-            disabled={false}
-            buttonStyle={{ marginBottom: '5%', marginTop: '5%', width: width * 0.85, alignSelf: 'center' }}
-            />
         </View>
       </View>
     </View>
@@ -190,19 +196,18 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   label: {
-    fontSize: 18,
+    fontSize: 13,
     color: Theme.PRIMARY,
     fontFamily: 'Poppins-Bold',
   },
   pickerContainer: {
-    borderWidth: 2,
+    borderWidth: 1.5,
     borderColor: Theme.INPUT,
     borderRadius: 10,
     marginBottom: 15,
     backgroundColor: 'white',
   },
   picker: {
-    height: height * 0.06,
     width: '100%',
   },
   input: {

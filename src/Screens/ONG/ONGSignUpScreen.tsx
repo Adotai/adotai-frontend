@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, ImageBackground, ScrollView, Alert, Dimensions } from 'react-native';
+import { StyleSheet, Text, View, ImageBackground, ScrollView, Alert, Dimensions, KeyboardAvoidingView, Platform } from 'react-native';
 import React from 'react';
 import { TextInput } from 'react-native-paper';
 import CustomButton from '../../Components/CustomButton';
@@ -36,70 +36,75 @@ export default function ONGSignUpScreen() {
       <View style={styles.overlay}>
         <View style={styles.formContainer}>
           <Text style={styles.loginText}>Cadastro ONG</Text>
-          <ScrollView contentContainerStyle={{ flexGrow: 1, width: '100%' }} keyboardShouldPersistTaps="handled">
-            <TextInput
-              label="Nome da ONG"
-              mode="outlined"
-              value={name}
-              onChangeText={setName}
-              style={styles.input}
-              theme={inputTheme}
-              autoCapitalize="words"
-            />
-            <TextInput
-              label="CNPJ"
-              mode="outlined"
-              value={cpf}
-              onChangeText={setCpf}
-              style={styles.input}
-              theme={inputTheme}
-              keyboardType="numeric"
-            />
-            <TextInput
-              label="E-mail"
-              mode="outlined"
-              value={email}
-              onChangeText={setEmail}
-              style={styles.input}
-              theme={inputTheme}
-              autoCapitalize="none"
-              keyboardType="email-address"
-              autoComplete="email"
-            />
-            <TextInput
-              label="Telefone"
-              mode="outlined"
-              value={phone}
-              onChangeText={setPhone}
-              style={styles.input}
-              theme={inputTheme}
-              keyboardType="phone-pad"
-              autoComplete="tel"
-            />
-            <TextInput
-              label="Senha"
-              mode="outlined"
-              value={password}
-              onChangeText={setPassword}
-              style={styles.input}
-              theme={inputTheme}
-              secureTextEntry
-              autoCapitalize="none"
-              autoComplete="password"
-            />
-            <TextInput
-              label="Confirme sua Senha"
-              mode="outlined"
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-              style={styles.input}
-              theme={inputTheme}
-              secureTextEntry
-              autoCapitalize="none"
-              autoComplete="password"
-            />
-          </ScrollView>
-
+          <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
+          >
+            <ScrollView contentContainerStyle={{ flexGrow: 1, width: '100%' }} keyboardShouldPersistTaps="handled">
+              <TextInput
+                label="Nome da ONG"
+                mode="outlined"
+                value={name}
+                onChangeText={setName}
+                style={styles.input}
+                theme={inputTheme}
+                autoCapitalize="words"
+              />
+              <TextInput
+                label="CNPJ"
+                mode="outlined"
+                value={cpf}
+                onChangeText={setCpf}
+                style={styles.input}
+                theme={inputTheme}
+                keyboardType="numeric"
+              />
+              <TextInput
+                label="E-mail"
+                mode="outlined"
+                value={email}
+                onChangeText={setEmail}
+                style={styles.input}
+                theme={inputTheme}
+                autoCapitalize="none"
+                keyboardType="email-address"
+                autoComplete="email"
+              />
+              <TextInput
+                label="Telefone"
+                mode="outlined"
+                value={phone}
+                onChangeText={setPhone}
+                style={styles.input}
+                theme={inputTheme}
+                keyboardType="phone-pad"
+                autoComplete="tel"
+              />
+              <TextInput
+                label="Senha"
+                mode="outlined"
+                value={password}
+                onChangeText={setPassword}
+                style={styles.input}
+                theme={inputTheme}
+                secureTextEntry
+                autoCapitalize="none"
+                autoComplete="password"
+              />
+              <TextInput
+                label="Confirme sua Senha"
+                mode="outlined"
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+                style={styles.input}
+                theme={inputTheme}
+                secureTextEntry
+                autoCapitalize="none"
+                autoComplete="password"
+              />
+            </ScrollView>
+          </KeyboardAvoidingView>
           <CustomButton
             title={'Seguinte'}
             borderColor="transparent"
@@ -136,7 +141,7 @@ export default function ONGSignUpScreen() {
               });
             }}
             disabled={false}
-            buttonStyle={{ marginBottom: '5%', marginTop: '5%', width: width * 0.85,alignSelf: 'center' }}
+            buttonStyle={{ marginBottom: '5%', marginTop: '5%', width: width * 0.85, alignSelf: 'center' }}
           />
         </View>
       </View>
