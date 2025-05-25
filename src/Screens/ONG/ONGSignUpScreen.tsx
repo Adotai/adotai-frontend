@@ -103,46 +103,47 @@ export default function ONGSignUpScreen() {
                 autoCapitalize="none"
                 autoComplete="password"
               />
+              <CustomButton
+                title={'Seguinte'}
+                borderColor="transparent"
+                textColor={Theme.BACK}
+                color={Theme.PRIMARY}
+                onPress={() => {
+                  if (!name || !email || !phone || !cpf || !password || !confirmPassword) {
+                    Alert.alert('Erro', 'Todos os campos são obrigatórios.');
+                    return;
+                  }
+
+                  if (password !== confirmPassword) {
+                    Alert.alert('Erro', 'As senhas não coincidem.');
+                    return;
+                  }
+
+                  if (!/^\S+@\S+\.\S+$/.test(email)) {
+                    Alert.alert('Erro', 'Formato de e-mail inválido.');
+                    return;
+                  }
+
+                  if (!/^\d{14}$/.test(cpf.replace(/\D/g, ''))) {
+                    Alert.alert('Erro', 'CNPJ inválido. Certifique-se de que possui 14 dígitos.');
+                    return;
+                  }
+
+                  navigation.navigate('Address', {
+                    name,
+                    email,
+                    telephone: phone,
+                    cpf,
+                    password,
+                    fromOng: true,
+                  });
+                }}
+                disabled={false}
+                buttonStyle={{ marginBottom: '5%', marginTop: '5%', width: width * 0.85, alignSelf: 'center' }}
+              />
             </ScrollView>
           </KeyboardAvoidingView>
-          <CustomButton
-            title={'Seguinte'}
-            borderColor="transparent"
-            textColor={Theme.BACK}
-            color={Theme.PRIMARY}
-            onPress={() => {
-              if (!name || !email || !phone || !cpf || !password || !confirmPassword) {
-                Alert.alert('Erro', 'Todos os campos são obrigatórios.');
-                return;
-              }
 
-              if (password !== confirmPassword) {
-                Alert.alert('Erro', 'As senhas não coincidem.');
-                return;
-              }
-
-              if (!/^\S+@\S+\.\S+$/.test(email)) {
-                Alert.alert('Erro', 'Formato de e-mail inválido.');
-                return;
-              }
-
-              if (!/^\d{14}$/.test(cpf.replace(/\D/g, ''))) {
-                Alert.alert('Erro', 'CNPJ inválido. Certifique-se de que possui 14 dígitos.');
-                return;
-              }
-
-              navigation.navigate('Address', {
-                name,
-                email,
-                telephone: phone,
-                cpf,
-                password,
-                fromOng: true,
-              });
-            }}
-            disabled={false}
-            buttonStyle={{ marginBottom: '5%', marginTop: '5%', width: width * 0.85, alignSelf: 'center' }}
-          />
         </View>
       </View>
     </View>

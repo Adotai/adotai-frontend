@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Image, StyleSheet, Dimensions, Pressable, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, Image, StyleSheet, Dimensions, Pressable, ScrollView, TouchableOpacity, Alert, Linking } from 'react-native';
 import { Theme } from '../../../constants/Themes';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
@@ -18,6 +18,16 @@ export default function UserAnimalDetailsScreen({ route }: any) {
   const [current, setCurrent] = useState(0);
 
   const photos = animal.photos || [];
+
+  const handleWhatsApp = () => {
+  // Número da ONG (exemplo: DDD + número, só números)
+  const phone = ong?.phone?.replace(/\D/g, ''); // remove caracteres não numéricos
+  // Mensagem personalizada
+  const message = `Olá! Estava utilizando o aplicativo Adotai e possuo interesse em adotar o animal ${animal.name}`;
+  // Monta o link do WhatsApp
+  const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+  Linking.openURL(url);
+};
 
   const handleNext = () => {
     if (current < photos.length - 1) setCurrent(current + 1);
@@ -165,7 +175,7 @@ export default function UserAnimalDetailsScreen({ route }: any) {
         <CustomButton
           color={Theme.PRIMARY}
           title='Entrar em contato'
-          onPress={() => { }}
+          onPress={handleWhatsApp}
           buttonStyle={{ alignSelf: 'center', marginVertical: 16, width: width * 0.95 }}
         />
       </View>

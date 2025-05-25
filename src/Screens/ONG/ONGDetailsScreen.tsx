@@ -66,12 +66,12 @@ function ImageUploadInput({ label, images, setImages }: { label: string, images:
     <View>
       <Text style={styles.label}>{label}</Text>
       <TouchableOpacity style={styles.uploadContainer} onPress={handlePickImage} disabled={images.length >= 3}>
-        <View style={[styles.uploadBox, { height: height * 0.1, flexDirection: 'row', alignContent: 'center', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap' }]}>
+        <View style={[styles.uploadBox, { height: height * 0.15, flexDirection: 'row', alignContent: 'center', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap' }]}>
           {images.length === 0 ? (
             <Text style={styles.uploadText}>Selecionar fotos</Text>
           ) : (
             images.map((img, idx) => (
-              <View key={idx} style={{ margin: 8, alignItems: 'center' }}>
+              <View key={idx} style={{ margin: 8, alignItems: 'center', }}>
                 <Image source={{ uri: img.uri }} style={styles.imagePreview} />
                 <TouchableOpacity onPress={() => handleRemove(idx)}>
                   <Ionicons name="close-circle" size={20} color="#d33" />

@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image, Dimensions, ScrollView, Alert } from 'react-native';
+import { StyleSheet, Text, View, Image, Dimensions, ScrollView, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import React from 'react';
 import { Theme } from '../../../constants/Themes';
 import { TextInput } from 'react-native-paper';
@@ -37,6 +37,11 @@ export default function UserSignUpScreen() {
       <View style={styles.overlay}>
         <View style={styles.formContainer}>
           <Text style={styles.loginText}>Informações pessoais</Text>
+            <KeyboardAvoidingView
+                      style={{ flex: 1 }}
+                      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                      keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
+                    >
           <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
             <TextInput
               label="Nome"
@@ -139,6 +144,7 @@ export default function UserSignUpScreen() {
             disabled={false}
             buttonStyle={{ marginBottom: '5%', marginTop: '5%', width: width * .85, alignSelf: 'center' }}
           />
+          </KeyboardAvoidingView>
         </View>
       </View>
     </View>

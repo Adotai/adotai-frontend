@@ -88,8 +88,12 @@ export default function UserONGDetailScreen({ route }: any) {
           <View style={[styles.row,{flexDirection: 'column'}]}>
             <Text style={styles.label}>Endereço:</Text>
             <Text style={[styles.value]}>
-              {ong.address.street}, Nº {ong.address.number}, CEP: {ong.address.zipCode}
+              {ong.address.street}, {ong.address.number}
             </Text>
+          </View>
+           <View style={styles.row}>
+            <Text style={styles.label}>CEP:</Text>
+            <Text style={styles.value}>{ong.address.zipCode}</Text>
           </View>
         </View>
       </View>
