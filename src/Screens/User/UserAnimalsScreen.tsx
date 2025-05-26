@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image, ScrollView, SafeAreaView, Dimensions } from 'react-native'
+import { StyleSheet, Text, View, Image, ScrollView, SafeAreaView, Dimensions, FlatList } from 'react-native'
 import React from 'react'
 import DogCard from '../../Components/DogCard'
 import { fetchAnimalsByState, fetchLoggedUser, fetchOngs } from '../../actions/userActions';
@@ -17,22 +17,21 @@ export default function UserAnimalsScreen() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [animals, setAnimals] = React.useState<any[]>([]);
   const [ongs, setOngs] = React.useState<any[]>([]);
-  const [selectedState, setSelectedState] = React.useState<string | null>(null); // começa como null
+  const [selectedState, setSelectedState] = React.useState<string | null>(null); 
+  const [refreshing, setRefreshing] = React.useState(false);
 
-  // Primeiro busca o estado do usuário
   React.useEffect(() => {
     const init = async () => {
       const user = await fetchLoggedUser();
       if (user?.state && estados.includes(user.state)) {
         setSelectedState(user.state);
       } else {
-        setSelectedState('SP'); // fallback padrão
+        setSelectedState('SP'); 
       }
     };
     init();
   }, []);
 
-  // Depois carrega os dados quando selectedState estiver definido
   React.useEffect(() => {
     const load = async () => {
       if (!selectedState) return;
@@ -45,6 +44,19 @@ export default function UserAnimalsScreen() {
     };
     load();
   }, [selectedState]);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    if (selectedState) {
+      const [animalsData, ongsData] = await Promise.all([
+        fetchAnimalsByState(selectedState),
+        fetchOngs()
+      ]);
+      setAnimals(animalsData);
+      setOngs(ongsData);
+    }
+    setRefreshing(false);
+  };
 
   const getOngLocation = (ongId: number) => {
     const ong = ongs.find(o => o.id === ongId);
@@ -76,21 +88,22 @@ export default function UserAnimalsScreen() {
           </Picker>
         )}
       </View>
-      <ScrollView contentContainerStyle={styles.listContainer}>
-        {animals.length === 0 ? (
-          <Text style={{ textAlign: 'center', marginTop: 32 }}>Nenhum animal encontrado para região.</Text>
-        ) : (
-          animals.map(animal => (
-            <DogCard
-              key={animal.id}
-              name={animal.name}
-              image={animal.photos && animal.photos.length > 0 ? animal.photos[0].photoUrl : ''}
-              location={getOngLocation(animal.ongId)}
-              onPress={() => navigation.navigate('UserAnimalDetails', { animal, city: getOngLocation(animal.ongId), ongName: getOngName(animal.ongId), ongs })}
-            />
-          ))
+      <FlatList
+        data={animals}
+        keyExtractor={item => String(item.id)}
+        renderItem={({ item }) => (
+          <DogCard
+            name={item.name}
+            image={item.photos && item.photos.length > 0 ? item.photos[0].photoUrl : ''}
+            location={getOngLocation(item.ongId)}
+            onPress={() => navigation.navigate('UserAnimalDetails', { animal: item, city: getOngLocation(item.ongId), ongName: getOngName(item.ongId), ongs })}
+          />
         )}
-      </ScrollView>
+        ListEmptyComponent={<Text style={{ textAlign: 'center', marginTop: 32 }}>Nenhum animal encontrado para região.</Text>}
+        refreshing={refreshing}
+        onRefresh={onRefresh}
+        contentContainerStyle={styles.listContainer}
+      />
     </SafeAreaView>
   )
 }

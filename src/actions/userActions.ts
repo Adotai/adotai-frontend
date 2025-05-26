@@ -164,7 +164,7 @@ export const fetchOngs = async (): Promise<any[]> => {
     });
     return response.data.data || [];
   } catch (error) {
-    console.error('Erro ao buscar ONGs:', error);
+    //console.error('Erro ao buscar ONGs:', error);
     throw error;
   }
 };
@@ -256,7 +256,7 @@ export const fetchAnimalsByState = async (uf: string): Promise<any[]> => {
       // Estado sem animais — retorna array vazio sem logar erro
       return [];
     }
-    console.error('Erro ao buscar animais por estado:', error);
+    //console.error('Erro ao buscar animais por estado:', error);
     return [];
   }
 };

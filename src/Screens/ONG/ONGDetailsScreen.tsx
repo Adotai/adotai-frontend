@@ -88,7 +88,7 @@ function ImageUploadInput({ label, images, setImages }: { label: string, images:
   );
 }
 
-const animalTypes = ['Cães', 'Gatos', 'Cães e Gatos', 'Outros'];
+const animalTypes = ['Cães', 'Gatos', 'Cães e Gatos'];
 
 export default function ONGDetailsScreen({ route, navigation }: any) {
   const { name, email, telephone, cnpj, password, address } = route.params || {};
