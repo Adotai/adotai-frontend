@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { FlatList, RefreshControl, Text, Image, Dimensions} from 'react-native';
+import { FlatList, RefreshControl, Text, Image, Dimensions, StatusBar} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { fetchOngs } from '../../actions/userActions';
 import OngCard from '../../Components/OngCard';
@@ -36,6 +36,8 @@ export default function UserONGScreen() {
   }, []);
 
   return (
+     <>
+          <StatusBar backgroundColor="transparent" barStyle="dark-content" />
     <SafeAreaView style={{ flex: 1, backgroundColor: '#fff'}}>
       <Image style={{ width: width * 0.5, height: height*0.06, marginLeft: 10, marginVertical: 16 }} source={require('../../../assets/images/adotai-text.png')} />
       
@@ -51,6 +53,7 @@ export default function UserONGScreen() {
         }
       />
     </SafeAreaView>
+    </>
   );
 }
 

@@ -8,8 +8,8 @@ import * as ImagePicker from 'expo-image-picker';
 import CustomButton from '../../Components/CustomButton';
 import { Ionicons } from '@expo/vector-icons';
 import { uploadFileToStorage } from '../../services/uploadFileToStorage';
-import { TextInput } from 'react-native-paper'; // Troque CustomInput por TextInput do paper
-import { handleSignUpOng } from '../../actions/userActions';
+import { TextInput } from 'react-native-paper'; 
+import { handleSignUpOng } from '../../actions/ongActions';
 
 const { width, height } = Dimensions.get('window');
 

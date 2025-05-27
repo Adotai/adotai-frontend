@@ -92,72 +92,10 @@ export const handleSignUp = async (
   }
 };
 
-export const handleSignUpOng = async (
-  name: string,
-  email: string,
-  telephone: string,
-  cnpj: string,
-  password: string,
-  pix: string,
-  documents: { socialStatute: string; boardMeeting: string },
-  photos: { photoUrl: string }[],
-  address: {
-    street: string;
-    number: number;
-    city: string;
-    state: string;
-    zipCode: string;
-  },
-  description: string
-): Promise<boolean> => {
-  try {
-    const addressResponse = await axios.post(`${USER_ROUTE}/address`, address);
-
-    if (addressResponse.status !== 200) {
-      Alert.alert('Erro', 'Falha ao criar endereço.');
-      return false;
-    }
-
-    const addressId = addressResponse.data.data.id;
-
-    const ongResponse = await axios.post(`${USER_ROUTE}/ongs`, {
-      name,
-      phone: telephone,
-      cnpj,
-      email,
-      password,
-      pix: pix || '',
-      documents,
-      photos,
-      addressId,
-      status: false,
-      description
-    });
-
-    if (ongResponse.status === 200) {
-      Alert.alert('Sucesso', 'ONG cadastrada com sucesso!');
-      await AsyncStorage.setItem('ongId', String(ongResponse.data.data.id));
-      return true;
-    } else {
-      Alert.alert('Erro', 'Falha ao cadastrar ONG.');
-      return false;
-    }
-  } catch (error: any) {
-    if (error.response) {
-      const { data } = error.response;
-      Alert.alert('Erro', data?.message || 'Erro no servidor.');
-    } else {
-      console.error('Request error:', error);
-      Alert.alert('Erro', 'Não foi possível conectar ao servidor.');
-    }
-    return false;
-  }
-};
-
 export const fetchOngs = async (): Promise<any[]> => {
   try {
     const token = await AsyncStorage.getItem('authToken');
-    const response = await axios.get(`${USER_ROUTE}/ongs`, {
+    const response = await axios.get(`${USER_ROUTE}/ong`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -187,7 +125,7 @@ export const acceptOng = async (id: number): Promise<boolean> => {
 export const deleteOng = async (id: number): Promise<boolean> => {
   try {
     const token = await AsyncStorage.getItem('authToken');
-    await axios.delete(`${USER_ROUTE}/ongs/${id}`, {
+    await axios.delete(`${USER_ROUTE}/ong/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return true;
@@ -197,21 +135,6 @@ export const deleteOng = async (id: number): Promise<boolean> => {
   }
 };
 
-export const createAnimal = async (animalObj: any): Promise<any> => {
-  const token = await AsyncStorage.getItem('authToken');
-  if (!token) throw new Error('Token não encontrado');
-  const response = await axios.post(
-    `${USER_ROUTE}/animal`,
-    animalObj,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    }
-  );
-  return response.data;
-};
 
 export const getLoggedOngId = async (): Promise<number | null> => {
   try {
@@ -219,7 +142,7 @@ export const getLoggedOngId = async (): Promise<number | null> => {
     if (!email) return null;
 
     const token = await AsyncStorage.getItem('authToken');
-    const response = await axios.get(`${USER_ROUTE}/ongs`, {
+    const response = await axios.get(`${USER_ROUTE}/ong`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     const ongs = response.data.data;
@@ -261,13 +184,13 @@ export const fetchAnimalsByState = async (uf: string): Promise<any[]> => {
   }
 };
 
-export const fetchLoggedUser = async (): Promise<{ name?: string, city?: string, state?: string, email?: string, cpf?: string , phone?: string} | null> => {
+export const fetchLoggedUser = async (): Promise<{ id?: number, name?: string, city?: string, state?: string, email?: string, cpf?: string , phone?: string, address?: any } | null> => {
   try {
     const token = await AsyncStorage.getItem('authToken');
     const email = await AsyncStorage.getItem('userEmail');
     if (!token || !email) return null;
 
-    const response = await axios.get(`${USER_ROUTE}/users`, {
+    const response = await axios.get(`${USER_ROUTE}/user`, {
       headers: { Authorization: `Bearer ${token}` }
     });
 
@@ -275,15 +198,38 @@ export const fetchLoggedUser = async (): Promise<{ name?: string, city?: string,
     if (!user) return null;
 
     return {
+      id: user.id,
       name: user.name,
-      city: user.address?.city,
-      state: user.address?.state,
       email: user.email,
       cpf: user.cpf,
-      phone: user.telephone
+      phone: user.telephone,
+      city: user.address?.city,
+      state: user.address?.state,
+      address: user.address, // objeto completo
     };
   } catch (err) {
     console.error('Erro ao buscar dados do usuário:', err);
     return null;
+  }
+};
+
+export const updateUser = async (user: {
+  id: number;
+  name: string;
+  email: string;
+  cpf: string;
+  password: string;
+  telephone: string;
+  address: any;
+  addressId: number;
+}) => {
+  try {
+    const token = await AsyncStorage.getItem('authToken');
+    const response = await axios.put(`${USER_ROUTE}/user`, user, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  } catch (error: any) {
+    throw error;
   }
 };

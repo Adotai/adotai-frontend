@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
   loginText: {
     fontSize: 24,
     color: Theme.PRIMARY,
-    fontFamily: 'Poppins-Bold',
+    fontFamily: 'Poppins-SemiBold',
     marginTop: 20,
     marginBottom: 20,
   },

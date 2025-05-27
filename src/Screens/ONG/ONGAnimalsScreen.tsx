@@ -1,9 +1,10 @@
 import React from 'react';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
+import { View, Text, StyleSheet, FlatList, StatusBar } from 'react-native';
 import { fetchAnimals, getLoggedOngId } from '../../actions/userActions';
 import DogCard from '../../Components/DogCard';
 import { RootStackParamList } from '../../types';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function ONGAnimalsScreen({ }) {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -34,7 +35,10 @@ export default function ONGAnimalsScreen({ }) {
   };
 
   return (
-    <View style={styles.container}>
+        <>
+
+    <StatusBar backgroundColor="#fff" barStyle="dark-content" />
+    <SafeAreaView style={styles.container}>
       <FlatList
         data={animals}
         keyExtractor={item => String(item.id)}
@@ -46,11 +50,12 @@ export default function ONGAnimalsScreen({ }) {
             onPress={() => navigation.navigate('ONGAnimalDetails', { animal: item })}
           />
         )}
-        ListEmptyComponent={<Text>Nenhum animal encontrado.</Text>}
+        ListEmptyComponent={<Text>Nenhum animal cadastrado.</Text>}
         refreshing={refreshing}
         onRefresh={onRefresh}
       />
-    </View>
+    </SafeAreaView>
+    </>
   );
 }
 

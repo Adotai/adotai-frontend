@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, StyleSheet, Alert, ScrollView, Switch, Text, TouchableOpacity, Image } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import { createAnimal, getLoggedOngId } from '../../actions/userActions';
+import { createAnimal,  } from '../../actions/ongActions';
+import { getLoggedOngId } from '../../actions/userActions'
 import { Button, TextInput } from 'react-native-paper';
 import CustomButton from '../../Components/CustomButton';
 import { Theme } from '../../../constants/Themes';
@@ -157,8 +158,6 @@ export default function ONGCreateAnimalsScreen({ navigation }: any) {
           onChangeText={setAnimalDescription}
           style={styles.input}
           theme={inputTheme}
-          multiline
-          numberOfLines={4}
         />
       
         <TextInput

@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image, ScrollView, SafeAreaView, Dimensions, FlatList } from 'react-native'
+import { StyleSheet, Text, View, Image, ScrollView, SafeAreaView, Dimensions, FlatList, StatusBar } from 'react-native'
 import React from 'react'
 import DogCard from '../../Components/DogCard'
 import { fetchAnimalsByState, fetchLoggedUser, fetchOngs } from '../../actions/userActions';
@@ -17,7 +17,7 @@ export default function UserAnimalsScreen() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [animals, setAnimals] = React.useState<any[]>([]);
   const [ongs, setOngs] = React.useState<any[]>([]);
-  const [selectedState, setSelectedState] = React.useState<string | null>(null); 
+  const [selectedState, setSelectedState] = React.useState<string | null>(null);
   const [refreshing, setRefreshing] = React.useState(false);
 
   React.useEffect(() => {
@@ -26,7 +26,7 @@ export default function UserAnimalsScreen() {
       if (user?.state && estados.includes(user.state)) {
         setSelectedState(user.state);
       } else {
-        setSelectedState('SP'); 
+        setSelectedState('SP');
       }
     };
     init();
@@ -72,39 +72,43 @@ export default function UserAnimalsScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 40, marginBottom: 8 }}>
-        <Image style={{ width: width * 0.5, height: height * 0.05 }} source={require('../../../assets/images/adotai-text.png')} />
-        {selectedState && (
-          <Picker
-            selectedValue={selectedState}
-            onValueChange={(itemValue) => setSelectedState(itemValue)}
-            style={{ width: 120, height: 'auto' }}
-            itemStyle={{ fontSize: 16 }}
-          >
-            {estados.map((uf) => (
-              <Picker.Item key={uf} label={uf} value={uf} />
-            ))}
-          </Picker>
-        )}
-      </View>
-      <FlatList
-        data={animals}
-        keyExtractor={item => String(item.id)}
-        renderItem={({ item }) => (
-          <DogCard
-            name={item.name}
-            image={item.photos && item.photos.length > 0 ? item.photos[0].photoUrl : ''}
-            location={getOngLocation(item.ongId)}
-            onPress={() => navigation.navigate('UserAnimalDetails', { animal: item, city: getOngLocation(item.ongId), ongName: getOngName(item.ongId), ongs })}
-          />
-        )}
-        ListEmptyComponent={<Text style={{ textAlign: 'center', marginTop: 32 }}>Nenhum animal encontrado para região.</Text>}
-        refreshing={refreshing}
-        onRefresh={onRefresh}
-        contentContainerStyle={styles.listContainer}
-      />
-    </SafeAreaView>
+    <>
+      <StatusBar backgroundColor="#fff" barStyle="dark-content" />
+      <SafeAreaView style={styles.container}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 40, marginBottom: 8 }}>
+          <Image style={{ width: width * 0.5, height: height * 0.05 }} source={require('../../../assets/images/adotai-text.png')} />
+          {selectedState && (
+            <Picker
+              selectedValue={selectedState}
+              onValueChange={(itemValue) => setSelectedState(itemValue)}
+              style={{ width: 120, height: 'auto' }}
+              itemStyle={{ fontSize: 16 }}
+            >
+              {estados.map((uf) => (
+                <Picker.Item key={uf} label={uf} value={uf} />
+              ))}
+            </Picker>
+          )}
+        </View>
+        <FlatList
+          data={animals}
+          keyExtractor={item => String(item.id)}
+          renderItem={({ item }) => (
+            <DogCard
+              name={item.name}
+              image={item.photos && item.photos.length > 0 ? item.photos[0].photoUrl : ''}
+              location={getOngLocation(item.ongId)}
+              onPress={() => navigation.navigate('UserAnimalDetails', { animal: item, city: getOngLocation(item.ongId), ongName: getOngName(item.ongId), ongs })}
+            />
+          )}
+          ListEmptyComponent={<Text style={{ textAlign: 'center', marginTop: 32 }}>Nenhum animal encontrado para região.</Text>}
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          contentContainerStyle={styles.listContainer}
+        />
+      </SafeAreaView>
+    </>
+
   )
 }
 

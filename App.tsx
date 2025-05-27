@@ -130,10 +130,11 @@ export default function App() {
               name="UserEditProfile"
               component={UserEditProfileScreen}
               options={{
-                headerShown: false,
-                headerTransparent: true,
-                headerTitle: '',
-                headerTintColor: '#FFFFFF',
+                   headerShown: true,
+                headerTitle: 'Editar informações',
+                headerTintColor: '#AD334A',
+                headerTitleAlign: 'center',
+                headerTransparent: false,
               }} />
             <Stack.Screen
               name="Address"
@@ -178,7 +179,7 @@ export default function App() {
               name="ONGHome"
               component={ONGHomeScreen}
               options={{
-                headerShown: true,
+                headerShown: false,
                 headerTransparent: true,
                 headerTitle: '',
                 headerTintColor: '#FFFFFF',

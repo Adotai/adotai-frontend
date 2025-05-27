@@ -27,9 +27,9 @@ export default function UserProfileScreen({ navigation }: any) {
         setUserName(userData.name || '');
         setUserCity(userData.city || '');
         setUserState(userData.state || '');
-        setUserEmail(userData.email || 'fudeu');
-        setUserPhone(userData.phone || 'fudeu');
-        setUserCpf(userData.cpf || 'fudeu');
+        setUserEmail(userData.email || '');
+        setUserPhone(userData.phone || '');
+        setUserCpf(userData.cpf || '');
       }
     };
     loadUser();
@@ -50,7 +50,7 @@ export default function UserProfileScreen({ navigation }: any) {
       <Image style={{ position: 'absolute', width: '100%', height: '100%' }} source={require('../../../assets/images/background-home.png')} />
       <View style={styles.overlay}>
         <Text style={{ position: 'relative', margin: 32, marginBottom: 0, fontFamily: 'Poppins-SemiBold', color: 'white', fontSize: 32 }}>{userName}</Text>
-        <Text style={{ position: 'relative', margin: 32, marginTop: 0, fontFamily: 'Poppins-Regular', color: Theme.INPUT, fontSize: 16 }}>{userCity}, {userState}</Text>
+        <Text style={{ position: 'relative', margin: 32, marginTop: 0, fontFamily: 'Poppins-Regular', color: Theme.INPUT, fontSize: 16 }}>{userCity} {userState}</Text>
         <View style={styles.formContainer}>
           <TouchableOpacity
             style={styles.option}
@@ -61,9 +61,9 @@ export default function UserProfileScreen({ navigation }: any) {
               email: userEmail,
               phone: userPhone,
               cpf: userCpf,
-
             })}
-          >            <View style={styles.iconContainer}>
+          >
+            <View style={styles.iconContainer}>
               <Ionicons name='person-outline' size={25} color={Theme.PRIMARY} />
             </View>
             <Text style={[styles.label]}>Dados pessoais</Text>

@@ -6,6 +6,7 @@ import CustomButton from '../../Components/CustomButton';
 import { StatusBar } from 'expo-status-bar';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../../types';
+import { Ionicons } from '@expo/vector-icons';
 
 const { width, height } = Dimensions.get('window');
 
@@ -46,6 +47,8 @@ export default function UserSignUpScreen() {
   const [cpf, setCpf] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [confirmPassword, setConfirmPassword] = React.useState('');
+  const [showPassword, setShowPassword] = React.useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
 
   return (
     <View style={styles.container}>
@@ -99,7 +102,7 @@ export default function UserSignUpScreen() {
                 style={styles.input}
                 theme={inputTheme}
                 keyboardType="numeric"
-                maxLength={15}
+                maxLength={14}
               />
               <TextInput
                 label="Senha"
@@ -108,9 +111,15 @@ export default function UserSignUpScreen() {
                 onChangeText={setPassword}
                 style={styles.input}
                 theme={inputTheme}
-                secureTextEntry
+                secureTextEntry={!showPassword}
                 autoCapitalize="none"
                 autoComplete="password"
+                right={
+                  <TextInput.Icon
+                    icon={showPassword ? 'eye-off' : 'eye'}
+                    onPress={() => setShowPassword((prev) => !prev)}
+                  />
+                }
               />
               <TextInput
                 label="Confirme sua Senha"
@@ -119,9 +128,15 @@ export default function UserSignUpScreen() {
                 onChangeText={setConfirmPassword}
                 style={styles.input}
                 theme={inputTheme}
-                secureTextEntry
+                secureTextEntry={!showConfirmPassword}
                 autoCapitalize="none"
                 autoComplete="password"
+                right={
+                  <TextInput.Icon
+                    icon={showConfirmPassword ? 'eye-off' : 'eye'}
+                    onPress={() => setShowConfirmPassword((prev) => !prev)}
+                  />
+                }
               />
             </ScrollView>
 
@@ -202,7 +217,7 @@ const styles = StyleSheet.create({
   loginText: {
     fontSize: 24,
     color: Theme.PRIMARY,
-    fontFamily: 'Poppins-Bold',
+    fontFamily: 'Poppins-SemiBold',
     marginTop: 20,
     marginBottom: 20,
   },

@@ -24,13 +24,16 @@ export default function SignInScreen() {
 
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
+  const [showPassword, setShowPassword] = React.useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
+
 
   const onLoginPress = async () => {
     if (!email || !password) {
       Alert.alert('Erro', 'Preencha e-mail e senha.');
       return;
     }
-  
+
     const result = await handleLogin(email, password);
     if (result.success) {
       if (result.role === 'admin') {
@@ -54,28 +57,35 @@ export default function SignInScreen() {
       <View style={styles.overlay}>
         <View style={styles.formContainer}>
           <Text style={styles.loginText}>Login</Text>
-            <TextInput
-              label="E-mail"
-              mode="outlined"
-              value={email}
-              onChangeText={text => setEmail(text.replace(/\s/g, ''))} // Bloqueia espaços
-              style={styles.input}
-              theme={inputTheme}
-              autoCapitalize="none"
-              keyboardType="email-address"
-              autoComplete="email"
-            />
-            <TextInput
-              label="Senha"
-              mode="outlined"
-              value={password}
-              onChangeText={text => setPassword(text.replace(/\s/g, ''))} // Bloqueia espaços
-              style={styles.input} 
-              theme={inputTheme}
-              secureTextEntry
-              autoCapitalize="none"
-              autoComplete="password"
-            />
+          <TextInput
+            label="E-mail"
+            mode="outlined"
+            value={email}
+            onChangeText={text => setEmail(text.replace(/\s/g, ''))} // Bloqueia espaços
+            style={styles.input}
+            theme={inputTheme}
+            autoCapitalize="none"
+            keyboardType="email-address"
+            autoComplete="email"
+          />
+          <TextInput
+            label="Senha"
+            mode="outlined"
+            value={password}
+            onChangeText={text => setPassword(text.replace(/\s/g, ''))} // Bloqueia espaços
+            style={styles.input}
+            theme={inputTheme}
+            secureTextEntry={!showPassword}
+
+            autoCapitalize="none"
+            autoComplete="password"
+            right={
+              <TextInput.Icon
+                icon={showPassword ? 'eye-off' : 'eye'}
+                onPress={() => setShowPassword((prev) => !prev)}
+              />
+            }
+          />
 
           <CustomButton
             title={'Entrar'}
@@ -131,12 +141,12 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
     borderTopLeftRadius: 20,
     bottom: 0,
-    
+
   },
   loginText: {
     fontSize: 24,
     color: Theme.PRIMARY,
-    fontFamily: 'Poppins-Bold',
+    fontFamily: 'Poppins-SemiBold',
     marginTop: 20,
     marginBottom: 20,
   },
@@ -147,9 +157,9 @@ const styles = StyleSheet.create({
   },
   input: {
     marginBottom: '5%',
-    width: width * 0.85,          
+    width: width * 0.85,
     backgroundColor: '#fff',
     alignSelf: 'center',
-    borderRadius: 10, 
+    borderRadius: 10,
   },
 });
