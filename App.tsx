@@ -27,6 +27,7 @@ import ONGCreateAnimalsScreen from './src/Screens/ONG/ONGCreateAnimalsScreen';
 import UserONGDetailScreen from './src/Screens/User/UserONGDetailScreen';
 import ONGAnimalDetails from './src/Screens/ONG/ONGAnimalDetails';
 import UserAnimalDetailsScreen from './src/Screens/User/UserAnimalDetailsScreen';
+import UserEditProfileScreen from './src/Screens/User/UserEditProfileScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -119,6 +120,15 @@ export default function App() {
             <Stack.Screen
               name="UserProfile"
               component={UserProfileScreen}
+              options={{
+                headerShown: false,
+                headerTransparent: true,
+                headerTitle: '',
+                headerTintColor: '#FFFFFF',
+              }} />
+              <Stack.Screen
+              name="UserEditProfile"
+              component={UserEditProfileScreen}
               options={{
                 headerShown: false,
                 headerTransparent: true,

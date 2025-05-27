@@ -11,7 +11,7 @@ export type RootStackParamList = {
         cpf: string;
         password: string;
         fromOng: boolean;
-    }; 
+    };
     AdminScreen: undefined;
     ONGInfos: {
         ong: object
@@ -21,13 +21,22 @@ export type RootStackParamList = {
     UserONGDetail: {
         ong: object
     };
-    ONGAnimalDetails: { 
+    ONGAnimalDetails: {
         animal: object
     };
-    UserAnimalDetails: { 
+    UserAnimalDetails: {
         animal: object,
         city: string,
         ongName: string,
         ongs: object[]
+    };
+    UserEditProfile: {
+        name: string;
+        city: string;
+        state: string;
+        email: string;
+        phone: string;
+        cpf: string;
+    
     };
 }

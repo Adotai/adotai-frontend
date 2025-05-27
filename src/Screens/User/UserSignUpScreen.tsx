@@ -20,6 +20,23 @@ const inputTheme = {
   roundness: 10,
 };
 
+
+function maskPhone(value: string) {
+  return value
+    .replace(/\D/g, '')
+    .replace(/^(\d{2})(\d)/g, '($1) $2')
+    .replace(/(\d{5})(\d)/, '$1-$2')
+    .replace(/(-\d{4})\d+?$/, '$1');
+}
+
+function maskCpf(value: string) {
+  return value
+    .replace(/\D/g, '')
+    .replace(/(\d{3})(\d)/, '$1.$2')
+    .replace(/(\d{3})(\d)/, '$1.$2')
+    .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+}
+
 export default function UserSignUpScreen() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
@@ -37,113 +54,115 @@ export default function UserSignUpScreen() {
       <View style={styles.overlay}>
         <View style={styles.formContainer}>
           <Text style={styles.loginText}>Informações pessoais</Text>
-            <KeyboardAvoidingView
-                      style={{ flex: 1 }}
-                      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                      keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
-                    >
-          <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
-            <TextInput
-              label="Nome"
-              mode="outlined"
-              value={name}
-              onChangeText={setName}
-              style={styles.input}
-              theme={inputTheme}
-              autoCapitalize="words"
-            />
-            <TextInput
-              label="E-mail"
-              mode="outlined"
-              value={email}
-              onChangeText={setEmail}
-              style={styles.input}
-              theme={inputTheme}
-              autoCapitalize="none"
-              keyboardType="email-address"
-              autoComplete="email"
-            />
-            <TextInput
-              label="Telefone"
-              mode="outlined"
-              value={phone}
-              onChangeText={setPhone}
-              style={styles.input}
-              theme={inputTheme}
-              keyboardType="phone-pad"
-              autoComplete="tel"
-            />
-            <TextInput
-              label="CPF"
-              mode="outlined"
-              value={cpf}
-              onChangeText={setCpf}
-              style={styles.input}
-              theme={inputTheme}
-              keyboardType="numeric"
-            />
-            <TextInput
-              label="Senha"
-              mode="outlined"
-              value={password}
-              onChangeText={setPassword}
-              style={styles.input}
-              theme={inputTheme}
-              secureTextEntry
-              autoCapitalize="none"
-              autoComplete="password"
-            />
-            <TextInput
-              label="Confirme sua Senha"
-              mode="outlined"
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-              style={styles.input}
-              theme={inputTheme}
-              secureTextEntry
-              autoCapitalize="none"
-              autoComplete="password"
-            />
-          </ScrollView>
+          <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
+          >
+            <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
+              <TextInput
+                label="Nome"
+                mode="outlined"
+                value={name}
+                onChangeText={setName}
+                style={styles.input}
+                theme={inputTheme}
+                autoCapitalize="words"
+              />
+              <TextInput
+                label="E-mail"
+                mode="outlined"
+                value={email}
+                onChangeText={setEmail}
+                style={styles.input}
+                theme={inputTheme}
+                autoCapitalize="none"
+                keyboardType="email-address"
+                autoComplete="email"
+              />
+              <TextInput
+                label="Telefone"
+                mode="outlined"
+                value={phone}
+                onChangeText={text => setPhone(maskPhone(text))}
+                style={styles.input}
+                theme={inputTheme}
+                keyboardType="phone-pad"
+                autoComplete="tel"
+                maxLength={15}
+              />
+              <TextInput
+                label="CPF"
+                mode="outlined"
+                value={cpf}
+                onChangeText={text => setCpf(maskCpf(text))}
+                style={styles.input}
+                theme={inputTheme}
+                keyboardType="numeric"
+                maxLength={15}
+              />
+              <TextInput
+                label="Senha"
+                mode="outlined"
+                value={password}
+                onChangeText={setPassword}
+                style={styles.input}
+                theme={inputTheme}
+                secureTextEntry
+                autoCapitalize="none"
+                autoComplete="password"
+              />
+              <TextInput
+                label="Confirme sua Senha"
+                mode="outlined"
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+                style={styles.input}
+                theme={inputTheme}
+                secureTextEntry
+                autoCapitalize="none"
+                autoComplete="password"
+              />
+            </ScrollView>
 
-          <CustomButton
-            title={'Seguinte'}
-            borderColor="transparent"
-            textColor={Theme.BACK}
-            color={Theme.PRIMARY}
-            onPress={() => {
-              if (!name || !email || !phone || !cpf || !password || !confirmPassword) {
-                Alert.alert('Erro', 'Todos os campos são obrigatórios.');
-                return;
-              }
+            <CustomButton
+              title={'Seguinte'}
+              borderColor="transparent"
+              textColor={Theme.BACK}
+              color={Theme.PRIMARY}
+              onPress={() => {
+                if (!name || !email || !phone || !cpf || !password || !confirmPassword) {
+                  Alert.alert('Erro', 'Todos os campos são obrigatórios.');
+                  return;
+                }
 
-              if (password !== confirmPassword) {
-                Alert.alert('Erro', 'As senhas não coincidem.');
-                return;
-              }
+                if (password !== confirmPassword) {
+                  Alert.alert('Erro', 'As senhas não coincidem.');
+                  return;
+                }
 
-              if (!/^\S+@\S+\.\S+$/.test(email)) {
-                Alert.alert('Erro', 'Formato de e-mail inválido.');
-                return;
-              }
+                if (!/^\S+@\S+\.\S+$/.test(email)) {
+                  Alert.alert('Erro', 'Formato de e-mail inválido.');
+                  return;
+                }
 
-              if (!/^\d{11}$/.test(cpf.replace(/\D/g, ''))) {
-                Alert.alert('Erro', 'CPF inválido. Certifique-se de que possui 11 dígitos.');
-                return;
-              }
+                if (!/^\d{11}$/.test(cpf.replace(/\D/g, ''))) {
+                  Alert.alert('Erro', 'CPF inválido. Certifique-se de que possui 11 dígitos.');
+                  return;
+                }
 
-              navigation.navigate('Address', {
-                name,
-                email,
-                telephone: phone,
-                cpf,
-                password,
-                fromOng: false,
-              });
-            }}
-            disabled={false}
-            buttonStyle={{ marginBottom: '5%', marginTop: '5%', width: width * .85, alignSelf: 'center' }}
-          />
+                navigation.navigate('Address', {
+                  name,
+                  email,
+                  telephone: phone,
+                  cpf,
+                  password,
+                  fromOng: false,
+                });
+              }}
+              disabled={false}
+              buttonStyle={{ marginBottom: '5%', marginTop: '5%', width: width * .85, alignSelf: 'center' }}
+            />
           </KeyboardAvoidingView>
         </View>
       </View>

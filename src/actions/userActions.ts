@@ -261,7 +261,7 @@ export const fetchAnimalsByState = async (uf: string): Promise<any[]> => {
   }
 };
 
-export const fetchLoggedUser = async (): Promise<{ name?: string, city?: string, state?: string } | null> => {
+export const fetchLoggedUser = async (): Promise<{ name?: string, city?: string, state?: string, email?: string, cpf?: string , phone?: string} | null> => {
   try {
     const token = await AsyncStorage.getItem('authToken');
     const email = await AsyncStorage.getItem('userEmail');
@@ -277,7 +277,10 @@ export const fetchLoggedUser = async (): Promise<{ name?: string, city?: string,
     return {
       name: user.name,
       city: user.address?.city,
-      state: user.address?.state
+      state: user.address?.state,
+      email: user.email,
+      cpf: user.cpf,
+      phone: user.telephone
     };
   } catch (err) {
     console.error('Erro ao buscar dados do usuário:', err);
