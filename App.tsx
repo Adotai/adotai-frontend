@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { View, Text, StyleSheet, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, Touchable, TouchableOpacity } from 'react-native';
 import { useFonts } from 'expo-font';
 import { NavigationContainer } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
@@ -28,6 +28,10 @@ import UserONGDetailScreen from './src/Screens/User/UserONGDetailScreen';
 import ONGAnimalDetails from './src/Screens/ONG/ONGAnimalDetails';
 import UserAnimalDetailsScreen from './src/Screens/User/UserAnimalDetailsScreen';
 import UserEditProfileScreen from './src/Screens/User/UserEditProfileScreen';
+import ONGEditProfileScreen from './src/Screens/ONG/ONGEditProfileScreen';
+import ONGAnimalEditScreen from './src/Screens/ONG/ONGAnimalEditScreen';
+import { RootStackParamList } from './src/types';
+
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -126,11 +130,11 @@ export default function App() {
                 headerTitle: '',
                 headerTintColor: '#FFFFFF',
               }} />
-              <Stack.Screen
+            <Stack.Screen
               name="UserEditProfile"
               component={UserEditProfileScreen}
               options={{
-                   headerShown: true,
+                headerShown: true,
                 headerTitle: 'Editar informações',
                 headerTintColor: '#AD334A',
                 headerTitleAlign: 'center',
@@ -226,14 +230,32 @@ export default function App() {
                 headerTintColor: '#FFFFFF',
               }}
             />
+
             <Stack.Screen
               name="ONGAnimalDetails"
               component={ONGAnimalDetails}
-              options={{
-                headerShown: true,
-                headerTransparent: true,
-                headerTitle: '',
-                headerTintColor: '#FFFFFF',
+              options={({ navigation, route }) => {
+                // Cast para o tipo correto:
+                const params = route.params as RootStackParamList['ONGAnimalDetails'];
+                return {
+                  headerShown: true,
+                  headerTransparent: true,
+                  headerTitle: '',
+                  headerTintColor: '#FFFFFF',
+                  headerRight: () => (
+                    <TouchableOpacity  onPress={() => {
+                        navigation.navigate('ONGAnimalEdit', { animal: params.animal });
+                      }}>
+                    <Ionicons
+                      name="pencil"
+                      size={24}
+                      color="#FFFFFF"
+                      style={{ marginRight: 16 }}
+                     
+                    />
+                    </TouchableOpacity>
+                  ),
+                };
               }}
             />
             <Stack.Screen
@@ -244,6 +266,26 @@ export default function App() {
                 headerTransparent: true,
                 headerTitle: '',
                 headerTintColor: '#FFFFFF',
+              }}
+            />
+            <Stack.Screen
+              name="ONGEditProfile"
+              component={ONGEditProfileScreen}
+              options={{
+                headerShown: true,
+                headerTransparent: false,
+                headerTitle: 'Editar Perfil',
+                headerTintColor: Theme.PRIMARY,
+              }}
+            />
+            <Stack.Screen
+              name="ONGAnimalEdit"
+              component={ONGAnimalEditScreen}
+              options={{
+                headerShown: true,
+                headerTransparent: false,
+                headerTitle: 'Editar Animal',
+                headerTintColor: Theme.PRIMARY,
               }}
             />
           </Stack.Navigator>

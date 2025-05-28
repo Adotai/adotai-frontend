@@ -119,111 +119,111 @@ export default function UserEditProfileScreen() {
 
   return (
     <SafeAreaView style={styles.overlay}>
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
-          <TextInput
-            label="Nome"
-            mode="outlined"
-            value={userName}
-            onChangeText={setUserName}
-            style={styles.input}
-            theme={inputTheme}
-            autoCapitalize="words"
-          />
-          <TextInput
-            label="E-mail"
-            mode="outlined"
-            value={userEmail}
-            onChangeText={setEmail}
-            style={styles.input}
-            theme={inputTheme}
-            autoCapitalize="none"
-            keyboardType="email-address"
-            autoComplete="email"
-          />
-          <TextInput
-            label="Telefone"
-            mode="outlined"
-            value={userPhone}
-            onChangeText={text => setPhone(maskPhone(text))}
-            style={styles.input}
-            theme={inputTheme}
-            keyboardType="phone-pad"
-            autoComplete="tel"
-            maxLength={15} // Limita o tamanho máximo do telefone
-          />
-          <TextInput
-            label="CPF"
-            mode="outlined"
-            value={userCpf}
-            onChangeText={text => setCpf(maskCpf(text))}
-            style={styles.input}
-            theme={inputTheme}
-            keyboardType="numeric"
-            maxLength={14} // Limita o tamanho máximo do CPF
-          />
-         <TextInput
-  label="CEP"
-  mode="outlined"
-  value={userAddress?.zipCode || ''}
-  onChangeText={text =>
-    setUserAddress((prev: any) => ({
-      ...prev,
-      zipCode: maskCep(text)
-    }))
-  }
-  style={styles.input}
-  theme={inputTheme}
-  keyboardType="numeric"
-  maxLength={9}
-/>
-          <TextInput
-            label="Endereço"
-            mode="outlined"
-
-            value={userAddress?.street || ''}
-            onChangeText={text => setUserAddress((prev: any) => ({ ...prev, street: text }))}
-            style={styles.input}
-            theme={inputTheme}
-          />
-          <TextInput
-            label="Número"
-            mode="outlined"
-
-            value={userAddress?.number ? String(userAddress.number) : ''}
-            onChangeText={text => setUserAddress((prev: any) => ({ ...prev, number: text.replace(/\D/g, '') }))}
-            style={styles.input}
-            theme={inputTheme}
-            keyboardType="numeric"
-          />
-          <TextInput
-            label="Cidade"
-            mode="outlined"
-
-            value={userCity}
-            onChangeText={setUserCity}
-            style={styles.input}
-            theme={inputTheme}
-          />
-          <TextInput
-            label="Estado"
-            mode="outlined"
-
-            value={userState}
-            onChangeText={setUserState}
-            style={styles.input}
-            theme={inputTheme}
-          />
-        </ScrollView>
-
-        <CustomButton
-          title={'Salvar'}
-          borderColor="transparent"
-          textColor={Theme.BACK}
-          color={Theme.PRIMARY}
-          onPress={handleSave}
-          disabled={false}
-          buttonStyle={{ marginBottom: '5%', marginTop: '5%', width: width * .85, alignSelf: 'center' }}
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
+        <TextInput
+          label="Nome"
+          mode="outlined"
+          value={userName}
+          onChangeText={setUserName}
+          style={styles.input}
+          theme={inputTheme}
+          autoCapitalize="words"
         />
+        <TextInput
+          label="E-mail"
+          mode="outlined"
+          value={userEmail}
+          onChangeText={setEmail}
+          style={styles.input}
+          theme={inputTheme}
+          autoCapitalize="none"
+          keyboardType="email-address"
+          autoComplete="email"
+        />
+        <TextInput
+          label="Telefone"
+          mode="outlined"
+          value={userPhone}
+          onChangeText={text => setPhone(maskPhone(text))}
+          style={styles.input}
+          theme={inputTheme}
+          keyboardType="phone-pad"
+          autoComplete="tel"
+          maxLength={15} // Limita o tamanho máximo do telefone
+        />
+        <TextInput
+          label="CPF"
+          mode="outlined"
+          value={userCpf}
+          onChangeText={text => setCpf(maskCpf(text))}
+          style={styles.input}
+          theme={inputTheme}
+          keyboardType="numeric"
+          maxLength={14} // Limita o tamanho máximo do CPF
+        />
+        <TextInput
+          label="CEP"
+          mode="outlined"
+          value={userAddress?.zipCode || ''}
+          onChangeText={text =>
+            setUserAddress((prev: any) => ({
+              ...prev,
+              zipCode: maskCep(text)
+            }))
+          }
+          style={styles.input}
+          theme={inputTheme}
+          keyboardType="numeric"
+          maxLength={9}
+        />
+        <TextInput
+          label="Endereço"
+          mode="outlined"
+
+          value={userAddress?.street || ''}
+          onChangeText={text => setUserAddress((prev: any) => ({ ...prev, street: text }))}
+          style={styles.input}
+          theme={inputTheme}
+        />
+        <TextInput
+          label="Número"
+          mode="outlined"
+
+          value={userAddress?.number ? String(userAddress.number) : ''}
+          onChangeText={text => setUserAddress((prev: any) => ({ ...prev, number: text.replace(/\D/g, '') }))}
+          style={styles.input}
+          theme={inputTheme}
+          keyboardType="numeric"
+        />
+        <TextInput
+          label="Cidade"
+          mode="outlined"
+
+          value={userCity}
+          onChangeText={setUserCity}
+          style={styles.input}
+          theme={inputTheme}
+        />
+        <TextInput
+          label="Estado"
+          mode="outlined"
+
+          value={userState}
+          onChangeText={setUserState}
+          style={styles.input}
+          theme={inputTheme}
+        />
+      </ScrollView>
+
+      <CustomButton
+        title={'Salvar'}
+        borderColor="transparent"
+        textColor={Theme.BACK}
+        color={Theme.PRIMARY}
+        onPress={handleSave}
+        disabled={false}
+        buttonStyle={{ marginBottom: '5%', marginTop: '5%', width: width * .85, alignSelf: 'center' }}
+      />
     </SafeAreaView>
   );
 }
@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
   },
   overlay: {
-     alignItems: 'center', width: '100%', backgroundColor: '#fff', height: '100%' 
+    alignItems: 'center', width: '100%', backgroundColor: '#fff', height: '100%'
   },
   formContainer: {
     flex: 1,

@@ -15,9 +15,9 @@ export default function ONGAnimalsScreen({ }) {
     const ongId = await getLoggedOngId();
     if (ongId) {
       // Busca todos os animais (ou use o fetch atual)
-      const allAnimals = await fetchAnimals(); 
+      const allAnimals = await fetchAnimals();
       // Filtra só os da ONG logada
-      const filtered = allAnimals.filter(animal => animal.ongId === ongId );
+      const filtered = allAnimals.filter(animal => animal.ongId === ongId);
       setAnimals(filtered);
     } else {
       setAnimals([]);
@@ -35,26 +35,26 @@ export default function ONGAnimalsScreen({ }) {
   };
 
   return (
-        <>
+    <>
 
-    <StatusBar backgroundColor="#fff" barStyle="dark-content" />
-    <SafeAreaView style={styles.container}>
-      <FlatList
-        data={animals}
-        keyExtractor={item => String(item.id)}
-        renderItem={({ item }) => (
-          <DogCard
-            name={item.name}
-            image={item.photos && item.photos.length > 0 ? item.photos[0].photoUrl : ''}
-            location={item.species === 'DOG' ? 'Cachorro' : 'Gato'}
-            onPress={() => navigation.navigate('ONGAnimalDetails', { animal: item })}
-          />
-        )}
-        ListEmptyComponent={<Text>Nenhum animal cadastrado.</Text>}
-        refreshing={refreshing}
-        onRefresh={onRefresh}
-      />
-    </SafeAreaView>
+      <StatusBar backgroundColor="#fff" barStyle="dark-content" />
+      <SafeAreaView style={styles.container}>
+        <FlatList
+          data={animals}
+          keyExtractor={item => String(item.id)}
+          renderItem={({ item }) => (
+            <DogCard
+              name={item.name}
+              image={item.photos && item.photos.length > 0 ? item.photos[0].photoUrl : ''}
+              location={item.species === 'DOG' ? 'Cachorro' : 'Gato'}
+              onPress={() => navigation.navigate('ONGAnimalDetails', { animal: item })}
+            />
+          )}
+          ListEmptyComponent={<Text>Nenhum animal cadastrado.</Text>}
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+        />
+      </SafeAreaView>
     </>
   );
 }

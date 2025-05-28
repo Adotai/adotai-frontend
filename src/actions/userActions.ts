@@ -63,7 +63,7 @@ export const handleSignUp = async (
 
     const addressId = addressResponse.data.data.id;
 
-    const userResponse = await axios.post(`${USER_ROUTE}/users`, {
+    const userResponse = await axios.post(`${USER_ROUTE}/user`, {
       name,
       email,
       telephone,

@@ -1,3 +1,9 @@
+export type Animal = {
+  id: number;
+  name: string;
+  [key: string]: any; 
+};
+
 export type RootStackParamList = {
     Onboarding: undefined;
     SignIn: undefined;
@@ -22,7 +28,7 @@ export type RootStackParamList = {
         ong: object
     };
     ONGAnimalDetails: {
-        animal: object
+        animal: Animal
     };
     UserAnimalDetails: {
         animal: object,
@@ -39,4 +45,15 @@ export type RootStackParamList = {
         cpf: string;
     
     };
+    ONGEditProfile:{
+        name: string;
+        city: string;
+        state: string;
+        email: string;
+        phone: string;
+        cnpj: string;
+    };
+    ONGAnimalEdit:{
+        animal: Animal
+    }
 }

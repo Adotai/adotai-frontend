@@ -38,7 +38,7 @@ export const handleSignUpOng = async (
 
     const addressId = addressResponse.data.data.id;
 
-    const ongResponse = await axios.post(`${USER_ROUTE}/ongs`, {
+    const ongResponse = await axios.post(`${USER_ROUTE}/ong`, {
       name,
       phone: telephone,
       cnpj,
@@ -88,4 +88,59 @@ export const createAnimal = async (animalObj: any): Promise<any> => {
   return response.data;
 };
 
+export const fetchLoggedOng = async (): Promise<any> => {
+  const token = await AsyncStorage.getItem('authToken');
+  const email = await AsyncStorage.getItem('userEmail');
+  if (!token || !email) return null;
+  const res = await axios.get(`${USER_ROUTE}/ong`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return res.data.data.find((o: any) => o.email === email);
+};
 
+
+export const updateOng = async (updateDto: any) => {
+  const token = await AsyncStorage.getItem('authToken');
+  return axios.put(`${USER_ROUTE}/ong`, updateDto, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+};
+
+export const deleteOngPhotos = async (ongId: number, photoIdsToDelete: number[]) => {
+  const token = await AsyncStorage.getItem('authToken');
+  return axios.post(
+    `${USER_ROUTE}/ong/delete-photo`,
+    { ongId, photoIdsToDelete },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+};
+
+export const updateAnimal = async (animalObj: any) => {
+  const token = await AsyncStorage.getItem('authToken');
+  if (!token) throw new Error('Token não encontrado');
+  const response = await axios.put(
+    `${USER_ROUTE}/animal/${animalObj.id}`,
+    animalObj,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    }
+  );
+  return response.data;
+};
+
+export const deleteAnimalPhoto = async (animalId: number, photoId: number) => {
+  const token = await AsyncStorage.getItem('authToken');
+  if (!token) throw new Error('Token não encontrado');
+  const response = await axios.delete(
+    `${USER_ROUTE}/animal/photo/${animalId}/${photoId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      }
+    }
+  );
+  return response.data;
+};
