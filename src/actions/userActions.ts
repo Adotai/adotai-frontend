@@ -111,7 +111,7 @@ export const fetchOngs = async (): Promise<any[]> => {
 export const acceptOng = async (id: number): Promise<boolean> => {
   try {
     const token = await AsyncStorage.getItem('authToken');
-    await axios.put(`${USER_ROUTE}/ongs/${id}`, {}, {
+    await axios.put(`${USER_ROUTE}/ong/status/${id}`, {}, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return true;
