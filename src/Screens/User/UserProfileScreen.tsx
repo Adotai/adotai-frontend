@@ -71,13 +71,6 @@ export default function UserProfileScreen({ navigation }: any) {
           </TouchableOpacity>
           <TouchableOpacity style={styles.option} onPress={() => { }}>
             <View style={styles.iconContainer}>
-              <Ionicons name='trash-outline' size={25} color={Theme.PRIMARY} />
-            </View>
-            <Text style={[styles.label]}>Excluir minha conta</Text>
-            <Ionicons name="chevron-forward" size={20} color={Theme.PRIMARY} style={styles.chevron} />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.option} onPress={() => { }}>
-            <View style={styles.iconContainer}>
               <Ionicons name='lock-closed-outline' size={25} color={Theme.PRIMARY} />
             </View>
             <Text style={[styles.label]}>Alterar senha</Text>

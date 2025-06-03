@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, Image, StyleSheet, Dimensions, Pressable, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, Image, StyleSheet, Dimensions, Pressable, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { Theme } from '../../../constants/Themes';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../types';
 import { useNavigation } from '@react-navigation/native';
 import CustomButton from '../../Components/CustomButton';
+import { updateAnimalStatus } from '../../actions/ongActions';
 
 
 export default function ONGAnimalDetails({ route }: any) {
@@ -15,6 +16,17 @@ export default function ONGAnimalDetails({ route }: any) {
   const { animal } = route.params;
   const { width, height } = Dimensions.get('window');
   const [current, setCurrent] = useState(0);
+  const [animalStatus, setAnimalStatus] = useState(animal.status);
+
+  const handleToggleStatus = async () => {
+    try {
+      await updateAnimalStatus(animal, !animalStatus);
+      setAnimalStatus(!animalStatus);
+      Alert.alert('Sucesso', `Animal ${!animalStatus ? 'ativado' : 'desativado'}!`);
+    } catch (e) {
+      Alert.alert('Erro', 'Não foi possível atualizar o status.');
+    }
+  };
 
   const photos = animal.photos || [];
 
@@ -146,6 +158,12 @@ export default function ONGAnimalDetails({ route }: any) {
         </View>
     
       </View>
+      <CustomButton
+    title={animalStatus ? "Desabilitar Animal" : "Habilitar Animal"}
+    color={animalStatus ? Theme.PRIMARY:  "#888" }
+    onPress={handleToggleStatus}
+    buttonStyle={{ alignSelf: 'center', margin: 16 ,borderWidth: 0 }}
+  />
     </ScrollView>
   );
 }

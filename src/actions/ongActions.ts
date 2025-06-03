@@ -144,3 +144,31 @@ export const deleteAnimalPhoto = async (animalId: number, photoId: number) => {
   );
   return response.data;
 };
+
+export const fetchAnimalsByOng = async (ongId: number): Promise<any[]> => {
+  const token = await AsyncStorage.getItem('authToken');
+  if (!token) throw new Error('Token não encontrado');
+  const response = await axios.get(
+    `${USER_ROUTE}/animal/ong/${ongId}`,
+    {
+      headers: { Authorization: `Bearer ${token}` }
+    }
+  );
+  return response.data.data || [];
+};
+
+export const updateAnimalStatus = async (animal: any, status: boolean) => {
+  const token = await AsyncStorage.getItem('authToken');
+  if (!token) throw new Error('Token não encontrado');
+  const response = await axios.put(
+    `${USER_ROUTE}/animal/status/${animal.id}`,
+    { ...animal, status },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    }
+  );
+  return response.data;
+};

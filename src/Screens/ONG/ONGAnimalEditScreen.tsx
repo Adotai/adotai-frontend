@@ -119,6 +119,7 @@ const [color, setColor] = useState(animal?.color || '');
   };
 
   return (
+    <View style={{ flex: 1, backgroundColor: '#fff' }}>
     <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
       <Text style={styles.label}>Fotos do Animal</Text>
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginBottom: 16 }}>
@@ -262,13 +263,14 @@ const [color, setColor] = useState(animal?.color || '');
           <Text style={{ color: dewormed ? Theme.PRIMARY : '#888' }}>{dewormed ? 'Sim' : 'Não'}</Text>
         </TouchableOpacity>
       </View>
-      <CustomButton
+    </ScrollView>
+    <CustomButton
         title="Salvar"
         color={Theme.PRIMARY}
         onPress={handleSave}
-        buttonStyle={{ margin: 24 }}
+        buttonStyle={{ alignSelf: 'center', margin: 8 }}
       />
-    </ScrollView>
+    </View>
   );
 }
 

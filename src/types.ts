@@ -1,7 +1,7 @@
 export type Animal = {
-  id: number;
-  name: string;
-  [key: string]: any; 
+    id: number;
+    name: string;
+    [key: string]: any;
 };
 
 export type RootStackParamList = {
@@ -34,7 +34,8 @@ export type RootStackParamList = {
         animal: object,
         city: string,
         ongName: string,
-        ongs: object[]
+        ongs: object[],
+        fromOngList: boolean
     };
     UserEditProfile: {
         name: string;
@@ -43,9 +44,9 @@ export type RootStackParamList = {
         email: string;
         phone: string;
         cpf: string;
-    
+
     };
-    ONGEditProfile:{
+    ONGEditProfile: {
         name: string;
         city: string;
         state: string;
@@ -53,7 +54,10 @@ export type RootStackParamList = {
         phone: string;
         cnpj: string;
     };
-    ONGAnimalEdit:{
+    ONGAnimalEdit: {
         animal: Animal
+    };
+    UserAnimalONG: {
+        ong: string
     }
 }

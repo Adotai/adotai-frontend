@@ -5,6 +5,7 @@ import DogCard from '../../Components/DogCard';
 import { RootStackParamList } from '../../types';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { fetchAnimalsByOng } from '../../actions/ongActions';
 
 export default function ONGAnimalsScreen({ }) {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -14,15 +15,12 @@ export default function ONGAnimalsScreen({ }) {
   const load = async () => {
     const ongId = await getLoggedOngId();
     if (ongId) {
-      // Busca todos os animais (ou use o fetch atual)
-      const allAnimals = await fetchAnimals();
-      // Filtra só os da ONG logada
-      const filtered = allAnimals.filter(animal => animal.ongId === ongId);
-      setAnimals(filtered);
+      const animalsFromApi = await fetchAnimalsByOng(ongId);
+      setAnimals(animalsFromApi);
     } else {
       setAnimals([]);
     }
-  };
+};
 
   React.useEffect(() => {
     load();

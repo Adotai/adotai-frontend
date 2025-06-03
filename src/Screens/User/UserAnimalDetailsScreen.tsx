@@ -12,7 +12,7 @@ export default function UserAnimalDetailsScreen({ route }: any) {
 
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
 
-  const { animal, city, ongName, ongs } = route.params;
+  const { animal, city, ongName, ongs, fromOngList } = route.params;
   const ong = ongs?.find((o: any) => o.name === ongName || o.id === animal.ongId);
   const { width, height } = Dimensions.get('window');
   const [current, setCurrent] = useState(0);
@@ -20,14 +20,14 @@ export default function UserAnimalDetailsScreen({ route }: any) {
   const photos = animal.photos || [];
 
   const handleWhatsApp = () => {
-  // Número da ONG (exemplo: DDD + número, só números)
-  const phone = ong?.phone?.replace(/\D/g, ''); // remove caracteres não numéricos
-  // Mensagem personalizada
-  const message = `Olá! Estava utilizando o aplicativo Adotai e possuo interesse em adotar o animal ${animal.name}`;
-  // Monta o link do WhatsApp
-  const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-  Linking.openURL(url);
-};
+    // Número da ONG (exemplo: DDD + número, só números)
+    const phone = ong?.phone?.replace(/\D/g, ''); // remove caracteres não numéricos
+    // Mensagem personalizada
+    const message = `Olá! Estava utilizando o aplicativo Adotai e possuo interesse em adotar o animal ${animal.name}`;
+    // Monta o link do WhatsApp
+    const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+    Linking.openURL(url);
+  };
 
   const handleNext = () => {
     if (current < photos.length - 1) setCurrent(current + 1);
@@ -98,25 +98,27 @@ export default function UserAnimalDetailsScreen({ route }: any) {
         </View>
 
         {/* <View style= {{width: width*0.9, alignSelf:'center', backgroundColor: Theme.INPUT, height: 1}}></View> */}
-        <TouchableOpacity onPress={() => {
-          if (ong) {
-            navigation.navigate('UserONGDetail', { ong });
-          } else {
-            Alert.alert('ONG não encontrada', 'A ONG associada a este animal não foi encontrada.');
-          }
-        }} style={[styles.info, { flexDirection: 'row', alignItems: 'center' }]}>
-          <View style= {{ backgroundColor: Theme.PASTEL, borderRadius: 10, margin: 8, padding: 16}}>
-          <Ionicons name="globe-outline" size={22} color={Theme.PRIMARY} style={{ }} />
-          </View>
-          <Text style={[styles.value, { color:'black', width: '75%' }]}>{ongName}</Text>
-          <Ionicons name="chevron-forward" size={22} color={Theme.PRIMARY} style={{ }} />
-        </TouchableOpacity>
+        {!fromOngList && (
+          <TouchableOpacity onPress={() => {
+            if (ong) {
+              navigation.navigate('UserONGDetail', { ong });
+            } else {
+              Alert.alert('ONG não encontrada', 'A ONG associada a este animal não foi encontrada.');
+            }
+          }} style={[styles.info, { flexDirection: 'row', alignItems: 'center' }]}>
+            <View style={{ backgroundColor: Theme.PASTEL, borderRadius: 10, margin: 8, padding: 16 }}>
+              <Ionicons name="globe-outline" size={22} color={Theme.PRIMARY} />
+            </View>
+            <Text style={[styles.value, { color: 'black', width: '75%' }]}>{ongName}</Text>
+            <Ionicons name="chevron-forward" size={22} color={Theme.PRIMARY} />
+          </TouchableOpacity>
+        )}
 
 
 
         <View style={[styles.info, { paddingLeft: 16, paddingTop: 16, paddingBottom: 16 }]}>
           <Text style={{ fontFamily: 'Poppins-Bold', fontSize: 20, color: Theme.PRIMARY }}>Sobre o Animal</Text>
-          <View style={[styles.row, { flexDirection: 'column'}]}>
+          <View style={[styles.row, { flexDirection: 'column' }]}>
             <Text style={[styles.label]}>Descrição do animal:</Text>
             <Text style={styles.value}>{animal.animalDescription}</Text>
           </View>
@@ -151,7 +153,7 @@ export default function UserAnimalDetailsScreen({ route }: any) {
               {animal.temperament === 'unknown' && 'Indefinido'}
             </Text>
           </View>
-             <View style={styles.row}>
+          <View style={styles.row}>
             <Text style={styles.label}>Porte:</Text>
             <Text style={styles.value}>
               {animal.size === 'medio' && 'Médio'}

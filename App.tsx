@@ -31,6 +31,7 @@ import UserEditProfileScreen from './src/Screens/User/UserEditProfileScreen';
 import ONGEditProfileScreen from './src/Screens/ONG/ONGEditProfileScreen';
 import ONGAnimalEditScreen from './src/Screens/ONG/ONGAnimalEditScreen';
 import { RootStackParamList } from './src/types';
+import UserAnimalONGScreen from './src/Screens/User/UserAnimalONGScreen';
 
 
 const Stack = createStackNavigator();
@@ -285,6 +286,16 @@ export default function App() {
                 headerShown: true,
                 headerTransparent: false,
                 headerTitle: 'Editar Animal',
+                headerTintColor: Theme.PRIMARY,
+              }}
+            />
+            <Stack.Screen
+              name="UserAnimalONG"
+              component={UserAnimalONGScreen}
+              options={{
+                headerShown: true,
+                headerTransparent: false,
+                headerTitle: 'Animais da ONG',
                 headerTintColor: Theme.PRIMARY,
               }}
             />
