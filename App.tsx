@@ -296,7 +296,7 @@ export default function App() {
                 headerShown: true,
                 headerTransparent: false,
                 headerTitle: 'Animais da ONG',
-                headerTintColor: Theme.PRIMARY,
+                headerTintColor: Theme.TERTIARY,
               }}
             />
           </Stack.Navigator>

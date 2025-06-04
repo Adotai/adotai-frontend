@@ -1,4 +1,4 @@
-import { FlatList, View, Text } from "react-native";
+import { FlatList, View, Text, SafeAreaViewComponent, SafeAreaView } from "react-native";
 import DogCard from "../../Components/DogCard";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../../types";
@@ -31,7 +31,7 @@ export default function UserAnimalONG({ route }: any) {
     const onRefresh = () => loadAnimals();
 
     return (
-        <View style={{ flex: 1, padding: 16 }}>
+        <SafeAreaView style={{ flex: 1, padding: 16, paddingTop: 8,  backgroundColor: '#fff' }}>
             <FlatList
                 data={animals}
                 keyExtractor={item => String(item.id)}
@@ -48,7 +48,7 @@ export default function UserAnimalONG({ route }: any) {
                 refreshing={refreshing}
                 onRefresh={onRefresh}
             />
-        </View>
+        </SafeAreaView>
     );
 }
 

@@ -156,7 +156,8 @@ export default function ONGDetailsScreen({ route, navigation }: any) {
         },
         photos,
         address,
-        description
+        description,
+        animalType 
       );
 
       if (success) {
