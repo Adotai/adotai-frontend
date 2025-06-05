@@ -19,18 +19,35 @@ const inputTheme = {
   roundness: 10,
 };
 
+function maskPhone(value: string) {
+  return value
+    .replace(/\D/g, '') // Remove tudo que não é dígito
+    .replace(/^(\d{2})(\d)/g, '($1) $2') // Adiciona parênteses ao DDD
+    .replace(/(\d{5})(\d)/, '$1-$2') // Adiciona hífen após o 5º dígito do número
+    .replace(/(-\d{4})\d+?$/, '$1'); // Garante que não tenha mais que 4 dígitos depois do hífen
+}
+
+function maskCnpj(value: string) {
+  return value
+    .replace(/\D/g, '') // Remove tudo que não é dígito
+    .replace(/^(\d{2})(\d)/, '$1.\$2') // Adiciona ponto após o 2º dígito
+    .replace(/^(\d{2})\.(\d{3})(\d)/, '$1.\$2.\$3') // Adiciona ponto após o 5º dígito
+    .replace(/\.(\d{3})(\d)/, '.\$1/\$2') // Adiciona barra após o 8º dígito
+    .replace(/(\d{4})(\d)/, '$1-\$2') // Adiciona hífen após o 12º dígito
+    .slice(0, 18); // Limita a 18 caracteres (XX.XXX.XXX/XXXX-XX)
+}
+
 export default function ONGSignUpScreen() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   const [name, setName] = React.useState('');
   const [email, setEmail] = React.useState('');
   const [phone, setPhone] = React.useState('');
-  const [cpf, setCpf] = React.useState('');
+  const [cnpj, setCnpj] = React.useState(''); 
   const [password, setPassword] = React.useState('');
   const [confirmPassword, setConfirmPassword] = React.useState('');
   const [showPassword, setShowPassword] = React.useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
-
 
   return (
     <View style={styles.container}>
@@ -57,11 +74,12 @@ export default function ONGSignUpScreen() {
               <TextInput
                 label="CNPJ"
                 mode="outlined"
-                value={cpf}
-                onChangeText={setCpf}
+                value={cnpj} 
+                onChangeText={text => setCnpj(maskCnpj(text))} 
                 style={styles.input}
                 theme={inputTheme}
                 keyboardType="numeric"
+                maxLength={18} 
               />
               <TextInput
                 label="E-mail"
@@ -78,11 +96,12 @@ export default function ONGSignUpScreen() {
                 label="Telefone"
                 mode="outlined"
                 value={phone}
-                onChangeText={setPhone}
+                onChangeText={text => setPhone(maskPhone(text))} 
                 style={styles.input}
                 theme={inputTheme}
                 keyboardType="phone-pad"
                 autoComplete="tel"
+                maxLength={15} 
               />
               <TextInput
                 label="Senha"
@@ -124,7 +143,7 @@ export default function ONGSignUpScreen() {
                 textColor={Theme.BACK}
                 color={Theme.PRIMARY}
                 onPress={() => {
-                  if (!name || !email || !phone || !cpf || !password || !confirmPassword) {
+                  if (!name || !email || !phone || !cnpj || !password || !confirmPassword) { 
                     Alert.alert('Erro', 'Todos os campos são obrigatórios.');
                     return;
                   }
@@ -139,16 +158,23 @@ export default function ONGSignUpScreen() {
                     return;
                   }
 
-                  if (!/^\d{14}$/.test(cpf.replace(/\D/g, ''))) {
+                  const unmaskedCnpj = cnpj.replace(/\D/g, ''); 
+                  if (!/^\d{14}$/.test(unmaskedCnpj)) {
                     Alert.alert('Erro', 'CNPJ inválido. Certifique-se de que possui 14 dígitos.');
+                    return;
+                  }
+
+                  const unmaskedPhone = phone.replace(/\D/g, '');
+                  if (!/^\d{10,11}$/.test(unmaskedPhone)) {
+                    Alert.alert('Erro', 'Telefone inválido. Certifique-se de que possui 10 ou 11 dígitos (incluindo DDD).');
                     return;
                   }
 
                   navigation.navigate('Address', {
                     name,
                     email,
-                    telephone: phone,
-                    cpf,
+                    telephone: phone, 
+                    cpf: cnpj,
                     password,
                     fromOng: true,
                   });
@@ -158,7 +184,6 @@ export default function ONGSignUpScreen() {
               />
             </ScrollView>
           </KeyboardAvoidingView>
-
         </View>
       </View>
     </View>

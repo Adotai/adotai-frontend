@@ -29,11 +29,9 @@ export const handleLogin = async (email: string, password: string): Promise<{ su
     }
   } catch (error: any) {
     if (error.response) {
-      // Erro do backend (ex: senha errada)
       const msg = error.response.data?.message || 'E-mail ou senha incorretos.';
       return { success: false, error: msg };
     } else {
-      // Erro de rede
       return { success: false, error: 'Erro de conexão. Verifique sua internet.' };
     }
   }
@@ -107,7 +105,6 @@ export const fetchOngs = async (): Promise<any[]> => {
   }
 };
 
-// Aceitar ONG (mudar status para true)
 export const acceptOng = async (id: number): Promise<boolean> => {
   try {
     const token = await AsyncStorage.getItem('authToken');
@@ -121,7 +118,6 @@ export const acceptOng = async (id: number): Promise<boolean> => {
   }
 };
 
-// Deletar ONG
 export const deleteOng = async (id: number): Promise<boolean> => {
   try {
     const token = await AsyncStorage.getItem('authToken');
@@ -176,7 +172,6 @@ export const fetchAnimalsByState = async (uf: string): Promise<any[]> => {
     return response.data.data || [];
   } catch (error: any) {
     if (error.response?.status === 404) {
-      // Estado sem animais — retorna array vazio sem logar erro
       return [];
     }
     //console.error('Erro ao buscar animais por estado:', error);
@@ -205,7 +200,7 @@ export const fetchLoggedUser = async (): Promise<{ id?: number, name?: string, c
       phone: user.telephone,
       city: user.address?.city,
       state: user.address?.state,
-      address: user.address, // objeto completo
+      address: user.address, 
     };
   } catch (err) {
     console.error('Erro ao buscar dados do usuário:', err);
@@ -215,13 +210,13 @@ export const fetchLoggedUser = async (): Promise<{ id?: number, name?: string, c
 
 export const updateUser = async (user: {
   id: number;
-  name: string;
-  email: string;
-  cpf: string;
-  password: string;
-  telephone: string;
-  address: any;
-  addressId: number;
+  name?: string;
+  email?: string;
+  cpf?: string;
+  password?: string;
+  telephone?: string;
+  address?: any;
+  addressId?: number;
 }) => {
   try {
     const token = await AsyncStorage.getItem('authToken');

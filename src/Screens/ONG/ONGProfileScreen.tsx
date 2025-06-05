@@ -1,24 +1,54 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, Dimensions } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Theme } from '../../../constants/Themes';
-import { useNavigation } from '@react-navigation/native';
+import ChangePasswordModal from '../../Components/CustomModal';
+import { fetchLoggedOng, updateOng } from '../../actions/ongActions'; 
+import { UpdateOngPayload } from '../../types';
 
-const { width, height } = Dimensions.get('window');
+
+const { height } = Dimensions.get('window');
 
 export default function ONGProfileScreen({ navigation}  : any ) {
 
-    // Exemplo de dados estáticos, substitua por dados reais da ONG se necessário
     const [ongName, setOngName] = React.useState('');
     const [ongCity, setOngCity] = React.useState('');
     const [ongState, setOngState] = React.useState('');
     const [ongEmail, setOngEmail] = React.useState('');
     const [ongPhone, setOngPhone] = React.useState('');
     const [ongCnpj, setOngCnpj] = React.useState('');
+    const [isPasswordModalVisible, setIsPasswordModalVisible] = useState(false);
+    const [ongId, setOngId] = useState<number | null>(null); 
 
-    // Carregue os dados reais da ONG aqui se desejar
+     useEffect(() => {
+    const loadONGData = async () => {
+      const ongData: {
+        id: number;
+        name: string;
+        phone: string;
+        cnpj: string;
+        email: string;
+        pix: string;
+        documents: any;
+        address: any; 
+        photos: any[]; 
+        description: string;
+        status: boolean;
+      } | null = await fetchLoggedOng();
+      if (ongData) {
+        setOngId(ongData.id || null);
+        setOngName(ongData.name || '');
+        setOngCity(ongData.address?.city || '');
+        setOngState(ongData.address?.state || '');
+        setOngEmail(ongData.email || '');
+        setOngPhone(ongData.phone || '');
+        setOngCnpj(ongData.cnpj || '');
+      }
+    };
+    loadONGData();
+  }, []);
 
     const handleLogout = async () => {
         await AsyncStorage.removeItem('authToken');
@@ -28,6 +58,18 @@ export default function ONGProfileScreen({ navigation}  : any ) {
             routes: [{ name: 'Onboarding' }],
         });
     };
+
+    const handleUpdateONGPassword = async (id: number, newPassword: string) => {
+    try {
+      const payload: UpdateOngPayload = {
+        id: id,
+        password: newPassword,
+      };
+      await updateOng(payload);
+    } catch (error: any) {
+      throw error;
+    }
+  };
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
@@ -54,7 +96,7 @@ export default function ONGProfileScreen({ navigation}  : any ) {
                         <Ionicons name="chevron-forward" size={20} color={Theme.PRIMARY} style={styles.chevron} />
                     </TouchableOpacity>
                     
-                    <TouchableOpacity style={styles.option} onPress={() => { }}>
+                    <TouchableOpacity style={styles.option} onPress={() => {setIsPasswordModalVisible(true)}}>
                         <View style={styles.iconContainer}>
                             <Ionicons name='lock-closed-outline' size={25} color={Theme.PRIMARY} />
                         </View>
@@ -70,6 +112,12 @@ export default function ONGProfileScreen({ navigation}  : any ) {
                     </TouchableOpacity>
                 </View>
             </View>
+            <ChangePasswordModal
+        isVisible={isPasswordModalVisible}
+        onClose={() => setIsPasswordModalVisible(false)}
+        onUpdatePassword={handleUpdateONGPassword} 
+        entityId={ongId} 
+      />
         </SafeAreaView>
     );
 }

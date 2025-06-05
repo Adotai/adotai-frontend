@@ -23,25 +23,87 @@ const inputTheme = {
 };
 
 export default function ONGAnimalEditScreen({ route }: any) {
+
+  const DOG_BREEDS = [
+    'Vira-lata', 'Pastor Alemão', 'Golden Retriever', 'Labrador Retriever', 'Poodle',
+    'Shih Tzu', 'Buldogue Francês', 'Chihuahua', 'Yorkshire Terrier', 'Dachshund',
+    'Border Collie', 'Outra raça'
+  ];
+
+  const CAT_BREEDS = [
+    'Vira-lata', 'Siamês', 'Persa', 'Maine Coon', 'Ragdoll', 'Sphynx',
+    'Bengal', 'British Shorthair', 'Outra raça'
+  ];
+
+  const ANIMAL_COLORS = [
+    'Preto', 'Branco', 'Marrom', 'Caramelo', 'Cinza', 'Dourado',
+    'Tigrado', 'Malhado', 'Tricolor', 'Outra cor'
+  ];
+
   const navigation = useNavigation();
   const { animal } = route.params;
 
   const [name, setName] = useState(animal?.name || '');
   const [animalDescription, setAnimalDescription] = useState(animal?.animalDescription || '');
   const [breed, setBreed] = useState(animal?.breed || '');
-const [color, setColor] = useState(animal?.color || '');
+  const [color, setColor] = useState(animal?.color || '');
   const [age, setAge] = useState(animal?.age ? String(animal.age) : '');
-  const [species, setSpecies] = useState(animal?.species?.description || 'Dog');
-  const [gender, setGender] = useState(animal?.gender || 'male');
-  const [size, setSize] = useState(animal?.size || 'pequeno');
-  const [temperament, setTemperament] = useState(animal?.temperament || 'shy');
-  const [health, setHealth] = useState(animal?.health || 'healthy');
+  const [species, setSpecies] = useState(animal?.species?.description || '');
+  const [gender, setGender] = useState(animal?.gender || '');
+  const [size, setSize] = useState(animal?.size || '');
+  const [temperament, setTemperament] = useState(animal?.temperament || '');
+  const [health, setHealth] = useState(animal?.health || '');
   const [vaccinated, setVaccinated] = useState(!!animal?.vaccinated);
   const [neutered, setNeutered] = useState(!!animal?.neutered);
   const [dewormed, setDewormed] = useState(!!animal?.dewormed);
   const [images, setImages] = useState<any[]>(animal?.photos || []);
+  const [currentBreeds, setCurrentBreeds] = React.useState(DOG_BREEDS);
+  const [otherBreed, setOtherBreed] = React.useState('');
+  const [currentColor, setCurrentColor] = React.useState('');
+  const [colorOther, setColorOther] = React.useState('');
 
-  // Adicionar nova imagem
+  useEffect(() => {
+    if (species === 'Dog') {
+      setCurrentBreeds(DOG_BREEDS);
+    } else if (species === 'Cat') {
+      setCurrentBreeds(CAT_BREEDS);
+    }
+  }, [species]);
+
+  useEffect(() => {
+    const breedList = species === "Dog" ? DOG_BREEDS : CAT_BREEDS;
+    if (breed && !isInList(breed, breedList)) {
+      setBreed('Outra raça');
+      setOtherBreed(breed);
+    } else if (breed) {
+      const dropdownValue = breedList.find(
+        (b) => b.toLowerCase() === breed.toLowerCase()
+      );
+      if (dropdownValue) setBreed(dropdownValue);
+    }
+    if (color && !isInList(color, ANIMAL_COLORS)) {
+      setColor('Outra cor');
+      setColorOther(color);
+    } else if (color) {
+      const dropdownValue = ANIMAL_COLORS.find(
+        (c) => c.toLowerCase() === color.toLowerCase()
+      );
+      if (dropdownValue) setColor(dropdownValue);
+    }
+  }, []);
+
+
+  const isInList = (value: string, list: string[]): boolean => {
+    if (!value) return false;
+    return list.some((item) => item.toLowerCase() === value.toLowerCase());
+  };
+
+  const formatCase = (str: string): string => {
+    if (!str) return '';
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+  };
+
+
   const handlePickImage = async () => {
     if (images.length >= 3) return;
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -59,7 +121,6 @@ const [color, setColor] = useState(animal?.color || '');
     }
   };
 
-  // Remover imagem (local ou backend)
   const handleRemoveImage = async (idx: number) => {
     const img = images[idx];
     if (img.id) {
@@ -73,6 +134,20 @@ const [color, setColor] = useState(animal?.color || '');
       setImages(images.filter((_, i) => i !== idx));
     }
   };
+
+  const colorToSend: string =
+    color === 'Outra cor'
+      ? colorOther.trim()
+        ? colorOther.trim()
+        : '' 
+      : color;
+
+  const breedToSend: string =
+    breed === 'Outra raça'
+      ? otherBreed.trim()
+        ? otherBreed.trim()
+        : '' 
+      : breed;
 
   const handleSave = async () => {
     try {
@@ -94,8 +169,8 @@ const [color, setColor] = useState(animal?.color || '');
         id: animal.id,
         name,
         animalDescription,
-        breed: { name: breed, speciesDescription: species },
-        color: { name: color },
+        breed: { name: breedToSend, speciesDescription: species },
+        color: { name: colorToSend },
         age: Number(age),
         species: { description: species },
         gender,
@@ -120,151 +195,195 @@ const [color, setColor] = useState(animal?.color || '');
 
   return (
     <View style={{ flex: 1, backgroundColor: '#fff' }}>
-    <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-      <Text style={styles.label}>Fotos do Animal</Text>
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginBottom: 16 }}>
-        {images.map((img, idx) => (
-          <View key={idx} style={{ margin: 8, alignItems: 'center' }}>
-            <Image source={{ uri: img.uri || img.photoUrl }} style={styles.imagePreview} />
-            <TouchableOpacity onPress={() => handleRemoveImage(idx)}>
-              <Text style={{ color: '#d33', fontSize: 12 }}>Remover</Text>
+      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+        <Text style={styles.label}>Fotos do Animal</Text>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginBottom: 16 }}>
+          {images.map((img, idx) => (
+            <View key={idx} style={{ margin: 8, alignItems: 'center' }}>
+              <Image source={{ uri: img.uri || img.photoUrl }} style={styles.imagePreview} />
+              <TouchableOpacity onPress={() => handleRemoveImage(idx)}>
+                <Text style={{ color: '#d33', fontSize: 12 }}>Remover</Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+          {images.length < 3 && (
+            <TouchableOpacity onPress={handlePickImage} style={{ justifyContent: 'center', alignItems: 'center', margin: 8 }}>
+              <Text style={{ fontSize: 32, color: '#888' }}>+</Text>
             </TouchableOpacity>
-          </View>
-        ))}
-        {images.length < 3 && (
-          <TouchableOpacity onPress={handlePickImage} style={{ justifyContent: 'center', alignItems: 'center', margin: 8 }}>
-            <Text style={{ fontSize: 32, color: '#888' }}>+</Text>
-          </TouchableOpacity>
-        )}
-      </View>
-      <TextInput
-        label="Nome"
-        mode="outlined"
-        value={name}
-        onChangeText={setName}
-        style={styles.input}
-        theme={inputTheme}
-      />
-      <TextInput
-        label="Descrição"
-        mode="outlined"
-        value={animalDescription}
-        onChangeText={setAnimalDescription}
-        style={styles.input}
-        theme={inputTheme}
-      />
-      <TextInput
-        label="Raça"
-        mode="outlined"
-        value={breed}
-        onChangeText={setBreed}
-        style={styles.input}
-        theme={inputTheme}
-      />
-      <TextInput
-        label="Cor"
-        mode="outlined"
-        value={color}
-        onChangeText={setColor}
-        style={styles.input}
-        theme={inputTheme}
-      />
-      <TextInput
-        label="Idade"
-        mode="outlined"
-        value={age}
-        onChangeText={setAge}
-        keyboardType="numeric"
-        style={styles.input}
-        theme={inputTheme}
-      />
-      <View style={styles.pickerWrapper}>
-        <Picker
-          selectedValue={species}
-          onValueChange={setSpecies}
-          style={styles.picker}
-          dropdownIconColor={Theme.TERTIARY}
-        >
-          <Picker.Item label="Cão" value="Dog" />
-          <Picker.Item label="Gato" value="Cat" />
-        </Picker>
-      </View>
-      <View style={styles.pickerWrapper}>
-        <Picker
-          selectedValue={gender}
-          onValueChange={setGender}
-          style={styles.picker}
-          dropdownIconColor={Theme.TERTIARY}
-        >
-          <Picker.Item label="Macho" value="male" />
-          <Picker.Item label="Fêmea" value="female" />
-        </Picker>
-      </View>
-      <View style={styles.pickerWrapper}>
-        <Picker
-          selectedValue={size}
-          onValueChange={setSize}
-          style={styles.picker}
-          dropdownIconColor={Theme.TERTIARY}
-        >
-          <Picker.Item label="Pequeno" value="pequeno" />
-          <Picker.Item label="Médio" value="medio" />
-          <Picker.Item label="Grande" value="grande" />
-        </Picker>
-      </View>
-      <View style={styles.pickerWrapper}>
-        <Picker
-          selectedValue={temperament}
-          onValueChange={setTemperament}
-          style={styles.picker}
-          dropdownIconColor={Theme.TERTIARY}
-        >
-          <Picker.Item label="Tímido" value="shy" />
-          <Picker.Item label="Protetor" value="protective" />
-          <Picker.Item label="Independente" value="independent" />
-          <Picker.Item label="Sociável" value="sociable" />
-          <Picker.Item label="Calmo" value="calm" />
-          <Picker.Item label="Agressivo" value="aggressive" />
-          <Picker.Item label="Brincalhão" value="playful" />
-          <Picker.Item label="Desconhecido" value="unknown" />
-        </Picker>
-      </View>
-      <View style={styles.pickerWrapper}>
-        <Picker
-          selectedValue={health}
-          onValueChange={setHealth}
-          style={styles.picker}
-          dropdownIconColor={Theme.TERTIARY}
-        >
-          <Picker.Item label="Saudável" value="healthy" />
-          <Picker.Item label="Doente" value="sick" />
-          <Picker.Item label="Recuperando" value="recovering" />
-          <Picker.Item label="Deficiente" value="disabled" />
-          <Picker.Item label="Desconhecido" value="unknown" />
-        </Picker>
-      </View>
-      {/* Fotos */}
+          )}
+        </View>
+        <TextInput
+          label="Nome"
+          mode="outlined"
+          value={name}
+          onChangeText={setName}
+          style={styles.input}
+          theme={inputTheme}
+        />
+        <TextInput
+          label="Descrição"
+          mode="outlined"
+          value={animalDescription}
+          onChangeText={setAnimalDescription}
+          style={styles.input}
+          theme={inputTheme}
+        />
+        <TextInput
+          label="Idade(em anos)"
+          mode="outlined"
+          value={age}
+          onChangeText={setAge}
+          keyboardType="numeric"
+          style={styles.input}
+          theme={inputTheme}
+        />
 
-      <View style={styles.switchRow}>
-        <Text style={styles.switchLabel}>Vacinado</Text>
-        <TouchableOpacity onPress={() => setVaccinated(v => !v)}>
-          <Text style={{ color: vaccinated ? Theme.PRIMARY : '#888' }}>{vaccinated ? 'Sim' : 'Não'}</Text>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.switchRow}>
-        <Text style={styles.switchLabel}>Castrado</Text>
-        <TouchableOpacity onPress={() => setNeutered(v => !v)}>
-          <Text style={{ color: neutered ? Theme.PRIMARY : '#888' }}>{neutered ? 'Sim' : 'Não'}</Text>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.switchRow}>
-        <Text style={styles.switchLabel}>Vermifugado</Text>
-        <TouchableOpacity onPress={() => setDewormed(v => !v)}>
-          <Text style={{ color: dewormed ? Theme.PRIMARY : '#888' }}>{dewormed ? 'Sim' : 'Não'}</Text>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
-    <CustomButton
+        <View style={styles.pickerWrapper}>
+          <Picker
+            selectedValue={breed}
+            onValueChange={(itemValue: string) => {
+              setBreed(itemValue);
+              if (itemValue !== 'Outra raça') setOtherBreed('');
+            }}
+            style={styles.picker}
+            dropdownIconColor={Theme.TERTIARY}
+          >
+            <Picker.Item label="Selecione a raça" value="" />
+            {(species === "Dog" ? DOG_BREEDS : CAT_BREEDS).map((b) => (
+              <Picker.Item key={b} label={b} value={b} />
+            ))}
+          </Picker>
+        </View>
+        {breed === 'Outra raça' && (
+          <View style={styles.inputContainerWithLabel}>
+            <TextInput
+              label="Outra Raça"
+              mode="outlined"
+              value={otherBreed}
+              onChangeText={setOtherBreed}
+              style={styles.input}
+              theme={inputTheme}
+            />
+          </View>
+        )}
+        <View style={styles.pickerWrapper}>
+            <Picker
+              selectedValue={color}
+              onValueChange={(itemValue: string) => {
+                setColor(itemValue);
+                if (itemValue !== 'Outra cor') setColorOther('');
+              }}
+              style={styles.picker}
+              dropdownIconColor={Theme.TERTIARY}
+            >
+              <Picker.Item label="Selecione a cor" value="" />
+              {ANIMAL_COLORS.map((c) => (
+                <Picker.Item key={c} label={c} value={c} />
+              ))}
+            </Picker>
+          </View>
+
+        {color === 'Outra cor' && (
+          <View style={styles.inputContainerWithLabel}>
+            <TextInput
+              label="Outra Cor"
+              mode="outlined"
+              value={colorOther}
+              onChangeText={setColorOther}
+              style={styles.input}
+              theme={inputTheme}
+            />
+          </View>
+        )}
+          
+        
+
+        <View style={styles.pickerWrapper}>
+          <Picker
+            selectedValue={species}
+            onValueChange={setSpecies}
+            style={styles.picker}
+            dropdownIconColor={Theme.TERTIARY}
+          >
+            <Picker.Item label="Cão" value="Dog" />
+            <Picker.Item label="Gato" value="Cat" />
+          </Picker>
+        </View>
+        <View style={styles.pickerWrapper}>
+          <Picker
+            selectedValue={gender}
+            onValueChange={setGender}
+            style={styles.picker}
+            dropdownIconColor={Theme.TERTIARY}
+          >
+            <Picker.Item label="Macho" value="male" />
+            <Picker.Item label="Fêmea" value="female" />
+          </Picker>
+        </View>
+        <View style={styles.pickerWrapper}>
+          <Picker
+            selectedValue={size}
+            onValueChange={setSize}
+            style={styles.picker}
+            dropdownIconColor={Theme.TERTIARY}
+          >
+            <Picker.Item label="Pequeno" value="pequeno" />
+            <Picker.Item label="Médio" value="medio" />
+            <Picker.Item label="Grande" value="grande" />
+          </Picker>
+        </View>
+        <View style={styles.pickerWrapper}>
+          <Picker
+            selectedValue={temperament}
+            onValueChange={setTemperament}
+            style={styles.picker}
+            dropdownIconColor={Theme.TERTIARY}
+          >
+            <Picker.Item label="Tímido" value="shy" />
+            <Picker.Item label="Protetor" value="protective" />
+            <Picker.Item label="Independente" value="independent" />
+            <Picker.Item label="Sociável" value="sociable" />
+            <Picker.Item label="Calmo" value="calm" />
+            <Picker.Item label="Agressivo" value="aggressive" />
+            <Picker.Item label="Brincalhão" value="playful" />
+            <Picker.Item label="Desconhecido" value="unknown" />
+          </Picker>
+        </View>
+        <View style={styles.pickerWrapper}>
+          <Picker
+            selectedValue={health}
+            onValueChange={setHealth}
+            style={styles.picker}
+            dropdownIconColor={Theme.TERTIARY}
+          >
+            <Picker.Item label="Saudável" value="healthy" />
+            <Picker.Item label="Doente" value="sick" />
+            <Picker.Item label="Recuperando" value="recovering" />
+            <Picker.Item label="Deficiente" value="disabled" />
+            <Picker.Item label="Desconhecido" value="unknown" />
+          </Picker>
+        </View>
+
+        <View style={styles.switchRow}>
+          <Text style={styles.switchLabel}>Vacinado</Text>
+          <TouchableOpacity onPress={() => setVaccinated(v => !v)}>
+            <Text style={{ color: vaccinated ? Theme.PRIMARY : '#888' }}>{vaccinated ? 'Sim' : 'Não'}</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.switchRow}>
+          <Text style={styles.switchLabel}>Castrado</Text>
+          <TouchableOpacity onPress={() => setNeutered(v => !v)}>
+            <Text style={{ color: neutered ? Theme.PRIMARY : '#888' }}>{neutered ? 'Sim' : 'Não'}</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.switchRow}>
+          <Text style={styles.switchLabel}>Vermifugado</Text>
+          <TouchableOpacity onPress={() => setDewormed(v => !v)}>
+            <Text style={{ color: dewormed ? Theme.PRIMARY : '#888' }}>{dewormed ? 'Sim' : 'Não'}</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+      <CustomButton
         title="Salvar"
         color={Theme.PRIMARY}
         onPress={handleSave}
@@ -325,4 +444,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#222',
   },
+  inputContainerWithLabel: {
+    width: '100%',
+  }
 });

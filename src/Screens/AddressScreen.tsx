@@ -3,7 +3,7 @@ import React from 'react';
 import { Picker } from '@react-native-picker/picker';
 import CustomButton from '../Components/CustomButton';
 import { Theme } from '../../constants/Themes';
-import { TextInput } from 'react-native-paper'; // Troque CustomInput por TextInput do paper
+import { TextInput } from 'react-native-paper';
 import { handleSignUp } from '../actions/userActions';
 
 
@@ -20,20 +20,27 @@ const inputTheme = {
   roundness: 10,
 };
 
+function maskCep(value: string) {
+  return value
+    .replace(/\D/g, '') // Remove tudo que não é dígito
+    .replace(/^(\d{5})(\d)/, '$1-$2') // Coloca o hífen depois do 5º dígito
+    .slice(0, 9); // Limita a 9 caracteres (XXXXX-XXX)
+}
+
 export default function AddressScreen({ route, navigation }: any) {
   const { name, email, telephone, cpf, password, fromOng } = route.params || {};
 
   if (!name || !email || !telephone || !cpf || !password) {
-    Alert.alert('Error', 'Missing user information. Please go back and fill in all fields.');
+    Alert.alert('Erro', 'Informações de usuário ausentes. Por favor, volte e preencha todos os campos.');
     return null;
   }
 
   const [cep, setCep] = React.useState('');
   const [state, setState] = React.useState('');
   const [city, setCity] = React.useState('');
-  const [address, setAddress] = React.useState('');
+  const [address, setAddress] = React.useState(''); 
   const [number, setNumber] = React.useState('');
-  const [houseType, setHouseType] = React.useState('');
+  const [houseType, setHouseType] = React.useState(''); 
 
   const states = [
     'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA',
@@ -41,24 +48,45 @@ export default function AddressScreen({ route, navigation }: any) {
     'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'
   ];
 
-  const handleRegister = async () => {
+  const validateAndProceed = () => {
     if (!cep || !state || !city || !address || !number) {
-      Alert.alert('Error', 'Please fill in all fields.');
+      Alert.alert('Erro', 'Por favor, preencha todos os campos obrigatórios.');
       return;
     }
 
+    const unmaskedCep = cep.replace(/\D/g, '');
+    if (!/^\d{8}$/.test(unmaskedCep)) {
+      Alert.alert('Erro', 'CEP inválido. Certifique-se de que possui 8 dígitos.');
+      return;
+    }
+
+    if (!/^\d+$/.test(number) || parseInt(number, 10) <= 0) {
+        Alert.alert('Erro', 'Número inválido. Por favor, insira um número positivo.');
+        return;
+    }
+
+
+    if (fromOng) {
+      handleOngNext();
+    } else {
+      handleRegister();
+    }
+  };
+
+
+  const handleRegister = async () => {
     const success = await handleSignUp(name, email, telephone, cpf, password, {
-      street: address,
+      street: address, 
       number: parseInt(number, 10),
       city,
       state,
-      zipCode: cep,
+      zipCode: cep.replace(/\D/g, ''), 
     });
 
     if (success) {
       navigation.navigate('UserHome');
     } else {
-      Alert.alert('Error', 'Failed to register user.');
+      Alert.alert('Erro', 'Falha ao cadastrar usuário.');
     }
   };
 
@@ -67,7 +95,7 @@ export default function AddressScreen({ route, navigation }: any) {
       name,
       email,
       telephone,
-      cnpj: cpf,
+      cnpj: cpf, 
       password,
       pix: '',
       address: {
@@ -75,7 +103,7 @@ export default function AddressScreen({ route, navigation }: any) {
         number: parseInt(number, 10),
         city,
         state,
-        zipCode: cep,
+        zipCode: cep.replace(/\D/g, ''), 
       },
     });
   };
@@ -97,10 +125,11 @@ export default function AddressScreen({ route, navigation }: any) {
                 label="CEP"
                 mode="outlined"
                 value={cep}
-                onChangeText={setCep}
+                onChangeText={text => setCep(maskCep(text))} 
                 style={styles.input}
                 theme={inputTheme}
-                keyboardType="numeric"
+                keyboardType="numeric" // Garante teclado numérico
+                maxLength={9} // Limita a 9 caracteres (XXXXX-XXX)
               />
 
               <View style={styles.pickerContainer}>
@@ -136,23 +165,31 @@ export default function AddressScreen({ route, navigation }: any) {
                 label="Número"
                 mode="outlined"
                 value={number}
-                onChangeText={setNumber}
+                onChangeText={text => setNumber(text.replace(/\D/g, ''))}
                 style={styles.input}
                 theme={inputTheme}
-                keyboardType="numeric"
+                keyboardType="numeric" 
               />
-              <CustomButton
-                title={fromOng ? 'Seguinte' : 'Cadastrar'}
-                borderColor="transparent"
-                textColor={Theme.BACK}
-                color={Theme.PRIMARY}
-                onPress={fromOng ? handleOngNext : handleRegister}
-                disabled={false}
-                buttonStyle={{ marginBottom: '5%', marginTop: '5%', width: width * 0.85, alignSelf: 'center' }}
-              />
+              {/* <TextInput
+                label="Tipo de Residência (ex: Casa, Apartamento)"
+                mode="outlined"
+                value={houseType}
+                onChangeText={setHouseType}
+                style={styles.input}
+                theme={inputTheme}
+              /> */}
             </ScrollView>
-          </KeyboardAvoidingView>
 
+            <CustomButton
+              title={fromOng ? 'Seguinte' : 'Cadastrar'}
+              borderColor="transparent"
+              textColor={Theme.BACK}
+              color={Theme.PRIMARY}
+              onPress={validateAndProceed} 
+              disabled={false}
+              buttonStyle={{ marginBottom: '5%', marginTop: '5%', width: width * 0.85, alignSelf: 'center' }}
+            />
+          </KeyboardAvoidingView>
         </View>
       </View>
     </View>
@@ -206,6 +243,9 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 15,
     backgroundColor: 'white',
+    width: width * 0.85, 
+    alignSelf: 'center',
+    justifyContent: 'center', 
   },
   picker: {
     width: '100%',

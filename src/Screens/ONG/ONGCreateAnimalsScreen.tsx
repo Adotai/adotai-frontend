@@ -1,12 +1,11 @@
 import React from 'react';
-import { View, StyleSheet, Alert, ScrollView, Switch, Text, TouchableOpacity, Image } from 'react-native';
+import { View, StyleSheet, Alert, ScrollView, Text, TouchableOpacity, Image } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import { createAnimal,  } from '../../actions/ongActions';
+import { createAnimal, } from '../../actions/ongActions';
 import { getLoggedOngId } from '../../actions/userActions'
-import { Button, TextInput } from 'react-native-paper';
+import { TextInput } from 'react-native-paper';
 import CustomButton from '../../Components/CustomButton';
 import { Theme } from '../../../constants/Themes';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 import { uploadFileToStorage } from '../../services/uploadFileToStorage';
@@ -19,8 +18,24 @@ const inputTheme = {
     background: '#fff',
     outline: '#ccc'
   },
-    roundness: 10,
+  roundness: 10,
 };
+
+const DOG_BREEDS = [
+  'Vira-lata', 'Pastor Alemão', 'Golden Retriever', 'Labrador Retriever', 'Poodle',
+  'Shih Tzu', 'Buldogue Francês', 'Chihuahua', 'Yorkshire Terrier', 'Dachshund',
+  'Border Collie', 'Outra raça'
+];
+
+const CAT_BREEDS = [
+  'Vira-lata', 'Siamês', 'Persa', 'Maine Coon', 'Ragdoll', 'Sphynx',
+  'Bengal', 'British Shorthair', 'Outra raça'
+];
+
+const ANIMAL_COLORS = [
+  'Preto', 'Branco', 'Marrom', 'Caramelo', 'Cinza', 'Dourado',
+  'Tigrado', 'Malhado', 'Tricolor', 'Outra cor'
+];
 
 function ImageUploadInput({ images, setImages }: { images: any[], setImages: (imgs: any[]) => void }) {
   const handlePickImage = async () => {
@@ -41,7 +56,7 @@ function ImageUploadInput({ images, setImages }: { images: any[], setImages: (im
   };
   return (
     <View style={{ marginBottom: 16 }}>
-      <TouchableOpacity style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 10, padding: 12, justifyContent:'center', alignItems: 'center', flexDirection: 'row', flexWrap: 'wrap' }} onPress={handlePickImage} disabled={images.length >= 3}>
+      <TouchableOpacity style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 10, padding: 12, justifyContent: 'center', alignItems: 'center', flexDirection: 'row', flexWrap: 'wrap' }} onPress={handlePickImage} disabled={images.length >= 3}>
         {images.length === 0 ? (
           <Text style={{ color: '#888' }}>Selecionar até 3 fotos</Text>
         ) : (
@@ -67,11 +82,11 @@ export default function ONGCreateAnimalsScreen({ navigation }: any) {
   const [breed, setBreed] = React.useState('');
   const [age, setAge] = React.useState('');
   const [color, setColor] = React.useState('');
-  const [species, setSpecies] = React.useState('Dog');
-  const [gender, setGender] = React.useState('male');
-  const [temperament, setTemperament] = React.useState('shy');
-  const [health, setHealth] = React.useState('healthy');
-  const [size, setSize] = React.useState('PEQUENO');
+  const [species, setSpecies] = React.useState('');
+  const [gender, setGender] = React.useState('');
+  const [temperament, setTemperament] = React.useState('');
+  const [health, setHealth] = React.useState('');
+  const [size, setSize] = React.useState('');
   const [vaccinated, setVaccinated] = React.useState(false);
   const [neutered, setNeutered] = React.useState(false);
   const [dewormed, setDewormed] = React.useState(false);
@@ -79,6 +94,22 @@ export default function ONGCreateAnimalsScreen({ navigation }: any) {
   const [images, setImages] = React.useState<any[]>([]);
   const [animalImages, setAnimalImages] = React.useState<any[]>([]);
   const [animalDescription, setAnimalDescription] = React.useState('');
+  const [currentBreeds, setCurrentBreeds] = React.useState(DOG_BREEDS);
+  const [otherBreed, setOtherBreed] = React.useState('');
+  const [currentColor, setCurrentColor] = React.useState('');
+  const [colorOther, setColorOther] = React.useState('');
+
+
+
+
+  React.useEffect(() => {
+    if (species === 'Dog') {
+      setCurrentBreeds(DOG_BREEDS);
+    } else if (species === 'Cat') {
+      setCurrentBreeds(CAT_BREEDS);
+    }
+    setBreed('');
+  }, [species]);
 
   React.useEffect(() => {
     const fetchOngId = async () => {
@@ -89,16 +120,38 @@ export default function ONGCreateAnimalsScreen({ navigation }: any) {
   }, []);
 
   const handleCreate = async () => {
+    const breedToSend = breed === "Outra raça" ? otherBreed : breed;
+    const colorToSend = color === "Outra cor" ? colorOther : color;
+
     try {
+      if (!name || !breed || !age || !color || !species || !gender || !temperament || !health || !size || !animalDescription) {
+        Alert.alert('Erro', 'Por favor, preencha todos os campos obrigatórios.');
+        return;
+      }
+
       if (animalImages.length === 0) {
         Alert.alert('Erro', 'Adicione pelo menos uma foto do animal.');
         return;
       }
-  
-      // Use o nome do animal e timestamp para criar um path único
+
+      const parsedAge = parseInt(age, 25);
+      if (isNaN(parsedAge) || parsedAge <= 0) {
+        Alert.alert('Erro', 'Idade inválida. Por favor, insira um número positivo.');
+        return;
+      }
+
+      if (breedToSend === '' || (breed === 'Outra' && (otherBreed.trim() === '' || otherBreed.trim() === 'Outra'))) {
+        Alert.alert('Erro', 'Por favor, selecione uma raça ou especifique a raça.');
+        return;
+      }
+      if (color === '' || (color === 'Outra' && (color.trim() === 'Outra' || color.trim() === ''))) {
+        Alert.alert('Erro', 'Por favor, selecione uma cor ou especifique a cor.');
+        return;
+      }
+
       const animalId = `${name.replace(/\s/g, '_')}_${Date.now()}`;
       let imageUrls: string[] = [];
-  
+
       for (let i = 0; i < animalImages.length; i++) {
         const img = animalImages[i];
         if (img?.uri) {
@@ -109,28 +162,30 @@ export default function ONGCreateAnimalsScreen({ navigation }: any) {
           imageUrls.push(url);
         }
       }
-  
+
+
+
       const photos = imageUrls.map((url) => ({ photoUrl: url }));
-  
+
       const animalObj = {
         ongId: ongId ?? 0,
         name,
         gender,
-        color: { name: color || 'Brown' },
-        breed: { name: breed, speciesDescription: species },
+        color: { name: colorToSend },
+        breed: { name: breedToSend, speciesDescription: species },
         species: { description: species },
-        age: Number(age),
+        age: parsedAge,
         size,
-        health: health || 'GOOD',
+        health: health,
         status: true,
         vaccinated,
         neutered,
         dewormed,
-        temperament: temperament || 'FRIENDLY',
-        photos, 
+        temperament: temperament,
+        photos,
         animalDescription,
       };
-  
+
       await createAnimal(animalObj);
       Alert.alert('Sucesso', 'Animal criado com sucesso!');
       navigation.goBack();
@@ -139,7 +194,6 @@ export default function ONGCreateAnimalsScreen({ navigation }: any) {
       Alert.alert('Erro', 'Falha ao criar animal.');
     }
   };
-
   return (
     <View style={{ alignItems: 'center', width: '100%', backgroundColor: '#fff', height: '100%' }}>
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
@@ -159,26 +213,9 @@ export default function ONGCreateAnimalsScreen({ navigation }: any) {
           style={styles.input}
           theme={inputTheme}
         />
-      
+
         <TextInput
-          label="Raça"
-          mode="outlined"
-          value={breed}
-          onChangeText={setBreed}
-          style={styles.input}
-          theme={inputTheme}
-        />
-      
-        <TextInput
-          label="Cor"
-          mode="outlined"
-          value={color}
-          onChangeText={setColor}
-          style={styles.input}
-          theme={inputTheme}
-        />
-        <TextInput
-          label="Idade"
+          label="Idade (em anos)"
           mode="outlined"
           value={age}
           onChangeText={setAge}
@@ -186,17 +223,75 @@ export default function ONGCreateAnimalsScreen({ navigation }: any) {
           style={styles.input}
           theme={inputTheme}
         />
-         <View style={styles.pickerWrapper}>
+
+        <View style={styles.pickerWrapper}>
           <Picker
             selectedValue={species}
-            onValueChange={setSpecies}
+            onValueChange={(itemValue) => setSpecies(itemValue)}
             style={styles.picker}
             dropdownIconColor={Theme.TERTIARY}
           >
+            <Picker.Item label="Selecione a espécie" value="" />
             <Picker.Item label="Cão" value="Dog" />
             <Picker.Item label="Gato" value="Cat" />
           </Picker>
         </View>
+
+        <View style={styles.pickerWrapper}>
+          <Picker
+            selectedValue={breed}
+            onValueChange={(itemValue) => setBreed(itemValue)}
+            style={styles.picker}
+            dropdownIconColor={Theme.TERTIARY}
+          >
+            <Picker.Item label="Selecione a raça" value="" />
+            {currentBreeds.map((b) => (
+              <Picker.Item key={b} label={b} value={b} />
+            ))}
+          </Picker>
+        </View>
+
+        {breed === 'Outra raça' && (<View style={styles.inputContainerWithLabel}>
+          <TextInput
+            label="Escreva a outra raça"
+            mode="outlined"
+            value={otherBreed}
+            onChangeText={setOtherBreed}
+            style={styles.input}
+            theme={inputTheme}
+          />
+        </View>
+        )}
+
+
+        <View style={styles.pickerWrapper}>
+          <Picker
+            selectedValue={color}
+            onValueChange={(itemValue) => setColor(itemValue)}
+            style={styles.picker}
+            dropdownIconColor={Theme.TERTIARY}
+          >
+            <Picker.Item label="Selecione a cor" value="" />
+            {ANIMAL_COLORS.map((c) => (
+              <Picker.Item key={c} label={c} value={c} />
+            ))}
+          </Picker>
+        </View>
+
+        {color === 'Outra cor' && (
+          <View style={styles.inputContainerWithLabel}>
+            <TextInput
+              label="Escreva a outra cor"
+              mode="outlined"
+              value={colorOther}
+              onChangeText={setColorOther}
+              style={styles.input}
+              theme={inputTheme}
+            />
+          </View>
+        )}
+
+
         <View style={styles.pickerWrapper}>
           <Picker
             selectedValue={gender}
@@ -204,11 +299,12 @@ export default function ONGCreateAnimalsScreen({ navigation }: any) {
             style={styles.picker}
             dropdownIconColor={Theme.TERTIARY}
           >
+            <Picker.Item label="Selecione o gênero" value="" />
             <Picker.Item label="Macho" value="male" />
             <Picker.Item label="Fêmea" value="female" />
           </Picker>
         </View>
-        
+
         <View style={styles.pickerWrapper}>
           <Picker
             selectedValue={size}
@@ -216,6 +312,7 @@ export default function ONGCreateAnimalsScreen({ navigation }: any) {
             style={styles.picker}
             dropdownIconColor={Theme.TERTIARY}
           >
+            <Picker.Item label="Selecione o porte" value="" />
             <Picker.Item label="Pequeno" value="pequeno" />
             <Picker.Item label="Médio" value="medio" />
             <Picker.Item label="Grande" value="grande" />
@@ -228,6 +325,7 @@ export default function ONGCreateAnimalsScreen({ navigation }: any) {
             style={styles.picker}
             dropdownIconColor={Theme.TERTIARY}
           >
+            <Picker.Item label="Selecione o temperamento" value="" />
             <Picker.Item label="Tímido" value="shy" />
             <Picker.Item label="Protetor" value="protective" />
             <Picker.Item label="Independente" value="independent" />
@@ -245,6 +343,7 @@ export default function ONGCreateAnimalsScreen({ navigation }: any) {
             style={styles.picker}
             dropdownIconColor={Theme.TERTIARY}
           >
+            <Picker.Item label="Selecione o estado de saúde" value="" />
             <Picker.Item label="Saudável" value="healthy" />
             <Picker.Item label="Doente" value="sick" />
             <Picker.Item label="Recuperando" value="recovering" />
@@ -252,35 +351,20 @@ export default function ONGCreateAnimalsScreen({ navigation }: any) {
             <Picker.Item label="Desconhecido" value="unknown" />
           </Picker>
         </View>
-       <ImageUploadInput images={animalImages} setImages={setAnimalImages} />
-       
-        <View style={styles.switchRow}>
+        <ImageUploadInput images={animalImages} setImages={setAnimalImages} />
+
+        <TouchableOpacity onPress={() => { setVaccinated(v => !v) }} style={styles.switchRow}>
           <Text style={styles.switchLabel}>Vacinado</Text>
-          <Switch
-            value={vaccinated}
-            onValueChange={setVaccinated}
-            thumbColor={vaccinated ? Theme.TERTIARY : Theme.INPUT}
-            trackColor={{ false: '#ccc', true: Theme.PRIMARY }}
-          />
-        </View>
-        <View style={styles.switchRow}>
+          <Text style={{ color: vaccinated ? Theme.PRIMARY : '#888' }}>{vaccinated ? 'Sim' : 'Não'}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => { setNeutered(v => !v) }} style={styles.switchRow}>
           <Text style={styles.switchLabel}>Castrado</Text>
-          <Switch
-            value={neutered}
-            onValueChange={setNeutered}
-            thumbColor={neutered ? Theme.TERTIARY : Theme.INPUT}
-            trackColor={{ false: '#ccc', true: Theme.PRIMARY }}
-          />
-        </View>
-        <View style={styles.switchRow}>
+          <Text style={{ color: neutered ? Theme.PRIMARY : '#888' }}>{neutered ? 'Sim' : 'Não'}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => { setDewormed(v => !v) }} style={styles.switchRow}>
           <Text style={styles.switchLabel}>Vermifugado</Text>
-          <Switch
-            value={dewormed}
-            onValueChange={setDewormed}
-            thumbColor={dewormed ? Theme.TERTIARY : Theme.INPUT}
-            trackColor={{ false: '#ccc', true: Theme.PRIMARY }}
-          />
-        </View>
+          <Text style={{ color: dewormed ? Theme.PRIMARY : '#888' }}>{dewormed ? 'Sim' : 'Não'}</Text>
+        </TouchableOpacity>
       </ScrollView>
       <CustomButton
         title="Cadastrar"
@@ -295,7 +379,7 @@ export default function ONGCreateAnimalsScreen({ navigation }: any) {
 
 const styles = StyleSheet.create({
   container: {
-    padding:24,
+    padding: 24,
     backgroundColor: '#fff',
     flexGrow: 1
   },
@@ -307,6 +391,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     width: '100%',
+    marginBottom: 8
   },
   switchLabel: {
     fontSize: 16,
@@ -331,4 +416,7 @@ const styles = StyleSheet.create({
     width: '100%',
     color: '#222',
   },
+  inputContainerWithLabel: {
+    width: '100%',
+  }
 });

@@ -1,10 +1,12 @@
 import { View, Text, Button, Image, StyleSheet, TouchableOpacity, Dimensions } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Theme } from '../../../constants/Themes';
 import { Ionicons } from '@expo/vector-icons';
-import { fetchLoggedUser } from '../../actions/userActions';
+import { fetchLoggedUser, updateUser } from '../../actions/userActions';
+import ChangePasswordModal from '../../Components/CustomModal';
+import { UpdateUserPayload } from '../../types';
 
 const { width, height } = Dimensions.get('window');
 
@@ -17,13 +19,15 @@ export default function UserProfileScreen({ navigation }: any) {
   const [userEmail, setUserEmail] = React.useState<string>('');
   const [userPhone, setUserPhone] = React.useState<string>('');
   const [userCpf, setUserCpf] = React.useState<string>('');
-
+  const [isPasswordModalVisible, setIsPasswordModalVisible] = useState(false);
+  const [userId, setUserId] = useState<number | null>(null);
 
 
   React.useEffect(() => {
     const loadUser = async () => {
       const userData = await fetchLoggedUser();
       if (userData) {
+        setUserId(typeof userData.id === 'number' ? userData.id : null);
         setUserName(userData.name || '');
         setUserCity(userData.city || '');
         setUserState(userData.state || '');
@@ -43,6 +47,18 @@ export default function UserProfileScreen({ navigation }: any) {
       index: 0,
       routes: [{ name: 'Onboarding' }],
     });
+  };
+
+  const handleUpdateUserPassword = async (id: number, newPassword: string) => {
+    try {
+      const payload: UpdateUserPayload = {
+        id: id,
+        password: newPassword,
+      };
+      await updateUser(payload);
+    } catch (error: any) {
+      throw error;
+    }
   };
 
   return (
@@ -69,7 +85,7 @@ export default function UserProfileScreen({ navigation }: any) {
             <Text style={[styles.label]}>Dados pessoais</Text>
             <Ionicons name="chevron-forward" size={20} color={Theme.PRIMARY} style={styles.chevron} />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.option} onPress={() => { }}>
+          <TouchableOpacity style={styles.option} onPress={() => {setIsPasswordModalVisible(true)}}>
             <View style={styles.iconContainer}>
               <Ionicons name='lock-closed-outline' size={25} color={Theme.PRIMARY} />
             </View>
@@ -91,6 +107,12 @@ export default function UserProfileScreen({ navigation }: any) {
           </TouchableOpacity>
         </View>
       </View>
+        <ChangePasswordModal
+        isVisible={isPasswordModalVisible}
+        onClose={() => setIsPasswordModalVisible(false)}
+        onUpdatePassword={handleUpdateUserPassword}
+        entityId={userId} 
+      />
     </SafeAreaView>
   )
 }

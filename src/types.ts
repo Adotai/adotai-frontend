@@ -4,6 +4,32 @@ export type Animal = {
     [key: string]: any;
 };
 
+export type UpdateUserPayload = {
+  id: number;
+  name?: string; 
+  email?: string; 
+  cpf?: string; 
+  password?: string; 
+  telephone?: string; 
+  address?: any; 
+  addressId?: number; 
+};
+
+export type UpdateOngPayload = {
+  id: number;
+  name?: string;
+  phone?: string;
+  cnpj?: string;
+  email?: string;
+  password?: string; 
+  pix?: string;
+  documents?: { socialStatute?: string; boardMeeting?: string }; 
+  photos?: any[]; 
+  description?: string;
+  address?: any; 
+  addressId?: number; 
+};
+
 export type RootStackParamList = {
     Onboarding: undefined;
     SignIn: undefined;

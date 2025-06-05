@@ -3,10 +3,8 @@ import React from 'react';
 import { Theme } from '../../../constants/Themes';
 import { TextInput } from 'react-native-paper';
 import CustomButton from '../../Components/CustomButton';
-import { StatusBar } from 'expo-status-bar';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../../types';
-import { Ionicons } from '@expo/vector-icons';
 
 const { width, height } = Dimensions.get('window');
 
@@ -20,7 +18,6 @@ const inputTheme = {
   },
   roundness: 10,
 };
-
 
 function maskPhone(value: string) {
   return value
@@ -166,6 +163,11 @@ export default function UserSignUpScreen() {
                   return;
                 }
 
+                const unmaskedPhone = phone.replace(/\D/g, ''); 
+                if (!/^\d{11}$/.test(unmaskedPhone)) {
+                  Alert.alert('Erro', 'Telefone inválido. Certifique-se de que possui 11 dígitos (incluindo DDD).');
+                  return;
+                }
                 navigation.navigate('Address', {
                   name,
                   email,

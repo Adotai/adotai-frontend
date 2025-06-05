@@ -25,7 +25,6 @@ export default function SignInScreen() {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [showPassword, setShowPassword] = React.useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
 
 
   const onLoginPress = async () => {
@@ -61,7 +60,7 @@ export default function SignInScreen() {
             label="E-mail"
             mode="outlined"
             value={email}
-            onChangeText={text => setEmail(text.replace(/\s/g, ''))} // Bloqueia espaços
+            onChangeText={text => setEmail(text.replace(/\s/g, ''))}
             style={styles.input}
             theme={inputTheme}
             autoCapitalize="none"
@@ -72,7 +71,7 @@ export default function SignInScreen() {
             label="Senha"
             mode="outlined"
             value={password}
-            onChangeText={text => setPassword(text.replace(/\s/g, ''))} // Bloqueia espaços
+            onChangeText={text => setPassword(text.replace(/\s/g, ''))}
             style={styles.input}
             theme={inputTheme}
             secureTextEntry={!showPassword}
