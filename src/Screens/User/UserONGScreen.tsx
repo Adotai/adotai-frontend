@@ -73,6 +73,7 @@ export default function UserONGScreen() {
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
+          ListEmptyComponent={<Text>Nenhuma ONG encontrada.</Text>}
         />
       </SafeAreaView>
     </>

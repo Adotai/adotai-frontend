@@ -92,13 +92,6 @@ export default function UserProfileScreen({ navigation }: any) {
             <Text style={[styles.label]}>Alterar senha</Text>
             <Ionicons name="chevron-forward" size={20} color={Theme.PRIMARY} style={styles.chevron} />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.option} onPress={() => { }}>
-            <View style={styles.iconContainer}>
-              <Ionicons name='help-circle-outline' size={25} color={Theme.PRIMARY} />
-            </View>
-            <Text style={[styles.label]}>Ajuda</Text>
-            <Ionicons name="chevron-forward" size={20} color={Theme.PRIMARY} style={styles.chevron} />
-          </TouchableOpacity>
           <TouchableOpacity style={[styles.option, { borderBottomWidth: 0, marginBottom: height * 0.15 }]} onPress={handleLogout}>
             <View style={styles.iconContainer}>
               <Ionicons name='exit-outline' size={25} color={Theme.PRIMARY} />

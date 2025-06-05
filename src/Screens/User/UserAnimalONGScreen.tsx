@@ -42,6 +42,7 @@ export default function UserAnimalONG({ route }: any) {
                         location={ong.address.city + '/' + ong.address.state}
                         onPress={() => navigation.navigate('UserAnimalDetails',
                             { animal: item, city: ong.address.city, ongName: ong.name, ongs: [ong], fromOngList: true })}
+                        status={item.status === false}
                     />
                 )}
                 ListEmptyComponent={<Text style={{ textAlign: 'center', marginTop: 32 }}>Nenhum animal encontrado para a ONG.</Text>}

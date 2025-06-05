@@ -22,7 +22,7 @@ export default function ONGAnimalDetails({ route }: any) {
     try {
       await updateAnimalStatus(animal, !animalStatus);
       setAnimalStatus(!animalStatus);
-      Alert.alert('Sucesso', `Animal ${!animalStatus ? 'ativado' : 'desativado'}!`);
+      Alert.alert('Sucesso', `Animal ${!animalStatus ? 'disponível para adoção' : 'marcado como adotado'}!`);
     } catch (e) {
       Alert.alert('Erro', 'Não foi possível atualizar o status.');
     }
@@ -159,10 +159,10 @@ export default function ONGAnimalDetails({ route }: any) {
     
       </View>
       <CustomButton
-    title={animalStatus ? "Desabilitar Animal" : "Habilitar Animal"}
-    color={animalStatus ? Theme.PRIMARY:  "#888" }
+    title={animalStatus ? "Marcar como Adotado" : "Disponibilizar para Adoção"}
+    color={animalStatus ? Theme.PRIMARY:  "#B9B9B9" }
     onPress={handleToggleStatus}
-    buttonStyle={{ alignSelf: 'center', margin: 16 ,borderWidth: 0 }}
+    buttonStyle={{ alignSelf: 'center', margin: 16 ,borderWidth: 0, width: width * 0.95 }}
   />
     </ScrollView>
   );

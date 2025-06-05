@@ -46,6 +46,7 @@ export default function ONGAnimalsScreen({ }) {
               image={item.photos && item.photos.length > 0 ? item.photos[0].photoUrl : ''}
               location={item.species === 'DOG' ? 'Cachorro' : 'Gato'}
               onPress={() => navigation.navigate('ONGAnimalDetails', { animal: item })}
+              status={item.status === false}
             />
           )}
           ListEmptyComponent={<Text>Nenhum animal cadastrado.</Text>}

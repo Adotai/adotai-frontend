@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
+import { Theme } from '../../constants/Themes';
 
 const { width, height } = Dimensions.get('window');
 
@@ -10,27 +10,48 @@ interface DogCardProps {
   image: string;
   location: string;
   onPress?: () => void;
+  status: boolean;
 }
 
-export default function DogCard({ name, image, location, onPress }: DogCardProps) {
+export default function DogCard({ name, image, location, onPress, status }: DogCardProps) {
   return (
-    <TouchableOpacity style={styles.card} activeOpacity={0.8} onPress={onPress}>
-      <Image source={{ uri: image }} style={styles.image} />
+    <TouchableOpacity style={styles.card} activeOpacity={0.8} onPress={onPress} disabled={status}>
+      <Image source={{ uri: image }} style={[styles.image]} />
+      {status && (
+        <View style={styles.grayscaleOverlay} pointerEvents="none" />
+      )}
+
       <LinearGradient
         colors={['transparent', 'rgba(0,0,0,0.7)']}
         style={styles.gradient}
       />
+
       <View style={styles.infoRow}>
         <View style={styles.infoText}>
+          {status && (
+            <View style = {{ backgroundColor: Theme.PASTEL,
+    borderRadius: 6,  width: width*0.25, alignItems: 'center', }}>
+            <Text style={styles.adoptedText}>Adotado</Text>
+            </View>
+          )}
           <Text style={styles.name}>{name}</Text>
           <Text style={styles.location}>{location}</Text>
+          
         </View>
+     
       </View>
+
     </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
+  grayscaleOverlay: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#888',
+    opacity: 0.75,
+  },
   card: {
     flexDirection: 'column',
     backgroundColor: '#f8f8f8',
@@ -52,6 +73,13 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
   },
+
+  adoptedText: {
+    color: Theme.PRIMARY,
+    fontSize: 16,
+    fontFamily: 'Poppins-SemiBold',
+    width: 'auto'
+  },
   gradient: {
     position: 'absolute',
     left: 0,
@@ -65,8 +93,6 @@ const styles = StyleSheet.create({
     left: 18,
     right: 18,
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
   },
   infoText: {
     flexDirection: 'column',

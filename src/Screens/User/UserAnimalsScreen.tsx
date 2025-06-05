@@ -99,6 +99,7 @@ export default function UserAnimalsScreen() {
               image={item.photos && item.photos.length > 0 ? item.photos[0].photoUrl : ''}
               location={getOngLocation(item.ongId)}
               onPress={() => navigation.navigate('UserAnimalDetails', { animal: item, city: getOngLocation(item.ongId), ongName: getOngName(item.ongId), ongs , fromOngList: false })}
+              status = { item.status === false}
             />
           )}
           ListEmptyComponent={<Text style={{ textAlign: 'center', marginTop: 32 }}>Nenhum animal encontrado para região.</Text>}
