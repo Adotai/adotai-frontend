@@ -12,6 +12,7 @@ const Tab = createBottomTabNavigator();
 export default function UserHomeScreen() {
   return (
     <Tab.Navigator
+      initialRouteName="Animais"
       screenOptions={({ route }) => ({
         tabBarIcon: ({ color, size }) => {
           const iconName = (() => {

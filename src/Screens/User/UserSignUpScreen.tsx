@@ -81,7 +81,7 @@ export default function UserSignUpScreen() {
                 autoComplete="email"
               />
               <TextInput
-                label="Telefone"
+                label="Telefone (com DDD e 11 digitos)"
                 mode="outlined"
                 value={phone}
                 onChangeText={text => setPhone(maskPhone(text))}
