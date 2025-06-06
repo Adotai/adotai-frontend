@@ -10,6 +10,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { uploadFileToStorage } from '../../services/uploadFileToStorage';
 import { TextInput } from 'react-native-paper'; 
 import { handleSignUpOng } from '../../actions/ongActions';
+import { ActivityIndicator } from 'react-native';
+
 
 const { width, height } = Dimensions.get('window');
 
@@ -92,15 +94,6 @@ const animalTypes = ['Cães', 'Gatos', 'Cães e Gatos'];
 
 export default function ONGDetailsScreen({ route, navigation }: any) {
   const { name, email, telephone, cnpj, password, address } = route.params || {};
-  // TODO: Antes de permitir o cadastro e upload dos arquivos,
-  // faça uma validação para checar se já existe uma ONG com esses dados (ex: CNPJ ou email).
-  // Só permita o cadastro e upload se não existir.
-  // Exemplo:
-  // const exists = await checkOngExists(cnpj, email);
-  // if (exists) {
-  //   Alert.alert('Erro', 'Já existe uma ONG cadastrada com esse CNPJ ou email.');
-  //   return;
-  // }
 
   const [animalType, setAnimalType] = useState('');
   const [pix, setPix] = useState('');
@@ -108,15 +101,34 @@ export default function ONGDetailsScreen({ route, navigation }: any) {
   const [ataFile, setAtaFile] = useState<any>(null);
   const [estatutoFile, setEstatutoFile] = useState<any>(null);
   const [localImages, setLocalImages] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+
 
   const handleSubmit = async () => {
+
+    if (!pix || !description || !animalType) {
+    Alert.alert('Erro', 'Preencha todos os campos obrigatórios!');
+    return;
+  }
+  if (!ataFile) {
+    Alert.alert('Erro', 'Envie a Ata da Assembleia da Atual Diretoria!');
+    return;
+  }
+  if (!estatutoFile) {
+    Alert.alert('Erro', 'Envie o Estatuto Social!');
+    return;
+  }
+  if (localImages.length === 0) {
+    Alert.alert('Erro', 'Envie pelo menos uma foto do local!');
+    return;
+  }
+    setLoading(true); 
     try {
       let ataUrl = '';
       let estatutoUrl = '';
       let imageUrls: string[] = [];
 
-      // Use o CNPJ como pasta principal
-      const ongId = cnpj.replace(/\D/g, ''); // remove caracteres não numéricos
+      const ongId = cnpj.replace(/\D/g, ''); 
 
       if (ataFile?.uri) {
         ataUrl = await uploadFileToStorage(
@@ -167,12 +179,20 @@ export default function ONGDetailsScreen({ route, navigation }: any) {
     } catch (err) {
       Alert.alert('Erro', 'Falha ao cadastrar ONG.');
       console.error(err);
+    } finally{
+       setLoading(false); 
     }
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <Image style={styles.backgroundImage} source={require('../../../assets/images/background-home.png')} />
+       {loading && (
+      <View style={styles.loadingOverlay}>
+        <ActivityIndicator size="large" color={Theme.PRIMARY} />
+        <Text style={{ color: Theme.PRIMARY, fontFamily: 'Poppins-SemiBold', marginTop: 10 }}>Carregando...</Text>
+      </View>
+    )}
       <View style={styles.formCard}>
         <Text style={styles.loginText}>Detalhes da ONG</Text>
         <KeyboardAvoidingView
@@ -226,7 +246,7 @@ export default function ONGDetailsScreen({ route, navigation }: any) {
               textColor={Theme.BACK}
               color={Theme.PRIMARY}
               onPress={handleSubmit}
-              disabled={false}
+              disabled={loading}
               buttonStyle={{ width: width * 0.85 }}
             />
           </ScrollView>
@@ -324,4 +344,15 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: '#fff',
   },
+  loadingOverlay: {
+  position: 'absolute',
+  left: 0,
+  top: 0,
+  width: '100%',
+  height: '100%',
+  backgroundColor: 'rgba(255,255,255,0.7)',
+  alignItems: 'center',
+  justifyContent: 'center',
+  zIndex: 1000,
+},
 });

@@ -9,6 +9,7 @@ import { Theme } from '../../../constants/Themes';
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 import { uploadFileToStorage } from '../../services/uploadFileToStorage';
+import { ActivityIndicator } from 'react-native';
 
 const inputTheme = {
   colors: {
@@ -98,6 +99,7 @@ export default function ONGCreateAnimalsScreen({ navigation }: any) {
   const [otherBreed, setOtherBreed] = React.useState('');
   const [currentColor, setCurrentColor] = React.useState('');
   const [colorOther, setColorOther] = React.useState('');
+  const [loading, setLoading] = React.useState(false);
 
 
 
@@ -123,6 +125,7 @@ export default function ONGCreateAnimalsScreen({ navigation }: any) {
     const breedToSend = breed === "Outra raça" ? otherBreed : breed;
     const colorToSend = color === "Outra cor" ? colorOther : color;
 
+    setLoading(true);
     try {
       if (!name || !breed || !age || !color || !species || !gender || !temperament || !health || !size || !animalDescription) {
         Alert.alert('Erro', 'Por favor, preencha todos os campos obrigatórios.');
@@ -193,9 +196,21 @@ export default function ONGCreateAnimalsScreen({ navigation }: any) {
       console.log('Erro ao criar animal:', e);
       Alert.alert('Erro', 'Falha ao criar animal.');
     }
+    finally {
+    setLoading(false); 
+  }
   };
+
+
+  
   return (
     <View style={{ alignItems: 'center', width: '100%', backgroundColor: '#fff', height: '100%' }}>
+      {loading && (
+  <View style={styles.loadingOverlay}>
+    <ActivityIndicator size="large" color={Theme.PRIMARY} />
+    <Text style={{ color: Theme.PRIMARY, fontFamily: 'Poppins-SemiBold', marginTop: 10 }}>Cadastrando animal...</Text>
+  </View>
+)}
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
         <TextInput
           label="Nome"
@@ -371,7 +386,7 @@ export default function ONGCreateAnimalsScreen({ navigation }: any) {
         color={Theme.PRIMARY}
         onPress={handleCreate}
         buttonStyle={{ margin: 24 }}
-
+        disabled={loading}
       />
     </View>
   );
@@ -418,5 +433,16 @@ const styles = StyleSheet.create({
   },
   inputContainerWithLabel: {
     width: '100%',
-  }
+  },
+  loadingOverlay: {
+  position: 'absolute',
+  left: 0,
+  top: 0,
+  width: '100%',
+  height: '100%',
+  backgroundColor: 'rgba(255,255,255,0.7)',
+  alignItems: 'center',
+  justifyContent: 'center',
+  zIndex: 1000,
+},
 });
