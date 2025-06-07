@@ -173,6 +173,7 @@ export default function ONGEditProfileScreen({ route }: any) {
                     label="Descrição"
                     mode="outlined"
                     theme={inputTheme}
+                    multiline
                 />
                 <TextInput
                     style={styles.input}

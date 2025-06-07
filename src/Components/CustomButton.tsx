@@ -1,5 +1,5 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, GestureResponderEvent, TextStyle, ViewStyle } from 'react-native';
+import { TouchableOpacity, Text, StyleSheet, GestureResponderEvent, TextStyle, ViewStyle, Dimensions } from 'react-native';
 import { Theme } from '../../constants/Themes';
 
 interface CustomButtonProps {
@@ -13,10 +13,13 @@ interface CustomButtonProps {
     buttonStyle?: ViewStyle; // Novo: Estilo customizado para o botão
 }
 
+const { width, height } = Dimensions.get('window');
+
+
 const CustomButton: React.FC<CustomButtonProps> = ({
     onPress,
     title,
-    color = '#2196F3',
+    color = Theme.PRIMARY,
     textColor = 'white',
     borderColor = Theme.PRIMARY,
     disabled = false, // Definindo valor padrão como false
@@ -41,7 +44,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
 
 const styles = StyleSheet.create({
     button: {
-        width: 350,
+        width: width * 0.95,
         height: 50,
         borderRadius: 8,
         alignItems: 'center',
@@ -51,7 +54,7 @@ const styles = StyleSheet.create({
     buttonText: {
         textAlign:'center',
         textAlignVertical: 'center',
-        fontSize: 18,
+        fontSize: 16,
         fontFamily: "Poppins-SemiBold",
     },
     disabledButton: {

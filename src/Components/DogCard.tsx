@@ -16,13 +16,13 @@ interface DogCardProps {
 export default function DogCard({ name, image, location, onPress, status }: DogCardProps) {
   return (
     <TouchableOpacity style={styles.card} activeOpacity={0.8} onPress={onPress} disabled={status}>
-      <Image source={{ uri: image }} style={[styles.image]} />
+      <Image source={{ uri: image }} style={[styles.image]} resizeMode="cover"/>
       {status && (
         <View style={styles.grayscaleOverlay} pointerEvents="none" />
       )}
 
       <LinearGradient
-        colors={['transparent', 'rgba(0,0,0,0.7)']}
+  colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.4)', 'rgba(0,0,0,0.85)']}
         style={styles.gradient}
       />
 
@@ -51,20 +51,23 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: '#888',
     opacity: 0.75,
+  
   },
   card: {
     flexDirection: 'column',
     backgroundColor: '#f8f8f8',
-    borderRadius: 12,
+    borderRadius: 10,
     marginBottom: 14,
     height: height * 0.258,
     overflow: 'hidden',
-    elevation: 2,
+    elevation: 3,
     shadowColor: '#000',
     shadowOpacity: 0.08,
     shadowRadius: 4,
     shadowOffset: { width: 0, height: 2 },
     position: 'relative',
+    marginTop: 8,
+
   },
   image: {
     width: '100%',

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, Dimensions, Pressable, ScrollView, FlatList, TouchableOpacity, Alert, Linking } from 'react-native';
+import { View, Text, Image, StyleSheet, Dimensions, Pressable, ScrollView, FlatList, TouchableOpacity, Alert, Linking, StatusBar } from 'react-native';
 import { Theme } from '../../../constants/Themes';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import DogCard from '../../Components/DogCard';
@@ -41,6 +41,10 @@ export default function UserONGDetailScreen({ route }: any) {
   };
 
   return (
+
+    <>
+        <StatusBar backgroundColor='transparent' barStyle="dark-content" />
+    
     <ScrollView style={{ flex: 1 }}>
       <View style={{ width, height: height * 0.55, position: 'relative', alignSelf: 'center', justifyContent: 'center', alignItems: 'center' }}>
         {photos.length > 0 ? (
@@ -148,7 +152,8 @@ export default function UserONGDetailScreen({ route }: any) {
 
 
     </ScrollView>
-
+</>
+    
   );
 }
 

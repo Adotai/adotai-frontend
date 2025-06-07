@@ -29,6 +29,7 @@ export default function UserHomeScreen() {
           })();
           return <Ionicons name={iconName} size={size} color={color} />;
         },
+        headerTintColor: 'black',
         tabBarActiveTintColor: Theme.PRIMARY,
         tabBarInactiveTintColor: 'gray',
         tabBarBackgroundColor: Theme.PRIMARY,
@@ -38,7 +39,9 @@ export default function UserHomeScreen() {
           fontFamily: 'Poppins-SemiBold',
         },
         tabBarStyle: {
-          height: 60,
+          height: 70,
+          borderTopLeftRadius: 20,
+          borderTopRightRadius: 20,
         },
       })}
     >

@@ -72,7 +72,7 @@ export default function ONGInfosScreen({ route, navigation }: any) {
           <>
             <Image
               source={{ uri: photos[current]?.photoUrl }}
-              style={{ width, height: 300, borderBottomLeftRadius:12, borderBottomRightRadius:12 }}
+              style={{ width, height: 300, borderBottomLeftRadius: 12, borderBottomRightRadius: 12 }}
             />
             <Pressable
               style={{ position: 'absolute', left: 0, top: 0, width: width / 2, height: 300 }}
@@ -105,6 +105,10 @@ export default function ONGInfosScreen({ route, navigation }: any) {
       <Text style={styles.name}>{ong.name}</Text>
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 24 }}>
         <View style={styles.info}>
+          <View style={[styles.row, { alignItems: 'flex-start', flexDirection: 'column'}]}>
+            <Text style={[styles.label]}>Descrição:</Text>
+            <Text style={styles.value}>{ong.description}</Text>
+          </View>
           <View style={styles.row}>
             <Text style={styles.label}>E-mail:</Text>
             <Text style={styles.value}>{ong.email}</Text>
@@ -121,14 +125,15 @@ export default function ONGInfosScreen({ route, navigation }: any) {
             <Text style={styles.label}>Pix:</Text>
             <Text style={styles.value}>{ong.pix}</Text>
           </View>
-          <View style={styles.row}>
+          <View style={[styles.row, { alignItems: 'flex-start', flexDirection: 'column'}]}>
             <Text style={styles.label}>Endereço:</Text>
             <Text style={styles.value}>
               {ong.address.street}, Nº {ong.address.number} - {ong.address.city}/{ong.address.state}, CEP: {ong.address.zipCode}
             </Text>
           </View>
+          <View style={{padding: 8}}>
           <Text style={[styles.label, { marginTop: 12 }]}>Documentos:</Text>
-          <View style={{ flexDirection: 'column', marginTop: 6}}>
+          <View style={{ flexDirection: 'column', marginTop: 6 }}>
             <TouchableOpacity
               style={styles.docButton}
               onPress={() => handleDownload(ong.documents?.socialStatute)}
@@ -144,10 +149,11 @@ export default function ONGInfosScreen({ route, navigation }: any) {
               <Text style={styles.docButtonText}>Ata de Reunião</Text>
             </TouchableOpacity>
           </View>
+          </View>
         </View>
       </ScrollView>
       <View style={styles.fixedButtons}>
-      <TouchableOpacity style={styles.rejectButton} onPress={handleDelete}>
+        <TouchableOpacity style={styles.rejectButton} onPress={handleDelete}>
           <Text style={styles.rejectText}>Recusar</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.acceptButton} onPress={handleAccept}>
@@ -194,9 +200,8 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    height: 50,
-    borderBottomWidth: 1,
     borderColor: Theme.INPUT,
+    padding: 8
   },
   label: {
     fontSize: 16,

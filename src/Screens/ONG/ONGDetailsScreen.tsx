@@ -26,7 +26,7 @@ function FileUploadInput({ label, file, setFile }: { label: string, file: any, s
     }
   };
   return (
-    <View style={{ width: width * 0.85, marginBottom: 15 }}>
+    <View style={{ width: width * 0.85, marginBottom: 15,}}>
       <Text style={styles.label}>{label}</Text>
       <TouchableOpacity style={styles.uploadBox} onPress={handlePickFile}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
@@ -222,6 +222,7 @@ export default function ONGDetailsScreen({ route, navigation }: any) {
               style={styles.input}
               theme={inputTheme}
               autoCapitalize="none"
+              multiline
             />
 
             <View style={styles.pickerContainer}>
@@ -279,7 +280,7 @@ const styles = StyleSheet.create({
     left: 0,
   },
   formCard: {
-    backgroundColor: '#fff',
+    backgroundColor: Theme.BACK,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     borderBottomLeftRadius: 0,
@@ -292,7 +293,7 @@ const styles = StyleSheet.create({
   loginText: {
     fontSize: 24,
     color: Theme.PRIMARY,
-    fontFamily: 'Poppins-Bold',
+    fontFamily: 'Poppins-SemiBold',
     marginTop: 20,
     marginBottom: 20,
   },
@@ -316,6 +317,7 @@ const styles = StyleSheet.create({
   uploadContainer: {
     width: width * 0.85,
     marginBottom: 15,
+    backgroundColor: '#fff'
   },
   uploadBox: {
     height: 50,
@@ -325,6 +327,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
+        backgroundColor: '#fff'
+
   },
   uploadText: {
     color: '#888',

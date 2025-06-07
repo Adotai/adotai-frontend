@@ -241,7 +241,10 @@ const styles = StyleSheet.create({
     position: 'absolute',
   },
   overlay: {
-    alignItems: 'center', width: '100%', backgroundColor: '#fff', height: '100%'
+    alignItems: 'center',
+    width: '100%',
+    backgroundColor:Theme.BACK,
+    height: '100%'
   },
   formContainer: {
     flex: 1,

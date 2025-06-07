@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { FlatList, RefreshControl, Text, Image, Dimensions, StatusBar, View } from 'react-native';
+import { FlatList, RefreshControl, Text, Image, Dimensions, StatusBar, View, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { fetchLoggedUser, fetchOngs } from '../../actions/userActions';
 import OngCard from '../../Components/OngCard';
@@ -7,6 +7,9 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../types';
 import { Picker } from '@react-native-picker/picker';
+import { Theme } from '../../../constants/Themes';
+import { Feather } from '@expo/vector-icons';
+
 
 const { width, height } = Dimensions.get('window');
 
@@ -35,19 +38,19 @@ export default function UserONGScreen() {
     }
   };
 
-  
-    React.useEffect(() => {
-      const init = async () => {
-        const user = await fetchLoggedUser();
-        if (user?.state && estados.includes(user.state)) {
-          setSelectedState(user.state);
-        } else {
-          setSelectedState('SP');
-        }
-      };
-      init();
-    }, []);
-  
+
+  React.useEffect(() => {
+    const init = async () => {
+      const user = await fetchLoggedUser();
+      if (user?.state && estados.includes(user.state)) {
+        setSelectedState(user.state);
+      } else {
+        setSelectedState('SP');
+      }
+    };
+    init();
+  }, []);
+
 
   useEffect(() => {
     loadOngs(selectedState);
@@ -60,24 +63,29 @@ export default function UserONGScreen() {
 
   return (
     <>
-      <StatusBar backgroundColor="#fff" barStyle="dark-content" />
-      <SafeAreaView style={{ flex: 1, backgroundColor: '#fff', paddingHorizontal: 10}}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 16 }}>
-
-          <Image style={{ width: width * 0.5, height: height * 0.05 }} source={require('../../../assets/images/adotai-text.png')} />
-
-          <Picker
-            selectedValue={selectedState}
-            onValueChange={(itemValue) => setSelectedState(itemValue)}
-            style={{  width: 120, height: 'auto' }}
-            itemStyle={{ fontSize: 16 }}
-
-          >
-            {estados.map((estado) => (
-              <Picker.Item key={estado} label={estado} value={estado} />
-            ))}
-          </Picker>
+      <StatusBar backgroundColor={Theme.TERTIARY} barStyle="dark-content" />
+      <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: Theme.BACK }}>
+        <View style={{
+          width: '100%', padding: 16, marginTop: 0, alignSelf: 'center', alignItems: 'center',
+          justifyContent: 'space-between', flexDirection: 'row', backgroundColor: Theme.TERTIARY, position: 'relative',
+          
+        }}>
+          <Image style={{ alignSelf: 'center', width: width * 0.25, height: height * 0.05, tintColor: Theme.BACK }}
+            source={require('../../../assets/images/adotai-text.png')} />
+            <View style={{ }}>
+            <Picker
+              selectedValue={selectedState}
+              onValueChange={(itemValue) => setSelectedState(itemValue)}
+              style={{ width: 105, color: 'white' }}
+            >
+              {estados.map((estado) => (
+                <Picker.Item key={estado} label={estado} value={estado} />
+              ))}
+            </Picker>
         </View>
+        </View>
+       
+          
         <FlatList
           data={ongs}
           keyExtractor={ong => ong.id?.toString() || Math.random().toString()}
@@ -88,7 +96,7 @@ export default function UserONGScreen() {
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
-          ListEmptyComponent={<Text style = {{textAlign: 'center', marginTop: 32}}>Nenhuma ONG encontrada para a região.</Text>}
+          ListEmptyComponent={<Text style={{ textAlign: 'center', marginTop: 32 }}>Nenhuma ONG encontrada para a região.</Text>}
         />
       </SafeAreaView>
     </>

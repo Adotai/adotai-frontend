@@ -39,10 +39,10 @@ const styles = StyleSheet.create({
         marginBottom: 16,
         borderRadius: 10,
         overflow: 'hidden',
-        backgroundColor: '#f8f8f8',
-        elevation: 5,
+        backgroundColor: '#FFF',
         marginTop: 8,
         width: '95%',
+        elevation: 3,
         alignSelf: 'center'
     },
     image: {

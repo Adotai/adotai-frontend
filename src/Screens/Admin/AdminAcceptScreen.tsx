@@ -7,6 +7,7 @@ import OngCard from '../../Components/OngCard';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { HeaderStyleInterpolators } from '@react-navigation/stack';
+import { Theme } from '../../../constants/Themes';
 
 export default function AdminAcceptScreen() {
   const [ongs, setOngs] = useState<any[]>([]);
@@ -97,7 +98,11 @@ export default function AdminAcceptScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, backgroundColor: '#fff' },
+  container: { 
+    flex: 1,
+    padding: 16,
+    backgroundColor: Theme.BACK
+   },
   menu: {
     position: 'absolute',
     top: 12,
