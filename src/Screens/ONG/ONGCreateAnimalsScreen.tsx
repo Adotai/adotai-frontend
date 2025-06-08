@@ -204,7 +204,7 @@ export default function ONGCreateAnimalsScreen({ navigation }: any) {
 
   
   return (
-    <View style={{ alignItems: 'center', width: '100%', backgroundColor: '#fff', height: '100%' }}>
+    <View style={{ alignItems: 'center', width: '100%', backgroundColor: Theme.BACK , height: '100%' }}>
       {loading && (
   <View style={styles.loadingOverlay}>
     <ActivityIndicator size="large" color={Theme.PRIMARY} />
@@ -227,6 +227,7 @@ export default function ONGCreateAnimalsScreen({ navigation }: any) {
           onChangeText={setAnimalDescription}
           style={styles.input}
           theme={inputTheme}
+          multiline
         />
 
         <TextInput
@@ -247,7 +248,7 @@ export default function ONGCreateAnimalsScreen({ navigation }: any) {
             dropdownIconColor={Theme.TERTIARY}
           >
             <Picker.Item label="Selecione a espécie" value="" />
-            <Picker.Item label="Cão" value="Dog" />
+            <Picker.Item label="Cachorro" value="Dog" />
             <Picker.Item label="Gato" value="Cat" />
           </Picker>
         </View>

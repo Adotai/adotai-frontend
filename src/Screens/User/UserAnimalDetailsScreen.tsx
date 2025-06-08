@@ -119,7 +119,7 @@ export default function UserAnimalDetailsScreen({ route }: any) {
 
 
         <View style={[styles.info, { paddingLeft: 16, paddingTop: 16, paddingBottom: 16 }]}>
-          <Text style={{ fontFamily: 'Poppins-Bold', fontSize: 20, color: Theme.PRIMARY }}>Sobre o Animal</Text>
+          <Text style={{ fontFamily: 'Poppins-Bold', fontSize: 20, color: Theme.TERTIARY }}>Sobre o Animal</Text>
           <View style={[styles.row, { flexDirection: 'column' }]}>
             <Text style={[styles.label]}>Descrição do animal:</Text>
             <Text style={styles.value}>{animal.animalDescription}</Text>
@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
     width: 60,
   },
   progressBarActive: {
-    backgroundColor: Theme.PRIMARY,
+    backgroundColor: Theme.TERTIARY,
   },
   progressBarInactive: {
     backgroundColor: Theme.BACK,

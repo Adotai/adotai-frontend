@@ -112,6 +112,7 @@ export default function UserONGDetailScreen({ route }: any) {
 
         <View style={[styles.info, { paddingTop: 16, paddingBottom: 24 }]}>
           <View style={[styles.row, { flexDirection: 'column' }]}>
+            <Text style={{ fontFamily: 'Poppins-Bold', fontSize: 20, color: Theme.TERTIARY }}>Sobre a ONG</Text>
             <Text style={styles.label}>Descrição da ONG:</Text>
             <Text style={[styles.value]}>
               {ong.description}
@@ -172,7 +173,7 @@ const styles = StyleSheet.create({
     width: 60,
   },
   progressBarActive: {
-    backgroundColor: Theme.PRIMARY,
+    backgroundColor: Theme.TERTIARY,
   },
   progressBarInactive: {
     backgroundColor: Theme.BACK,

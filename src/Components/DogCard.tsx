@@ -11,11 +11,12 @@ interface DogCardProps {
   location: string;
   onPress?: () => void;
   status: boolean;
+   canEdit?: boolean;
 }
 
-export default function DogCard({ name, image, location, onPress, status }: DogCardProps) {
+export default function DogCard({ name, image, location, onPress, status, canEdit = false }: DogCardProps) {
   return (
-    <TouchableOpacity style={styles.card} activeOpacity={0.8} onPress={onPress} disabled={status}>
+    <TouchableOpacity style={styles.card} activeOpacity={0.8} onPress={onPress} disabled={status && !canEdit}>
       <Image source={{ uri: image }} style={[styles.image]} resizeMode="cover"/>
       {status && (
         <View style={styles.grayscaleOverlay} pointerEvents="none" />

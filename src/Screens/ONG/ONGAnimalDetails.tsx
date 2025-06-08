@@ -28,6 +28,8 @@ export default function ONGAnimalDetails({ route }: any) {
     }
   };
 
+
+
   const photos = animal.photos || [];
 
   const handleNext = () => {
@@ -79,7 +81,28 @@ export default function ONGAnimalDetails({ route }: any) {
         </View>
         <View style={{ flex: 1 }} >
           <View style={[styles.info, { marginTop: -50 }]}>
-            <Text style={styles.name}>{animal.name}</Text>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <Text style={styles.name}>{animal.name}</Text>
+              {!animalStatus && (
+                <View style={{
+                  borderWidth: 2,
+                  borderColor: Theme.TERTIARY,
+                  borderRadius: 6,
+                  
+                  padding: 4,
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <Text style={{
+                    color: Theme.TERTIARY,
+                    fontFamily: 'Poppins-SemiBold',
+                    fontSize: 14
+                  }}>
+                    Adotado
+                  </Text>
+                </View>
+              )}
+            </View>
             <View style={[{ flexDirection: 'row', padding: 16, paddingBottom: 8, paddingTop: 0 }]}>
               <Ionicons name="paw-outline" size={24} color={'#555'} />
               <Text style={[styles.value, { marginLeft: 8 }]}>{animal.species === 'DOG' ? 'Cachorro' : 'Gato'}</Text>
@@ -96,7 +119,7 @@ export default function ONGAnimalDetails({ route }: any) {
             </View>
           </View>
           <View style={[styles.info, { paddingLeft: 16, paddingTop: 16, paddingBottom: 16 }]}>
-            <Text style={{ fontFamily: 'Poppins-Bold', fontSize: 20, color: Theme.PRIMARY }}>Sobre o Animal</Text>
+            <Text style={{ fontFamily: 'Poppins-Bold', fontSize: 20, color: Theme.TERTIARY }}>Sobre o Animal</Text>
             <View style={[styles.row, { flexDirection: 'column' }]}>
               <Text style={[styles.label]}>Descrição do animal:</Text>
               <Text style={styles.value}>{animal.animalDescription}</Text>
@@ -182,7 +205,7 @@ const styles = StyleSheet.create({
     width: 60,
   },
   progressBarActive: {
-    backgroundColor: Theme.PRIMARY,
+    backgroundColor: Theme.TERTIARY,
   },
   progressBarInactive: {
     backgroundColor: Theme.BACK,

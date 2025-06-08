@@ -32,8 +32,21 @@ export default function ChangePasswordModal({ isVisible, onClose, onUpdatePasswo
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+const handleConfirmAndChangePassword = () => {
+    Alert.alert(
+        'Confirmação',
+        'Tem certeza que deseja alterar a senha?',
+        [
+            { text: 'Cancelar', style: 'cancel' },
+            { text: 'Confirmar', onPress: handleChangePassword }
+        ],
+        { cancelable: true }
+    );
+};
+
 
     const handleChangePassword = async () => {
+
         if (!entityId) {
             Alert.alert('Erro', 'ID da entidade não identificado. Não foi possível alterar a senha.');
             return;
@@ -117,7 +130,7 @@ export default function ChangePasswordModal({ isVisible, onClose, onUpdatePasswo
                             borderColor="transparent"
                             textColor={Theme.BACK}
                             color={Theme.PRIMARY}
-                            onPress={handleChangePassword}
+                            onPress={handleConfirmAndChangePassword}
                             disabled={loading}
                             buttonStyle={styles.saveButton}
                         />

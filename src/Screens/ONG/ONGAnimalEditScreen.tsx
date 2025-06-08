@@ -2,12 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { View, ScrollView, StyleSheet, Image, TouchableOpacity, Alert, Dimensions } from 'react-native';
 import { TextInput, Text } from 'react-native-paper';
 import { Picker } from '@react-native-picker/picker';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp, NavigationProp } from '@react-navigation/native';
 import { Theme } from '../../../constants/Themes';
 import CustomButton from '../../Components/CustomButton';
 import * as ImagePicker from 'expo-image-picker';
 import { uploadFileToStorage } from '../../services/uploadFileToStorage';
 import { updateAnimal, deleteAnimalPhoto } from '../../actions/ongActions';
+import { RootStackParamList } from '../../types';
 
 const { width, height } = Dimensions.get('window');
 
@@ -40,7 +41,15 @@ export default function ONGAnimalEditScreen({ route }: any) {
     'Tigrado', 'Malhado', 'Tricolor', 'Outra cor'
   ];
 
-  const navigation = useNavigation();
+  const getSpeciesValue = (desc: string) => {
+  if (!desc) return 'Dog';
+  if (desc.toLowerCase() === 'dog' || desc.toLowerCase() === 'cachorro') return 'Dog';
+  if (desc.toLowerCase() === 'cat' || desc.toLowerCase() === 'gato') return 'Cat';
+  return 'Dog';
+};
+
+  
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { animal } = route.params;
 
   const [name, setName] = useState(animal?.name || '');
@@ -48,7 +57,7 @@ export default function ONGAnimalEditScreen({ route }: any) {
   const [breed, setBreed] = useState(animal?.breed || '');
   const [color, setColor] = useState(animal?.color || '');
   const [age, setAge] = useState(animal?.age ? String(animal.age) : '');
-  const [species, setSpecies] = useState(animal?.species?.description || '');
+  const [species, setSpecies] = useState(getSpeciesValue(animal?.species?.description));
   const [gender, setGender] = useState(animal?.gender || '');
   const [size, setSize] = useState(animal?.size || '');
   const [temperament, setTemperament] = useState(animal?.temperament || '');
@@ -121,6 +130,8 @@ export default function ONGAnimalEditScreen({ route }: any) {
     }
   };
 
+  
+
   const handleRemoveImage = async (idx: number) => {
     const img = images[idx];
     if (img.id) {
@@ -187,7 +198,7 @@ export default function ONGAnimalEditScreen({ route }: any) {
 
       await updateAnimal(animalObj);
       Alert.alert('Sucesso', 'Animal atualizado!');
-      navigation.goBack();
+      navigation.navigate('ONGHome');
     } catch (e) {
       Alert.alert('Erro', 'Erro ao atualizar animal.');
     }
@@ -227,6 +238,7 @@ export default function ONGAnimalEditScreen({ route }: any) {
           onChangeText={setAnimalDescription}
           style={styles.input}
           theme={inputTheme}
+          multiline
         />
         <TextInput
           label="Idade(em anos)"
@@ -305,7 +317,7 @@ export default function ONGAnimalEditScreen({ route }: any) {
             style={styles.picker}
             dropdownIconColor={Theme.TERTIARY}
           >
-            <Picker.Item label="Cão" value="Dog" />
+            <Picker.Item label="Cachorro" value="Dog" />
             <Picker.Item label="Gato" value="Cat" />
           </Picker>
         </View>
