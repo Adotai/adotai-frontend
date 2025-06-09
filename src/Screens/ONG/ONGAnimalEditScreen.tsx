@@ -41,13 +41,14 @@ export default function ONGAnimalEditScreen({ route }: any) {
     'Tigrado', 'Malhado', 'Tricolor', 'Outra cor'
   ];
 
-  const getSpeciesValue = (desc: string) => {
-  if (!desc) return 'Dog';
-  if (desc.toLowerCase() === 'dog' || desc.toLowerCase() === 'cachorro') return 'Dog';
-  if (desc.toLowerCase() === 'cat' || desc.toLowerCase() === 'gato') return 'Cat';
-  return 'Dog';
-};
-
+  const getSpeciesValue = (desc: any) => {
+    if (desc && typeof desc === "object" && desc.description)
+      desc = desc.description;
+    if (!desc) return '';
+    if (desc.toLowerCase() === 'dog' || desc.toLowerCase() === 'cachorro') return 'Dog';
+    if (desc.toLowerCase() === 'cat' || desc.toLowerCase() === 'gato') return 'Cat';
+    return '';
+  };
   
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { animal } = route.params;
@@ -57,7 +58,7 @@ export default function ONGAnimalEditScreen({ route }: any) {
   const [breed, setBreed] = useState(animal?.breed || '');
   const [color, setColor] = useState(animal?.color || '');
   const [age, setAge] = useState(animal?.age ? String(animal.age) : '');
-  const [species, setSpecies] = useState(getSpeciesValue(animal?.species?.description));
+  const [species, setSpecies] = useState(getSpeciesValue(animal?.species));
   const [gender, setGender] = useState(animal?.gender || '');
   const [size, setSize] = useState(animal?.size || '');
   const [temperament, setTemperament] = useState(animal?.temperament || '');

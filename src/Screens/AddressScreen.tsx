@@ -84,7 +84,7 @@ export default function AddressScreen({ route, navigation }: any) {
     });
 
     if (success) {
-      navigation.navigate('UserHome');
+      navigation.navigate('Onboarding');
     } else {
       Alert.alert('Erro', 'Falha ao cadastrar usuário.');
     }
