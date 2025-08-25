@@ -159,6 +159,18 @@ export const fetchAnimalsByOng = async (ongId: number): Promise<any[]> => {
   return response.data.data || [];
 };
 
+export const fetchUserAnimals = async (ongId: number): Promise<any[]> => {
+  const token = await AsyncStorage.getItem('authToken');
+  if (!token) throw new Error('Token não encontrado');
+  const response = await axios.get(
+    `${USER_ROUTE}/animal/requests/${ongId}`,
+    {
+      headers: { Authorization: `Bearer ${token}` }
+    }
+  );
+  return response.data.data || [];
+};
+
 export const updateAnimalStatus = async (animal: any, status: boolean) => {
   const token = await AsyncStorage.getItem('authToken');
   if (!token) throw new Error('Token não encontrado');

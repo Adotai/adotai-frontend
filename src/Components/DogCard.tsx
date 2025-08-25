@@ -18,9 +18,9 @@ export default function DogCard({ name, image, location, onPress, status, canEdi
   return (
     <TouchableOpacity style={styles.card} activeOpacity={0.8} onPress={onPress} disabled={status && !canEdit}>
       <Image source={{ uri: image }} style={[styles.image]} resizeMode="cover"/>
-      {status && (
+      {/* {status && (
         <View style={styles.grayscaleOverlay} pointerEvents="none" />
-      )}
+      )} */}
 
       <LinearGradient
   colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.4)', 'rgba(0,0,0,0.85)']}
@@ -29,12 +29,12 @@ export default function DogCard({ name, image, location, onPress, status, canEdi
 
       <View style={styles.infoRow}>
         <View style={styles.infoText}>
-          {status && (
+          {/* {status && (
             <View style = {{ backgroundColor: Theme.PASTEL,
     borderRadius: 6,  width: width*0.25, alignItems: 'center', }}>
             <Text style={styles.adoptedText}>Adotado</Text>
             </View>
-          )}
+          )} */}
           <Text style={styles.name}>{name}</Text>
           <Text style={styles.location}>{location}</Text>
           

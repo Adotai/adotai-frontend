@@ -5,15 +5,8 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import ONGProfileScreen from './ONGProfileScreen';
 import ONGAnimalsScreen from './ONGAnimalsScreen';
 import { Theme } from '../../../constants/Themes';
+import ONGUserAnimalsScreen from './ONGUserAnimalsScreen';
 
-// Tela fictícia para pessoas interessadas
-function InterestedPeopleScreen() {
-  return (
-    <View style={styles.container}>
-      <Text>Pessoas Interessadas</Text>
-    </View>
-  );
-}
 
 const Tab = createBottomTabNavigator();
 
@@ -28,6 +21,8 @@ export default function ONGHomeScreen() {
                 return 'paw-outline';
               case 'Perfil':
                 return 'person-circle-outline';
+              case 'Solicitações de Usuários':
+                return 'person-add-outline';
               default:
                 return 'help-circle-outline';
             }
@@ -45,8 +40,16 @@ export default function ONGHomeScreen() {
           height: 60,
         },
       })}
-    >
- 
+    > 
+      <Tab.Screen
+        name="Solicitações de Usuários"
+        component={ONGUserAnimalsScreen}
+        options={({ navigation }) => ({
+          headerShown: true,
+          headerTitle: 'Solicitações de Usuários',
+          headerTitleAlign: 'center',
+        })} />
+
       <Tab.Screen
         name="Animais"
         component={ONGAnimalsScreen}
@@ -69,6 +72,7 @@ export default function ONGHomeScreen() {
         name="Perfil"
         component={ONGProfileScreen}
       />
+      
     </Tab.Navigator>
   );
 }

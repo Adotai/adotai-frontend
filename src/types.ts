@@ -36,6 +36,7 @@ export type RootStackParamList = {
     UserSignUp: undefined;
     ONGSignUp: undefined;
     UserHome: undefined;
+    UserDonateAnimal: {ongId: number};
     Address: {
         name: string;
         email: string;

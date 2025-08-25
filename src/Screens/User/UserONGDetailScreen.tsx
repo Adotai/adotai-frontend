@@ -143,12 +143,23 @@ export default function UserONGDetailScreen({ route }: any) {
             <Text style={styles.value}>{ong.address.zipCode}</Text>
           </View>
         </View>
+         <CustomButton
+          color={'transparent'}
+          textColor={Theme.PRIMARY}
+          borderColor={Theme.PRIMARY}
+          title='Quero doar um animal'
+          onPress={() => {
+              navigation.navigate('UserDonateAnimal', { ongId: ong.id });
+            }}
+          buttonStyle={{ alignSelf: 'center', marginVertical: 16, width: width * 0.95 }}
+        />
         <CustomButton
           color={Theme.PRIMARY}
           title='Quero ser voluntário'
           onPress={handleWhatsApp}
           buttonStyle={{ alignSelf: 'center', marginVertical: 16, width: width * 0.95 }}
         />
+       
       </View>
 
 
