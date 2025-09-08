@@ -14,14 +14,16 @@ export default ({ config }) => ({
   },
   ios: {
     supportsTablet: true,
-    bundleIdentifier: "com.adotai.mobile"
+    bundleIdentifier: "com.adotai.mobile",
+    googleServicesFile: "./GoogleService-Info.plist" // <-- Adicione este campo!
   },
   android: {
     adaptiveIcon: {
       foregroundImage: "./assets/images/adotai-logo-png.png",
       backgroundColor: "#8A1732"
     },
-    package: "com.adotai.mobile"
+    package: "com.adotai.mobile",
+    googleServicesFile: "./google-services.json" // <-- Adicione este campo!
   },
   web: {
     favicon: "./assets/favicon.png"
@@ -38,5 +40,15 @@ export default ({ config }) => ({
     eas: {
       projectId: "479ba39c-112e-4f95-b95e-3148c85c743c" // <-- Isso é o que o EAS precisa!
     }
-  }
+  },
+  plugins: [
+    [
+      "expo-notifications",
+      {
+        icon: "./assets/images/adotai-logo-png.png",
+        color: "#8A1732",
+        sounds: ["./assets/sounds/notification.wav"]
+      }
+    ]
+  ]
 });

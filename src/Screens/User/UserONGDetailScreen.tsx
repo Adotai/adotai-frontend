@@ -156,7 +156,7 @@ export default function UserONGDetailScreen({ route }: any) {
         <CustomButton
           color={Theme.PRIMARY}
           title='Quero ser voluntário'
-          onPress={handleWhatsApp}
+          onPress={() => navigation.navigate('Chat', {chatId: "testeChat", loggedInUserId: 1})}
           buttonStyle={{ alignSelf: 'center', marginVertical: 16, width: width * 0.95 }}
         />
        

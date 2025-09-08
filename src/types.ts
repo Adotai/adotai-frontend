@@ -5,29 +5,29 @@ export type Animal = {
 };
 
 export type UpdateUserPayload = {
-  id: number;
-  name?: string; 
-  email?: string; 
-  cpf?: string; 
-  password?: string; 
-  telephone?: string; 
-  address?: any; 
-  addressId?: number; 
+    id: number;
+    name?: string;
+    email?: string;
+    cpf?: string;
+    password?: string;
+    telephone?: string;
+    address?: any;
+    addressId?: number;
 };
 
 export type UpdateOngPayload = {
-  id: number;
-  name?: string;
-  phone?: string;
-  cnpj?: string;
-  email?: string;
-  password?: string; 
-  pix?: string;
-  documents?: { socialStatute?: string; boardMeeting?: string }; 
-  photos?: any[]; 
-  description?: string;
-  address?: any; 
-  addressId?: number; 
+    id: number;
+    name?: string;
+    phone?: string;
+    cnpj?: string;
+    email?: string;
+    password?: string;
+    pix?: string;
+    documents?: { socialStatute?: string; boardMeeting?: string };
+    photos?: any[];
+    description?: string;
+    address?: any;
+    addressId?: number;
 };
 
 export type RootStackParamList = {
@@ -36,7 +36,11 @@ export type RootStackParamList = {
     UserSignUp: undefined;
     ONGSignUp: undefined;
     UserHome: undefined;
-    UserDonateAnimal: {ongId: number};
+    Chat: {
+        chatId: string,
+        loggedInUserId: number
+    };
+    UserDonateAnimal: { ongId: number };
     Address: {
         name: string;
         email: string;

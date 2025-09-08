@@ -34,6 +34,7 @@ import { RootStackParamList } from './src/types';
 import UserAnimalONGScreen from './src/Screens/User/UserAnimalONGScreen';
 import UserDonateAnimalScreen from './src/Screens/User/UserDonateAnimalScreen';
 import ONGUserAnimalsScreen from './src/Screens/ONG/ONGUserAnimalsScreen';
+import ChatScreen from './src/Screens/ChatScreen';
 
 
 const Stack = createStackNavigator();
@@ -320,6 +321,17 @@ export default function App() {
                 headerTransparent: true,
                 headerTitle: '',
                 headerTintColor: '#FFFFFF',
+              }}
+            />
+            <Stack.Screen
+              name="Chat"
+              component={ChatScreen}
+              options={{
+                headerShown: true,
+                headerTitle: 'Chat',
+                headerTintColor: Theme.PRIMARY,
+                headerTitleAlign: 'center',
+                headerTransparent: false,
               }}
             />
           </Stack.Navigator>
