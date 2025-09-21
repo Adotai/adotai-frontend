@@ -4,18 +4,20 @@ import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp } from 
 import { useRoute } from '@react-navigation/native';
 import { db } from '../services/firebaseConfig'; 
 import { Theme } from '../../constants/Themes';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface Message {
   id: string;
   text: string;
   userId: string;
   createdAt: any;
-  sender: 'user' | 'ong';
+  senderRole: 'user' | 'ong'; 
 }
 
 const ChatScreen = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
+  const [userRole, setUserRole] = useState<string | null>(null);
   
   interface ChatScreenRouteParams {
     chatId: string;
@@ -24,6 +26,10 @@ const ChatScreen = () => {
 
   const route = useRoute();
   const { chatId, loggedInUserId } = (route.params as ChatScreenRouteParams) || {};
+
+  useEffect(() => {
+    AsyncStorage.getItem('userRole').then(setUserRole);
+  }, []);
 
   // Se não houver chatId, mostra uma tela informativa
   if (!chatId) {
@@ -62,6 +68,7 @@ const ChatScreen = () => {
     await addDoc(collection(db, 'chats', chatId, 'messages'), {
       text: inputText,
       userId: loggedInUserId,
+      senderRole: userRole, 
       createdAt: serverTimestamp(),
     });
 
@@ -70,12 +77,35 @@ const ChatScreen = () => {
 
   // Renderização de cada item da lista
   const renderItem = ({ item }: { item: Message }) => {
-    const isMyMessage = item.userId === loggedInUserId;
+    const isMyMessage = item.userId === loggedInUserId && item.senderRole === userRole;
+    const isOngMessage = item.senderRole === 'ong';
+
     return (
-      <View style={[styles.messageBubble, isMyMessage ? styles.myMessage : styles.otherMessage]}>
-        <Text style={[styles.messageText, isMyMessage ? styles.myMessageText : styles.otherMessageText]}>
+      <View>
+
+      <View
+        style={[
+          styles.messageBubble,
+          isMyMessage ? styles.myMessage : styles.otherMessage,
+          isOngMessage
+            ? { backgroundColor: Theme.INPUT }
+            : { backgroundColor: Theme.PRIMARY }
+        ]}
+      >
+        {isOngMessage ? 
+        <Text style={{ fontSize: 12, color: Theme.PRIMARY, marginBottom: 2, fontFamily: 'Poppins-SemiBold' }}>
+          ONG 
+        </Text>
+        : null}
+        <Text
+          style={[
+            styles.messageText,
+            { color: isMyMessage ? Theme.INPUT : '#000' }
+          ]}
+        >
           {item.text}
         </Text>
+      </View>
       </View>
     );
   };
@@ -134,6 +164,7 @@ const styles = StyleSheet.create({
   },
   messageText: {
     fontSize: 16,
+    color: Theme.INPUT
   },
   myMessageText: {
     color: '#000',

@@ -8,6 +8,8 @@ import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../../types';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import CustomButton from '../../Components/CustomButton';
+import { createChatRoom } from '../../actions/actions';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 
@@ -156,7 +158,25 @@ export default function UserONGDetailScreen({ route }: any) {
         <CustomButton
           color={Theme.PRIMARY}
           title='Quero ser voluntário'
-          onPress={() => navigation.navigate('Chat', {chatId: "testeChat", loggedInUserId: 1})}
+          onPress={async () => {
+            try {
+              const userJson = await AsyncStorage.getItem('user');
+              console.log(userJson);
+              const user = userJson ? JSON.parse(userJson) : null;
+              if (!user?.id) {
+                Alert.alert('Erro', 'Usuário não encontrado.');
+                return;
+              }
+              const chatRoom = await createChatRoom(user.id, ong.id);
+              if (chatRoom?.id) {
+                navigation.navigate('Chat', { chatId: String(chatRoom.id), loggedInUserId: user.id }); 
+              } else {
+                Alert.alert('Erro', 'Não foi possível criar o chat.');
+              }
+            } catch (e) {
+              Alert.alert('Erro', 'Não foi possível criar o chat.');
+            }
+          }}
           buttonStyle={{ alignSelf: 'center', marginVertical: 16, width: width * 0.95 }}
         />
        

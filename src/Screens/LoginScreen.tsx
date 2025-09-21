@@ -5,7 +5,8 @@ import { TextInput } from 'react-native-paper'; // Troque CustomInput por TextIn
 import CustomButton from '../Components/CustomButton';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../types';
-import { handleLogin } from '../actions/userActions';
+import { handleLogin, fetchLoggedUser } from '../actions/userActions'; // Importe a função
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width, height } = Dimensions.get('window');
 
@@ -35,6 +36,12 @@ export default function SignInScreen() {
 
     const result = await handleLogin(email, password);
     if (result.success) {
+      // Buscar e salvar o usuário logado
+      const user = await fetchLoggedUser();
+      if (user) {
+        await AsyncStorage.setItem('user', JSON.stringify(user));
+      }
+
       if (result.role === 'admin') {
         navigation.navigate('AdminScreen');
       } else if (result.role === 'ong') {

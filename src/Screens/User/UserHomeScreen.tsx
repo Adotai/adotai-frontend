@@ -6,6 +6,7 @@ import UserProfileScreen from './UserProfileScreen';
 import UserONGScreen from './UserONGScreen';
 import UserAnimalsScreen from './UserAnimalsScreen';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import UserChatsScreen from './UserChatsScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -23,6 +24,8 @@ export default function UserHomeScreen() {
                 return 'person-circle-outline';
               case 'ONGs':
                 return 'globe-outline';
+              case 'Chats':
+                return 'chatbubble-ellipses-outline';
               default:
                 return 'help-circle-outline';
             }
@@ -45,6 +48,7 @@ export default function UserHomeScreen() {
         },
       })}
     >
+      <Tab.Screen name="Chats" component={UserChatsScreen} />
       <Tab.Screen name="ONGs" component={UserONGScreen} />
       <Tab.Screen name="Animais" component={UserAnimalsScreen} />
       <Tab.Screen name="Profile" component={UserProfileScreen} />

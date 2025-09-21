@@ -6,12 +6,14 @@ import ONGProfileScreen from './ONGProfileScreen';
 import ONGAnimalsScreen from './ONGAnimalsScreen';
 import { Theme } from '../../../constants/Themes';
 import ONGUserAnimalsScreen from './ONGUserAnimalsScreen';
+import ONGChatsScreen from './ONGChatsScreen';
 
 
 const Tab = createBottomTabNavigator();
 
 export default function ONGHomeScreen() {
   return (
+
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarIcon: ({ color, size }) => {
@@ -23,11 +25,13 @@ export default function ONGHomeScreen() {
                 return 'person-circle-outline';
               case 'Solicitações de Usuários':
                 return 'person-add-outline';
+              case 'Chats':
+                return 'chatbubble-ellipses-outline';
               default:
                 return 'help-circle-outline';
             }
-        })();
-         return <Ionicons name={iconName} size={size} color={color} />;
+          })();
+          return <Ionicons name={iconName} size={size} color={color} />;
         },
         tabBarActiveTintColor: Theme.PRIMARY,
         tabBarInactiveTintColor: 'gray',
@@ -40,7 +44,9 @@ export default function ONGHomeScreen() {
           height: 60,
         },
       })}
-    > 
+    >
+      <Tab.Screen name="Chats" component={ONGChatsScreen} />
+
       <Tab.Screen
         name="Solicitações de Usuários"
         component={ONGUserAnimalsScreen}
@@ -72,7 +78,7 @@ export default function ONGHomeScreen() {
         name="Perfil"
         component={ONGProfileScreen}
       />
-      
+
     </Tab.Navigator>
   );
 }

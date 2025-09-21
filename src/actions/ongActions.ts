@@ -186,3 +186,4 @@ export const updateAnimalStatus = async (animal: any, status: boolean) => {
   );
   return response.data;
 };
+
