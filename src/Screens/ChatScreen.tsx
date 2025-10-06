@@ -92,16 +92,10 @@ const ChatScreen = () => {
             : { backgroundColor: Theme.PRIMARY }
         ]}
       >
-        {isOngMessage ? 
-        <Text style={{ fontSize: 12, color: Theme.PRIMARY, marginBottom: 2, fontFamily: 'Poppins-SemiBold' }}>
-          ONG 
-        </Text>
-        : null}
+
         <Text
           style={[
-            styles.messageText,
-            { color: isMyMessage ? Theme.INPUT : '#000' }
-          ]}
+            styles.messageText          ]}
         >
           {item.text}
         </Text>
@@ -164,7 +158,6 @@ const styles = StyleSheet.create({
   },
   messageText: {
     fontSize: 16,
-    color: Theme.INPUT
   },
   myMessageText: {
     color: '#000',

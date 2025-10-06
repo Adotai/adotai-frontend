@@ -5,14 +5,13 @@ import { Theme } from '../../../constants/Themes';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fetchChatsByAccount } from '../../actions/actions';
-import { fetchOngs } from '../../actions/userActions'; // ajuste o caminho se necessário
-
+import { fetchUsers } from '../../actions/ongActions';
 
 export default function ONGChatsScreen({ navigation }: any) {
   const [chats, setChats] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [users, setUsers] = useState<any[]>([]);
+  const [users, setUsers] = useState<any[]>([]); // Mantenha este estado para usuários
 
   const loadChats = useCallback(async () => {
     try {
@@ -23,12 +22,15 @@ export default function ONGChatsScreen({ navigation }: any) {
         setLoading(false);
         return;
       }
-      const result = await fetchChatsByAccount(ong.id);
-      setChats(result || []);
 
-      // Busque todos os usuários para mostrar o nome do usuário no chat
-      const usersList = await fetchOngs();
+      // Busque todos os chats da ONG
+      const chatResult = await fetchChatsByAccount(ong.id);
+      setChats(chatResult || []);
+
+      // Busque todos os usuários
+      const usersList = await fetchUsers(); // Chame a nova função aqui
       setUsers(usersList || []);
+
     } catch (e) {
       setChats([]);
       setUsers([]);
@@ -48,6 +50,7 @@ export default function ONGChatsScreen({ navigation }: any) {
 
   // Função para pegar o nome do usuário pelo id
   const getUserName = (userId: number) => {
+    // Busque o usuário na lista de usuários que você já carregou
     const user = users.find(u => u.id === userId);
     return user ? user.name : `Usuário #${userId}`;
   };

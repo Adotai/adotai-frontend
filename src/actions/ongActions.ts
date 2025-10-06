@@ -187,3 +187,15 @@ export const updateAnimalStatus = async (animal: any, status: boolean) => {
   return response.data;
 };
 
+export const fetchUsers = async (): Promise<any[]> => {
+  try {
+    const token = await AsyncStorage.getItem('authToken');
+    const response = await axios.get(`${USER_ROUTE}/user`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data.data || [];
+  } catch (error) {
+    console.error('Erro ao buscar usuários:', error);
+    return [];
+  }
+};
