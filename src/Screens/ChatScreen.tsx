@@ -32,18 +32,18 @@ const ChatScreen = () => {
   }, []);
 
   // Se não houver chatId, mostra uma tela informativa
-  if (!chatId) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 32 }}>
-        <Text style={{ fontSize: 18, color: '#555', textAlign: 'center' }}>
-          Nenhuma conversa iniciada ainda.
-        </Text>
-        <Text style={{ fontSize: 14, color: '#888', marginTop: 8, textAlign: 'center' }}>
-          Inicie um chat para visualizar as mensagens.
-        </Text>
-      </View>
-    );
-  }
+   if (!chatId) {
+        return ( // Retorna JSX e sai do componente
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 32 }}>
+                <Text style={{ fontSize: 18, color: '#555', textAlign: 'center' }}>
+                    Nenhuma conversa iniciada ainda.
+                </Text>
+                <Text style={{ fontSize: 14, color: '#888', marginTop: 8, textAlign: 'center' }}>
+                    Inicie um chat para visualizar as mensagens.
+                </Text>
+            </View>
+        );
+    }
 
   // Lógica de leitura em tempo real com onSnapshot
   useEffect(() => {

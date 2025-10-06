@@ -7,6 +7,11 @@ import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../types';
 import { handleLogin, fetchLoggedUser } from '../actions/userActions'; // Importe a função
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { db } from '../services/firebaseConfig'; // Seu objeto Firestore
+import { doc, setDoc } from 'firebase/firestore'; // Funções do Firestore
+import * as Notifications from 'expo-notifications';
+import * as Device from 'expo-device';
+
 
 const { width, height } = Dimensions.get('window');
 
@@ -34,12 +39,17 @@ export default function SignInScreen() {
       return;
     }
 
+
     const result = await handleLogin(email, password);
     if (result.success) {
       // Buscar e salvar o usuário logado
-      const user = await fetchLoggedUser();
+      const user = await fetchLoggedUser(); // user deve ter user.id (o ID do seu BD)
       if (user) {
         await AsyncStorage.setItem('user', JSON.stringify(user));
+
+        if (user?.id !== undefined && user?.id !== null) {
+          await registerPushToken(user.id);
+        }
       }
 
       if (result.role === 'admin') {
@@ -53,6 +63,28 @@ export default function SignInScreen() {
       Alert.alert('Erro', result.error || 'Não foi possível fazer login.');
     }
   };
+
+  async function registerPushToken(userId: number) {
+    let token = '';
+    if (Device.isDevice) {
+      const { status: existingStatus } = await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+      if (existingStatus !== 'granted') {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+
+      if (finalStatus !== 'granted') return;
+
+      // Obtém o token do Expo
+      token = (await Notifications.getExpoPushTokenAsync()).data;
+
+      // Salva o token no Firestore na coleção 'users', usando o ID do seu backend como UID
+      await setDoc(doc(db, 'users', String(userId)), {
+        expoPushToken: token
+      }, { merge: true });
+    }
+  }
 
   return (
     <View style={styles.container}>

@@ -35,12 +35,23 @@ import UserAnimalONGScreen from './src/Screens/User/UserAnimalONGScreen';
 import UserDonateAnimalScreen from './src/Screens/User/UserDonateAnimalScreen';
 import ONGUserAnimalsScreen from './src/Screens/ONG/ONGUserAnimalsScreen';
 import ChatScreen from './src/Screens/ChatScreen';
+import * as Notifications from 'expo-notifications'; 
 
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
 SplashScreen.preventAutoHideAsync();
+
+
+  Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true, // Isso faz o banner aparecer em primeiro plano
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  }),
+});
+
 
 
 export default function App() {
@@ -65,6 +76,31 @@ export default function App() {
     if (fontsLoaded || error) SplashScreen.hideAsync();
   }, [fontsLoaded, error]);
 
+    useEffect(() => {
+    // Listener acionado quando a notificação é recebida (app aberto/primeiro plano)
+    const receivedListener = Notifications.addNotificationReceivedListener(notification => {
+      console.log('Notificação Recebida (App Aberto):', notification);
+      // Você pode adicionar lógica aqui para atualizar o chat ou mostrar um alerta customizado
+    });
+
+    // Listener acionado quando o usuário clica na notificação
+    const responseListener = Notifications.addNotificationResponseReceivedListener(response => {
+      console.log('Notificação Clicada:', response);
+      // Aqui você idealmente adicionaria a lógica para navegar para a tela de Chat
+      const chatId = response.notification.request.content.data.chatId;
+      if (chatId) {
+        // Exemplo: navigation.navigate('Chat', { chatId: chatId, ... });
+        // Para usar o 'navigation' aqui, você precisaria de um hook fora do container, 
+        // mas por enquanto, apenas o listener já resolve a exibição.
+      }
+    });
+
+    return () => {
+      Notifications.removeNotificationSubscription(receivedListener);
+      Notifications.removeNotificationSubscription(responseListener);
+    };
+  }, []);
+  
   if (!fontsLoaded && !error) return null;
 
   // Defina a tela inicial conforme a role
@@ -74,6 +110,8 @@ export default function App() {
     else if (userRole === "ong") initialRoute = "ONGHome";
     else initialRoute = "UserHome";
   }
+
+
 
   return (
     <SafeAreaProvider>
