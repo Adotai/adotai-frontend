@@ -1,16 +1,22 @@
 import * as functions from "firebase-functions/v1";
 import * as admin from "firebase-admin";
-import serviceAccount from "./serviceAccountKey.json";
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
-});
+
+// admin.initializeApp({
+//   credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
+//   projectId: "tcc-adotai", 
+// });
+admin.initializeApp();
+
 
 const db = admin.firestore();
 
 export const notifyNewMessage = functions.firestore
   .document('chats/{chatId}/messages/{messageId}') // <--- ESCUTA O CAMINHO CORRETO
   .onCreate(async (snap, context) => {
+
+    console.log("--- EXECUTANDO A VERSÃO FINAL DA FUNÇÃO ---");
+
     const newMessage = snap.data();
     const chatId = context.params.chatId;
 
@@ -36,7 +42,7 @@ export const notifyNewMessage = functions.firestore
     const userData = userDoc.data();
 
     // O campo é 'expoPushToken' ou 'fcmToken' - vamos usar 'expoPushToken' para ser explícito
-    const fcmToken = userData?.pushToken;
+    const fcmToken = userData?.expoPushToken;
 
     if (!fcmToken) {
       console.log(`Usuário ${recipientId} sem token de notificação (ou campo 'pushToken' ausente).`);
@@ -46,20 +52,19 @@ export const notifyNewMessage = functions.firestore
       ? String(newMessage.text)
       : "Você recebeu uma nova mensagem";
 
-    const payload: admin.messaging.MessagingPayload = {
+    const message: admin.messaging.Message = {
+      token: fcmToken, // O token vai aqui dentro
       notification: {
-        // 💥 CORRIGIDO: Garantia de string no body e title
         title: `Nova Mensagem!`,
         body: messageBody.length > 50 ? messageBody.substring(0, 47) + "..." : messageBody,
       },
       data: {
-        // É crucial enviar o chatId aqui para o frontend
         chatId: chatId,
       }
     };
 
-    // sendToDevice funciona para Expo Push Tokens e FCM tokens.
-    await admin.messaging().sendToDevice(fcmToken, payload);
+    // Use o método .send() que é mais moderno
+    await admin.messaging().send(message);
     console.log(`Notificação enviada para o chat ${chatId}.`);
     return null;
   });

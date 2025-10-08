@@ -5,6 +5,8 @@ import { useRoute } from '@react-navigation/native';
 import { db } from '../services/firebaseConfig'; 
 import { Theme } from '../../constants/Themes';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { doc, getDoc, setDoc } from "firebase/firestore";
+
 
 interface Message {
   id: string;
@@ -63,17 +65,35 @@ const ChatScreen = () => {
 
   // Lógica de envio da mensagem
   const sendMessage = async () => {
-    if (inputText.trim() === '') return;
+  if (inputText.trim() === '') return;
 
-    await addDoc(collection(db, 'chats', chatId, 'messages'), {
-      text: inputText,
-      userId: loggedInUserId,
-      senderRole: userRole, 
-      createdAt: serverTimestamp(),
+  const chatRef = doc(db, 'chats', chatId);
+  const chatSnap = await getDoc(chatRef);
+
+  // 🔥 Se o chat ainda não existe, cria o documento pai
+  if (!chatSnap.exists()) {
+    // Aqui você pode pegar o papel do usuário e decidir quem é quem
+    const storedRole = await AsyncStorage.getItem('userRole');
+    const storedOngId = await AsyncStorage.getItem('ongId');
+
+    const userId = loggedInUserId;
+    const ongId = storedOngId || "1"; // ou de onde vier o ID real da ONG
+
+    await setDoc(chatRef, {
+      userId,
+      ongId
     });
+  }
 
-    setInputText('');
-  };
+  await addDoc(collection(db, 'chats', chatId, 'messages'), {
+    text: inputText,
+    userId: loggedInUserId,
+    senderRole: userRole,
+    createdAt: serverTimestamp(),
+  });
+
+  setInputText('');
+};
 
   // Renderização de cada item da lista
   const renderItem = ({ item }: { item: Message }) => {

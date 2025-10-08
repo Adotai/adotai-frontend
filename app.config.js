@@ -47,7 +47,6 @@ export default ({ config }) => ({
       {
         icon: "./assets/images/adotai-logo-png.png",
         color: "#8A1732",
-        sounds: ["./assets/sounds/notification.wav"]
       }
     ]
   ]

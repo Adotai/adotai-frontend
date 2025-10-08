@@ -1,6 +1,8 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
+import { doc, setDoc } from "firebase/firestore";
+import { db } from "../services/firebaseConfig";
 
 const USER_ROUTE = Constants.expoConfig?.extra?.USER_ROUTE;
 
@@ -22,7 +24,17 @@ export const createChatRoom = async (userId: number, ongId: number) => {
         }
       }
     );
-    return response.data; // ChatRoomDTO
+
+    const chatRoom = response.data; 
+
+    if (chatRoom?.id) {
+      await setDoc(doc(db, "chats", String(chatRoom.id)), {
+        userId: String(userId),
+        ongId: String(ongId)
+      }, { merge: true });
+    }
+
+    return chatRoom;
   } catch (error) {
     console.error('Erro ao criar chat:', error);
     throw error;
