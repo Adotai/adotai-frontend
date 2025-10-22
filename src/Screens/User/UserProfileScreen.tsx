@@ -7,6 +7,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { fetchLoggedUser, updateUser } from '../../actions/userActions';
 import ChangePasswordModal from '../../Components/CustomModal';
 import { UpdateUserPayload } from '../../types';
+import { doc, updateDoc, deleteField } from "firebase/firestore"; 
+import { db } from '../../services/firebaseConfig';
 
 const { width, height } = Dimensions.get('window');
 
@@ -41,12 +43,42 @@ export default function UserProfileScreen({ navigation }: any) {
 
 
   const handleLogout = async () => {
-    await AsyncStorage.removeItem('authToken');
-    await AsyncStorage.removeItem('userEmail');
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'Onboarding' }],
-    });
+    try {
+      // Usamos o 'userId' que já está no estado do componente
+      if (userId) {
+        console.log(`Limpando token de notificação para o usuário ${userId}...`);
+        
+        // Acessa o documento do usuário no Firestore
+        const userDocRef = doc(db, 'users', String(userId));
+        
+        // Remove o campo do token de notificação
+        await updateDoc(userDocRef, {
+          expoPushToken: deleteField() 
+        });
+
+        console.log("Token de notificação limpo com sucesso do Firestore.");
+      }
+
+      // Limpa os dados locais da sessão
+      await AsyncStorage.removeItem('authToken');
+      await AsyncStorage.removeItem('userEmail');
+      await AsyncStorage.removeItem('user'); // Adicionado para limpeza completa
+      await AsyncStorage.removeItem('userRole'); // Adicionado para limpeza completa
+
+      // Navega o usuário para a tela de Onboarding/Login
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Onboarding' }],
+      });
+    } catch (error) {
+      console.error("Erro durante o processo de logout:", error);
+      // Como fallback em caso de erro, limpa tudo e desloga mesmo assim
+      await AsyncStorage.clear();
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Onboarding' }],
+      });
+    }
   };
 
   const handleUpdateUserPassword = async (id: number, newPassword: string) => {

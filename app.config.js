@@ -23,7 +23,7 @@ export default ({ config }) => ({
       backgroundColor: "#8A1732"
     },
     package: "com.adotai.mobile",
-    googleServicesFile: "./google-services.json" // <-- Adicione este campo!
+    googleServicesFile: process.env.GOOGLE_SERVICES_JSON
   },
   web: {
     favicon: "./assets/favicon.png"
