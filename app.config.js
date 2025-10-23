@@ -1,10 +1,10 @@
 export default ({ config }) => ({
   ...config,
-  name: "adotai-frontend",
+  name: "Adotai",
   slug: "adotai-frontend",
   version: "1.0.0",
   orientation: "portrait",
-  icon: "./assets/images/adotai-logo-png.png",
+  icon: "./assets/images/adotai-logo.png",
   userInterfaceStyle: "light",
   newArchEnabled: true,
   splash: {
@@ -19,8 +19,7 @@ export default ({ config }) => ({
   },
   android: {
     adaptiveIcon: {
-      foregroundImage: "./assets/images/adotai-logo-png.png",
-      backgroundColor: "#8A1732"
+      foregroundImage: "./assets/images/adotai-logo.png",
     },
     package: "com.adotai.mobile",
     googleServicesFile: process.env.GOOGLE_SERVICES_JSON
@@ -45,8 +44,7 @@ export default ({ config }) => ({
     [
       "expo-notifications",
       {
-        icon: "./assets/images/adotai-logo-png.png",
-        color: "#8A1732",
+        icon: "./assets/images/adotai-logo.png",
       }
     ]
   ]
