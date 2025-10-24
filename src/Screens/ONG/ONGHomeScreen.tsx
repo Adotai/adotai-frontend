@@ -7,6 +7,7 @@ import ONGAnimalsScreen from './ONGAnimalsScreen';
 import { Theme } from '../../../constants/Themes';
 import ONGUserAnimalsScreen from './ONGUserAnimalsScreen';
 import ONGChatsScreen from './ONGChatsScreen';
+import ONGNotificationsScreen from './ONGNotificationsScreen';
 
 
 const Tab = createBottomTabNavigator();
@@ -21,6 +22,8 @@ export default function ONGHomeScreen() {
             switch (route.name) {
               case 'Animais':
                 return 'paw-outline';
+              case 'Notificações':
+                return 'notifications-outline';
               case 'Perfil':
                 return 'person-circle-outline';
               case 'Solicitações de Usuários':
@@ -50,11 +53,10 @@ export default function ONGHomeScreen() {
       <Tab.Screen
         name="Solicitações de Usuários"
         component={ONGUserAnimalsScreen}
-        options={({ navigation }) => ({
-          headerShown: true,
-          headerTitle: 'Solicitações de Usuários',
-          headerTitleAlign: 'center',
-        })} />
+            options={{ headerShown: false }}
+ />
+
+        
 
       <Tab.Screen
         name="Animais"
@@ -74,6 +76,12 @@ export default function ONGHomeScreen() {
           ),
         })}
       />
+            <Tab.Screen 
+        name="Notificações" 
+        component={ONGNotificationsScreen} 
+        options={{ headerShown: false }}
+      />
+
       <Tab.Screen
         name="Perfil"
         component={ONGProfileScreen}

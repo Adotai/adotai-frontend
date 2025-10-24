@@ -36,6 +36,7 @@ import UserDonateAnimalScreen from './src/Screens/User/UserDonateAnimalScreen';
 import ONGUserAnimalsScreen from './src/Screens/ONG/ONGUserAnimalsScreen';
 import ChatScreen from './src/Screens/ChatScreen';
 import * as Notifications from 'expo-notifications'; 
+import ONGNotificationsScreen from './src/Screens/ONG/ONGNotificationsScreen';
 
 
 const Stack = createStackNavigator();
@@ -354,6 +355,16 @@ export default function App() {
             <Stack.Screen
               name= "ONGUserAnimals"
               component={ONGUserAnimalsScreen}
+               options={{
+                headerShown: false,
+                headerTransparent: true,
+                headerTitle: '',
+                headerTintColor: '#FFFFFF',
+              }}
+            />
+             <Stack.Screen
+              name= "ONGNotifications"
+              component={ONGNotificationsScreen}
                options={{
                 headerShown: false,
                 headerTransparent: true,
