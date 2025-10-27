@@ -6,6 +6,10 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../types';
 import CustomButton from '../../Components/CustomButton';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { collection, addDoc, serverTimestamp } from "firebase/firestore"; 
+import { db } from '../../services/firebaseConfig';
+import { fetchAnimalNameById } from '../../actions/userActions';
 
 
 export default function UserAnimalDetailsScreen({ route }: any) {
@@ -18,6 +22,65 @@ export default function UserAnimalDetailsScreen({ route }: any) {
   const [current, setCurrent] = useState(0);
 
   const photos = animal.photos || [];
+
+  const handleInterestPress = async () => {
+    // setLoadingInterest(true);
+    try {
+      // 1. Obter dados do usuário logado do AsyncStorage
+      const userString = await AsyncStorage.getItem('user');
+      if (!userString) {
+        Alert.alert("Erro", "Sessão inválida. Faça login novamente.");
+        // setLoadingInterest(false);
+        return;
+      }
+      const loggedInUser = JSON.parse(userString);
+      const userId = loggedInUser?.id;
+      // ▼▼▼ PEGA O NOME DIRETAMENTE DAQUI ▼▼▼
+      const userName = loggedInUser?.name || 'Um usuário'; 
+
+      // 2. Obter IDs do animal e ONG (como antes)
+      const animalId = animal?.id;
+      const ongId = animal?.ongId;
+
+      if (!userId || !animalId || !ongId) {
+        console.error("Dados faltando:", { userId, animalId, ongId });
+        Alert.alert("Erro", "Não foi possível registrar o interesse.");
+        // setLoadingInterest(false);
+        return;
+      }
+
+      // --- 3. Buscar APENAS o Nome do Animal via Action ---
+      console.log("Buscando nome do animal via action...");
+      //TODO: arrumar esse endpoint no back: const fetchedAnimalName = await fetchAnimalNameById(animalId);
+      //const animalName = fetchedAnimalName || 'um animal'; // Usa o nome encontrado ou o padrão
+      const animalName = 'um animal'; 
+      console.log(`Nomes obtidos: User='${userName}', Animal='${animalName}'`);
+      // --- Fim da Busca de Nomes ---
+
+      // 4. Preparar dados para Firestore (incluindo nomes)
+      const requestData = {
+        userId: String(userId),
+        animalId: String(animalId),
+        ongId: String(ongId),
+        userName: userName,     // <-- Nome do usuário (do AsyncStorage)
+        animalName: animalName, // <-- Nome do animal (da API)
+        requestTimestamp: serverTimestamp(),
+        status: 'pending'
+      };
+
+      // 5. Adicionar o documento (como antes)
+      const docRef = await addDoc(collection(db, "adoptionRequests"), requestData);
+      console.log("Interesse registrado com ID: ", docRef.id);
+      Alert.alert("Interesse Registrado!", "Seu interesse foi enviado para a ONG.");
+      // setInterestRegistered(true);
+
+    } catch (error) {
+      console.error("Erro geral ao registrar interesse: ", error);
+      Alert.alert("Erro", "Não foi possível registrar seu interesse.");
+    } finally {
+        // setLoadingInterest(false); 
+    }
+  };
 
   const handleWhatsApp = () => {
     // Número da ONG (exemplo: DDD + número, só números)
@@ -181,6 +244,13 @@ export default function UserAnimalDetailsScreen({ route }: any) {
           title='Adotar'
           onPress={handleWhatsApp}
           buttonStyle={{ alignSelf: 'center', marginVertical: 16, width: width * 0.95 }}
+        />
+         <CustomButton
+          color={Theme.TERTIARY}
+          title='Tenho interesse em adotar'
+          onPress={handleInterestPress}
+          borderColor={Theme.TERTIARY}
+          buttonStyle={{ alignSelf: 'center', marginBottom: 16, width: width * 0.95 }}
         />
       </View>
     </ScrollView>

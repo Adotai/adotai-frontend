@@ -228,3 +228,26 @@ export const updateUser = async (user: {
     throw error;
   }
 };
+
+
+export const fetchAnimalNameById = async (animalId: number): Promise<string | null> => {
+  try {
+    const token = await AsyncStorage.getItem('authToken');
+    if (!token || !USER_ROUTE) return null;
+
+    const response = await axios.get(`${USER_ROUTE}/animal/${animalId}`, { // ASSUMINDO GET /animal/{id}
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    // Ajuste 'response.data.name' conforme a estrutura real da sua API
+    if (response.data && response.data.name) {
+      return response.data.name;
+    } else {
+      console.warn(`Nome não encontrado na resposta da API para animal ${animalId}`);
+      return null;
+    }
+  } catch (err: any) {
+    console.error(`Erro ao buscar nome do animal ${animalId}:`, err.response?.data || err.message);
+    return null;
+  }
+};
