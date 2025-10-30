@@ -29,10 +29,10 @@ export const createChatRoom = async (userId: number, ongId: number) => {
 
     if (chatRoom?.id) {
       await setDoc(doc(db, "chats", String(chatRoom.id)), {
-        userId: String(userId),
-        ongId: String(ongId)
+        userId: Number(userId),
+        ongId: Number(ongId)
       }, { merge: true });
-    }
+    }''
 
     return chatRoom;
   } catch (error) {
@@ -54,6 +54,45 @@ export const fetchChatsByAccount = async (accountId: number) => {
     return response.data; // Array de ChatRoomDTO
   } catch (error) {
     console.error('Erro ao buscar chats:', error);
+    throw error;
+  }
+};
+
+export const getOrCreateChatRoom = async (userId: number, ongId: number) => {
+  try {
+    const token = await AsyncStorage.getItem('authToken');
+    // Buscar todos os chats da ONG
+    const response = await axios.get(
+      `${USER_ROUTE}/chat/rooms/account/${ongId}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    const chats = response.data as any[];
+    // Procura chat entre userId e ongId
+    let chatRoom = chats.find(
+      c => (c.userId === userId && c.ongId === ongId) || (c.userId === ongId && c.ongId === userId)
+    );
+    if (!chatRoom) {
+      // Se não existe, cria
+      const createResponse = await axios.post(
+        `${USER_ROUTE}/chat/room`,
+        { id: 0, userId, ongId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      chatRoom = createResponse.data;
+    }
+    // Garante que o Firestore tem o chat com o ID correto
+    await setDoc(doc(db, "chats", String(chatRoom.id)), {
+      userId: Number(userId),
+      ongId: Number(ongId)
+    }, { merge: true });
+    return chatRoom.id;
+  } catch (error) {
+    console.error('Erro ao buscar/criar chat:', error);
     throw error;
   }
 };

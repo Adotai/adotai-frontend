@@ -2,6 +2,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Alert } from 'react-native';
 import Constants from 'expo-constants';
+import { Animal } from '../types';
 
 const USER_ROUTE = Constants.expoConfig?.extra?.USER_ROUTE;
 
@@ -228,26 +229,47 @@ export const updateUser = async (user: {
     throw error;
   }
 };
-
-
 export const fetchAnimalNameById = async (animalId: number): Promise<string | null> => {
   try {
     const token = await AsyncStorage.getItem('authToken');
     if (!token || !USER_ROUTE) return null;
 
-    const response = await axios.get(`${USER_ROUTE}/animal/${animalId}`, { // ASSUMINDO GET /animal/{id}
+    const response = await axios.get(`${USER_ROUTE}/animal/id/${animalId}`, {
       headers: { Authorization: `Bearer ${token}` }
     });
 
-    // Ajuste 'response.data.name' conforme a estrutura real da sua API
-    if (response.data && response.data.name) {
-      return response.data.name;
+    // ▼▼▼ A CORREÇÃO ESTÁ AQUI ▼▼▼
+    // Verifique a estrutura: response.data -> .data -> .name
+    if (response.data && response.data.data && response.data.data.name) {
+      return response.data.data.name; // <-- Pega o nome de dentro do objeto aninhado
     } else {
-      console.warn(`Nome não encontrado na resposta da API para animal ${animalId}`);
+    // ▲▲▲ FIM DA CORREÇÃO ▲▲▲
+      console.warn(`Nome não encontrado na resposta da API (estrutura inesperada) para animal ${animalId}`);
+      console.log("Estrutura recebida:", JSON.stringify(response.data)); 
       return null;
     }
   } catch (err: any) {
     console.error(`Erro ao buscar nome do animal ${animalId}:`, err.response?.data || err.message);
+    return null;
+  }
+};
+
+export const fetchAnimalById = async (animalId: number): Promise<Animal | null> => {
+  try {
+    const token = await AsyncStorage.getItem('authToken');
+    if (!token || !USER_ROUTE) return null;
+
+    const response = await axios.get(`${USER_ROUTE}/animal/id/${animalId}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    if (response.data && response.data.data) {
+      return response.data.data as Animal;
+    } else {
+      return null;
+    }
+  } catch (err: any) {
+    console.error(`Erro ao buscar animal ${animalId}:`, err.response?.data || err.message);
     return null;
   }
 };

@@ -51,9 +51,9 @@ export default function UserAnimalDetailsScreen({ route }: any) {
 
       // --- 3. Buscar APENAS o Nome do Animal via Action ---
       console.log("Buscando nome do animal via action...");
-      //TODO: arrumar esse endpoint no back: const fetchedAnimalName = await fetchAnimalNameById(animalId);
-      //const animalName = fetchedAnimalName || 'um animal'; // Usa o nome encontrado ou o padrão
-      const animalName = 'um animal'; 
+      const fetchedAnimalName = await fetchAnimalNameById(animalId);
+      const animalName = fetchedAnimalName || 'um animal'; // Usa o nome encontrado ou o padrão
+      //const animalName = 'um animal'; 
       console.log(`Nomes obtidos: User='${userName}', Animal='${animalName}'`);
       // --- Fim da Busca de Nomes ---
 

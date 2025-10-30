@@ -1,13 +1,16 @@
-import { View, Text, StatusBar, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, StatusBar, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator, Modal, Pressable, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import React, { useState, useEffect } from 'react';
 import { Theme } from '../../../constants/Themes';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { collection, query, orderBy, onSnapshot, doc, updateDoc } from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../../services/firebaseConfig'; // Verifique o caminho
 import { useNavigation } from '@react-navigation/native'; // Para navegação (opcional)
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../types'; // Verifique o caminho
+import { Ionicons } from '@expo/vector-icons';
+import { fetchAnimalById } from '../../actions/userActions'; // ajuste o caminho se necessário
+import { getOrCreateChatRoom } from '../../actions/actions'; // ajuste o caminho
 
 // Interface para definir a estrutura de uma notificação
 interface NotificationItem {
@@ -18,15 +21,18 @@ interface NotificationItem {
   read: boolean;
   // Adicione outros campos que você salva, como requestId, animalId, userId
   requestId?: string;
-  animalId?: string;
-  userId?: string;
+  animalId?: string | number;
+  userId?: string | number
 }
+
 
 export default function ONGNotificationsScreen() {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>(); // Para navegação
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [ongId, setOngId] = useState<string | null>(null);
+  const [menuVisible, setMenuVisible] = useState(false);
+  const [selectedNotification, setSelectedNotification] = useState<NotificationItem | null>(null);
 
   useEffect(() => {
     const getOngId = async () => {
@@ -36,7 +42,7 @@ export default function ONGNotificationsScreen() {
         const id = userData?.id || userData; 
         if (id) {
             // ▼▼▼ LOG 1: VERIFICAR O ID OBTIDO ▼▼▼
-            console.log("ONGNotificationsScreen - ID da ONG obtido:", String(id)); 
+           // console.log("ONGNotificationsScreen - ID da ONG obtido:", String(id)); 
             setOngId(String(id)); 
         } else {
              console.error("ONGNotificationsScreen - ID da ONG não encontrado no JSON do AsyncStorage.");
@@ -56,7 +62,7 @@ export default function ONGNotificationsScreen() {
         console.log("ONGNotificationsScreen - Aguardando ongId...");
         return; 
     }
-    console.log(`ONGNotificationsScreen - Configurando listener para: users/${ongId}/notifications`); 
+    //console.log(`ONGNotificationsScreen - Configurando listener para: users/${ongId}/notifications`); 
 
     setLoading(true);
     const notificationsRef = collection(db, 'users', ongId, 'notifications');
@@ -64,15 +70,15 @@ export default function ONGNotificationsScreen() {
 
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       // ▼▼▼ LOG 3: VERIFICAR SE O LISTENER RECEBE DADOS ▼▼▼
-      console.log("ONGNotificationsScreen - Listener do Firestore acionado! Qtd docs:", querySnapshot.size); 
+      //console.log("ONGNotificationsScreen - Listener do Firestore acionado! Qtd docs:", querySnapshot.size); 
       const fetchedNotifications: NotificationItem[] = [];
       querySnapshot.forEach((doc) => {
         // ▼▼▼ LOG 4: VERIFICAR DADOS DE CADA DOC ▼▼▼
-        console.log("ONGNotificationsScreen - Notificação do Firestore:", doc.id, doc.data()); 
+        //console.log("ONGNotificationsScreen - Notificação do Firestore:", doc.id, doc.data()); 
         fetchedNotifications.push({ id: doc.id, ...doc.data() } as NotificationItem);
       });
       // ▼▼▼ LOG 5: VERIFICAR O ARRAY FINAL ANTES DE SETAR O ESTADO ▼▼▼
-      console.log("ONGNotificationsScreen - Notificações processadas:", fetchedNotifications); 
+      //console.log("ONGNotificationsScreen - Notificações processadas:", fetchedNotifications); 
       setNotifications(fetchedNotifications);
       setLoading(false);
     }, (error) => { 
@@ -94,36 +100,87 @@ export default function ONGNotificationsScreen() {
      }
   };
 
-  // 4. Função para navegar ao clicar (opcional)
   const handleNotificationPress = (item: NotificationItem) => {
-    console.log("Notificação clicada:", item);
-    // Marcar como lida ao clicar
     if (!item.read) {
         markAsRead(item.id);
     }
+  };
 
-    // Exemplo de navegação (adapte à sua necessidade e telas)
-    // Se for uma notificação de submissão de animal, talvez navegar
-    // para uma tela de detalhes da submissão?
-    // if (item.requestId && item.animalId) {
-    //   navigation.navigate('SubmissionDetailsScreen', { submissionId: item.requestId });
-    // }
+  const deleteNotification = async (notificationId: string) => {
+  if (!ongId) return;
+  try {
+    const notifDocRef = doc(db, 'users', ongId, 'notifications', notificationId);
+    await deleteDoc(notifDocRef);
+    console.log(`Notificação ${notificationId} excluída.`);
+  } catch (error) {
+    console.error("Erro ao excluir notificação:", error);
+  }
+};
+
+  // Funções para as ações do menu
+  const handleMenu = (item: NotificationItem) => {
+    setSelectedNotification(item);
+    setMenuVisible(true);
+  };
+
+  const handleDelete = async () => {
+    if (selectedNotification) {
+      await deleteNotification(selectedNotification.id);
+      setMenuVisible(false);
+    }
+  };
+
+  const handleChat = async () => {
+  if (selectedNotification?.userId && ongId) {
+    const chatId = await getOrCreateChatRoom(Number(selectedNotification.userId), Number(ongId));
+    if (chatId) {
+      navigation.navigate('Chat', {
+        chatId: String(chatId),
+        loggedInUserId: Number(ongId)
+      });
+      setMenuVisible(false);
+    } else {
+      Alert.alert('Erro', 'Não foi possível encontrar ou criar o chat.');
+    }
+  }
+};
+
+  const handleViewAnimal = async () => {
+    if (selectedNotification?.animalId) {
+      const animal = await fetchAnimalById(Number(selectedNotification.animalId));
+      if (animal) {
+        navigation.navigate('ONGAnimalDetails', { animal });
+        setMenuVisible(false);
+      } else {
+        Alert.alert('Erro', 'Animal não encontrado.');
+      }
+    }
   };
 
   // 5. Renderizar item da lista
   const renderItem = ({ item }: { item: NotificationItem }) => (
     <TouchableOpacity
-        style={[styles.notificationItem, !item.read && styles.unreadItem]}
-        onPress={() => handleNotificationPress(item)}
+      style={[styles.notificationItem, !item.read && styles.unreadItem]}
+      onPress={() => handleNotificationPress(item)}
+      activeOpacity={0.8}
     >
-      {/* <Text style={{color: 'red', fontWeight: 'bold'}}>-- ITEM RENDER TEST --</Text>*/}
-      <Text style={styles.notificationTitle}>{item.title}</Text>
-      <Text style={styles.notificationBody}>{item.body}</Text>
-      {item.timestamp && (
-        <Text style={styles.notificationTime}>
-          {new Date(item.timestamp?.toDate()).toLocaleString('pt-BR')}
-        </Text>
-      )}
+      <View style={{ flex: 1, padding: 12 }}>
+        <Text style={styles.notificationTitle}>{item.title}</Text>
+        <Text style={styles.notificationBody}>{item.body}</Text>
+        {item.timestamp && (
+          <Text style={[styles.notificationTime]}>
+            {new Date(item.timestamp?.toDate()).toLocaleString('pt-BR')}
+          </Text>
+        )}
+      </View>
+      <View style={{ alignItems: 'center', justifyContent: 'center', padding: 12 }}>
+        <TouchableOpacity
+          style={styles.menuButton}
+          onPress={() => handleMenu(item)}
+        >
+          <Ionicons name="ellipsis-vertical" size={22} color={Theme.PRIMARY} />
+        </TouchableOpacity>
+      </View>
       {!item.read && <View style={styles.unreadDot} />}
     </TouchableOpacity>
   );
@@ -132,17 +189,16 @@ export default function ONGNotificationsScreen() {
     <>
       <StatusBar backgroundColor={Theme.TERTIARY} barStyle="light-content" />
       <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: Theme.BACK }}>
-        {/* Header (seu código original) */}
+        {/* Header */}
         <View style={styles.header}>
           <Text style={styles.headerTitle}>
             Notificações
           </Text>
         </View>
-
         {/* Corpo da Tela */}
         <View style={styles.content}>
           {loading ? (
-            <ActivityIndicator size="large" color={Theme.PRIMARY} style={{ marginTop: 50 }}/>
+            <ActivityIndicator size="large" color={Theme.PRIMARY} style={{ marginTop: 50 }} />
           ) : notifications.length === 0 ? (
             <Text style={styles.emptyText}>Nenhuma notificação encontrada.</Text>
           ) : (
@@ -150,10 +206,38 @@ export default function ONGNotificationsScreen() {
               data={notifications}
               renderItem={renderItem}
               keyExtractor={(item) => item.id}
-              contentContainerStyle={{ paddingBottom: 20 }} // Espaço no final
+              contentContainerStyle={{ paddingBottom: 20 }}
             />
           )}
         </View>
+        {/* Modal de opções */}
+        <Modal
+          visible={menuVisible}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setMenuVisible(false)}
+        >
+          <Pressable style={styles.modalOverlay} onPress={() => setMenuVisible(false)}>
+            <View style={styles.menuModal}>
+              <TouchableOpacity style={styles.menuOption} onPress={handleDelete}>
+                <Ionicons name="trash-outline" size={18} color="#f44336" style={{ marginRight: 8 }} />
+                <Text style={{ color: '#f44336', fontSize: 16 }}>Excluir notificação</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.menuOption} onPress={handleChat} disabled={!selectedNotification?.userId}>
+                <Ionicons name="chatbubble-ellipses-outline" size={18} color={Theme.PRIMARY} style={{ marginRight: 8 }} />
+                <Text style={{ color: Theme.PRIMARY, fontSize: 16, opacity: selectedNotification?.userId ? 1 : 0.5 }}>
+                  Conversar com o usuário
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.menuOption} onPress={handleViewAnimal} disabled={!selectedNotification?.animalId}>
+                <Ionicons name="paw-outline" size={18} color={Theme.PRIMARY} style={{ marginRight: 8 }} />
+                <Text style={{ color: Theme.PRIMARY, fontSize: 16, opacity: selectedNotification?.animalId ? 1 : 0.5 }}>
+                  Ver animal
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </Pressable>
+        </Modal>
       </SafeAreaView>
     </>
   );
@@ -182,7 +266,6 @@ const styles = StyleSheet.create({
     },
     notificationItem: {
         backgroundColor: 'white',
-        padding: 15,
         borderRadius: 8,
         marginBottom: 10,
         elevation: 2, // Sombra no Android
@@ -190,7 +273,7 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.1,
         shadowRadius: 2,
-        position: 'relative', // Para o ponto de não lido
+        flexDirection: 'row'
     },
     unreadItem: {
         // Estilo extra para itens não lidos, se desejar (ex: borda)
@@ -211,8 +294,6 @@ const styles = StyleSheet.create({
         fontSize: 12,
         fontFamily: 'Poppins-Regular',
         color: '#999',
-        marginTop: 8,
-        textAlign: 'right',
     },
     emptyText: {
         textAlign: 'center',
@@ -229,5 +310,42 @@ const styles = StyleSheet.create({
         height: 10,
         borderRadius: 5,
         backgroundColor: Theme.PRIMARY,
-    }
+    },
+    deleteButton: {       
+        width: 32,
+        height: 32,
+        alignItems: 'center',
+        borderRadius: 8,
+        justifyContent: 'center',
+    },
+    deleteButtonText: {
+        color: 'white',
+        fontSize: 18,
+    },
+    menuButton: {
+        width: 32,
+        height: 32,
+        alignItems: 'center',
+        borderRadius: 8,
+        justifyContent: 'center',
+    },
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.25)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    menuModal: {
+        backgroundColor: 'white',
+        borderRadius: 12,
+        paddingVertical: 12,
+        paddingHorizontal: 16,
+        minWidth: 220,
+        elevation: 5,
+    },
+    menuOption: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 12,
+    },
 });

@@ -69,111 +69,84 @@ export const notifyNewMessage = functions.firestore
 
 
 export const notifyAdoptionRequest = functions.firestore
-  .document('adoptionRequests/{requestId}') // <-- Escuta a coleção correta
+  .document('adoptionRequests/{requestId}')
   .onCreate(async (snap, context) => {
     
-    console.log("--- NOVA SOLICITAÇÃO DE ADOÇÃO DETECTADA ---");
+    console.log("--- NOVA SOLICITAÇÃO (LÓGICA SIMPLIFICADA) ---");
+    const requestData = snap.data(); // Pega os dados salvos pelo App
+    const requestId = context.params.requestId;
 
-    const requestData = snap.data();
-
-    // Verificações básicas (ajuste os nomes dos campos se necessário)
-    if (!requestData || !requestData.userId || !requestData.ongId || !requestData.animalId) {
-      console.error("Dados da solicitação incompletos:", requestData);
-      return null;
+    // Valida dados essenciais (incluindo os nomes que o app salvou)
+    if (!requestData || !requestData.userId || !requestData.ongId || !requestData.animalId || !requestData.userName || !requestData.animalName) {
+      console.error(`Dados incompletos na solicitação ${requestId} (sem nomes?):`, requestData);
+      return null; 
     }
 
-    const requesterId = requestData.userId; // ID do usuário que pediu
-    const ongId = requestData.ongId;       // ID da ONG que deve ser notificada
-    const animalId = requestData.animalId; // ID do animal (para a mensagem)
+    // Pega os IDs E OS NOMES diretamente do documento
+    const requesterId = requestData.userId;
+    const ongId = requestData.ongId;
+    const animalId = requestData.animalId;
+    const userName = requestData.userName; 
+    const animalName = requestData.animalName; 
 
-    console.log(`Usuário ${requesterId} solicitou adoção do animal ${animalId} para a ONG ${ongId}`);
+    console.log(`Dados lidos: Usuário ${userName} (${requesterId}) solicitou ${animalName} (${animalId}) para ONG ${ongId}`);
 
-    // --- Busca de Nomes ---
-    let userName = `Um usuário`; // Valor padrão
-    let animalName = "um animal"; // Valor padrão
-
+    // --- Busca Token da ONG (Firestore - continua igual) ---
+    // *** AJUSTE 'users' se o token da ONG estiver em 'ongs' ***
+    const ongDocRef = db.collection('users').doc(String(ongId));
+    let fcmToken: string | null = null;
     try {
-        // Busca o nome do usuário
-        const userDoc = await db.collection('users').doc(String(requesterId)).get();
-        if (userDoc.exists && userDoc.data()?.name) {
-            userName = userDoc.data()?.name;
-            console.log("Nome do usuário encontrado:", userName);
-        } else {
-            console.log("Nome do usuário não encontrado ou campo 'name' ausente.");
-        }
+        const ongDoc = await ongDocRef.get();
+        if (!ongDoc.exists) { console.log(`Doc ONG ${ongId} não encontrado.`); return null; }
+        fcmToken = ongDoc.data()?.expoPushToken; // *** AJUSTE 'expoPushToken' se necessário ***
+        if (!fcmToken) { console.log(`ONG ${ongId} sem token.`); return null; }
+    } catch (dbError) { console.error(`Erro ao buscar ONG ${ongId}:`, dbError); return null;}
+    // --- Fim Busca Token ---
 
-        // Busca o nome do animal (Ajuste 'animals' e 'name' se necessário)
-        const animalDoc = await db.collection('animals').doc(String(animalId)).get();
-        if (animalDoc.exists && animalDoc.data()?.name) {
-            animalName = animalDoc.data()?.name;
-            console.log("Nome do animal encontrado:", animalName);
-        } else {
-            console.log("Nome do animal não encontrado ou campo 'name' ausente.");
-        }
-    } catch (e) { 
-        console.error("Erro ao buscar nomes:", e); 
-        // Continua com os nomes padrão se a busca falhar
-    }
-    // --- Fim da Busca de Nomes ---
-
-    // Busca o token da ONG (Ajuste 'users' se o token estiver em 'ongs')
-    const ongDoc = await db.collection('users').doc(String(ongId)).get(); 
-    const ongData = ongDoc.data();
-    const fcmToken = ongData?.expoPushToken;
-
-    if (!fcmToken) {
-      console.log(`ONG ${ongId} sem token de notificação.`);
-      return null;
-    }
-
-    // Monta a mensagem para a ONG usando os nomes buscados
+    // --- Montagem da Mensagem (Usa nomes do requestData) ---
     const message: admin.messaging.Message = {
       token: fcmToken,
       notification: {
         title: "Nova Solicitação de Adoção!",
-        body: `${userName} tem interesse em adotar ${animalName}.`, // <-- Nomes atualizados aqui
+        body: `${userName} tem interesse em adotar ${animalName}.`, // <-- USA OS NOMES CORRETOS!
       },
-      data: {
-        requestId: context.params.requestId, 
+      data: { 
+        requestId: requestId,
         animalId: String(animalId),
-        userId: String(requesterId)
+        userId: String(requesterId),
+        type: 'adoption_request'
       }
     };
+    // --- Fim Montagem ---
 
+    // --- Envio e Salvamento no Histórico ---
     try {
-      // 1. Envia a notificação PUSH
       await admin.messaging().send(message);
-      console.log(`Notificação de adoção enviada com sucesso para a ONG ${ongId}.`);
-
-      // 2. Salva a notificação no histórico da ONG
+      console.log(`Notificação PUSH enviada para ONG ${ongId}.`);
+      
       const notificationData = {
-        title: message.notification?.title || "Nova Solicitação de Adoção!",
-        body: message.notification?.body || `${userName} tem interesse em adotar ${animalName}.`,
-        timestamp: admin.firestore.FieldValue.serverTimestamp(),
-        read: false,
-        // Salva os IDs para possível navegação
-        requestId: context.params.requestId,
-        animalId: String(animalId),
-        userId: String(requesterId)
+          title: message.notification?.title || "Nova Solicitação de Adoção!",
+          body: message.notification?.body || `${userName} tem interesse em adotar ${animalName}.`, // Usa nomes corretos
+          timestamp: admin.firestore.FieldValue.serverTimestamp(),
+          read: false,
+          requestId: requestId,
+          animalId: String(animalId),
+          userId: String(requesterId),
+          type: 'adoption_request'
       };
+      
+      // *** AJUSTE 'users' se o histórico da ONG for em 'ongs' ***
+      await db.collection('users').doc(String(ongId)).collection('notifications').add(notificationData);
+      console.log(`Notificação salva no histórico da ONG ${ongId} com os nomes corretOS.`);
 
-      // (Verifique se a coleção é 'users' ou 'ongs' para a ONG)
-      await db.collection('users').doc(String(ongId)) 
-              .collection('notifications')
-              .add(notificationData);
-      console.log(`Notificação salva no histórico da ONG ${ongId}.`);
-
-    } catch (error: any) { // Captura o erro para ver detalhes
-      console.error(`ERRO AO ENVIAR/SALVAR NOTIFICAÇÃO DE ADOÇÃO para ONG ${ongId} (token ${fcmToken}):`, error);
-      if (error.code === 'messaging/mismatched-credential') {
-        console.error("CAUSA PROVÁVEL: O token pertence a um projeto Firebase diferente.");
-      } else if (error.code === 'messaging/registration-token-not-registered') {
-        console.error("CAUSA PROVÁVEL: O token não é mais válido (app desinstalado?). Considere remover este token do Firestore.");
-        // Opcional: Remover o token inválido do Firestore aqui
-        // await db.collection('users').doc(String(ongId)).update({ expoPushToken: admin.firestore.FieldValue.delete() });
-      }
+    } catch (error: any) { 
+        console.error(`ERRO AO ENVIAR/SALVAR NOTIFICAÇÃO para ONG ${ongId}:`, error);
+         if (error.code === 'messaging/registration-token-not-registered') {
+            console.warn("Token inválido detectado, removendo...");
+            await ongDocRef.update({ expoPushToken: admin.firestore.FieldValue.delete() });
+         }
     }
+    // --- Fim Envio/Salvamento ---
 
     return null;
   });
-
