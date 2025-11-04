@@ -53,18 +53,15 @@ export default function ONGHomeScreen() {
       <Tab.Screen
         name="Solicitações de Usuários"
         component={ONGUserAnimalsScreen}
-            options={{ headerShown: false }}
- />
+        options={{ headerShown: false }}
+      />
 
-        
+
 
       <Tab.Screen
         name="Animais"
         component={ONGAnimalsScreen}
         options={({ navigation }) => ({
-          headerShown: true,
-          headerTitle: 'Animais',
-          headerTitleAlign: 'center',
           headerRight: () => (
             <Ionicons
               name="add-circle-outline"
@@ -76,9 +73,9 @@ export default function ONGHomeScreen() {
           ),
         })}
       />
-            <Tab.Screen 
-        name="Notificações" 
-        component={ONGNotificationsScreen} 
+      <Tab.Screen
+        name="Notificações"
+        component={ONGNotificationsScreen}
         options={{ headerShown: false }}
       />
 

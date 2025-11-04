@@ -179,7 +179,8 @@ export default function UserDonateAnimalScreen({ navigation, route }: any) {
         temperament: temperament,
         photos,
         animalDescription,
-        userId
+        userId,
+        solicitationStatus: true
       };
 
       console.log('Animal a ser criado:', animalObj);

@@ -2,6 +2,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Alert } from 'react-native';
 import Constants from 'expo-constants';
+import { Animal } from '../types';
 
 const USER_ROUTE = Constants.expoConfig?.extra?.USER_ROUTE;
 
@@ -197,5 +198,39 @@ export const fetchUsers = async (): Promise<any[]> => {
   } catch (error) {
     console.error('Erro ao buscar usuários:', error);
     return [];
+  }
+};
+
+export const approveAnimalSubmission = async (animal: Animal): Promise<any> => {
+  try {
+    const token = await AsyncStorage.getItem('authToken');
+    if (!token || !USER_ROUTE) {
+      throw new Error('Token ou Rota de API não encontrados');
+    }
+
+    // Corpo de "APROVADO"
+    const requestBody = {
+      status: true,             // Torna o animal VISÍVEL/DISPONÍVEL
+      solicitationStatus: false // Remove da lista de PENDENTES
+    };
+
+    // Chama o endpoint PUT /animal/{id}
+    const response = await axios.put(
+      `${USER_ROUTE}/animal/status/${animal}`, // Chama o endpoint que você arrumou
+      requestBody, 
+      {
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+    
+    return response.data;
+
+  } catch (error: any) {
+    console.error(`Erro ao aprovar animal ${animal}:`, error.response?.data || error.message);
+    Alert.alert("Erro", "Não foi possível aprovar o animal.");
+    throw error;
   }
 };

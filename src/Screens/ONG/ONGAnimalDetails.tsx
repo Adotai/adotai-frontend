@@ -6,7 +6,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../types';
 import { useNavigation } from '@react-navigation/native';
 import CustomButton from '../../Components/CustomButton';
-import { updateAnimalStatus } from '../../actions/ongActions';
+import { approveAnimalSubmission, updateAnimalStatus } from '../../actions/ongActions';
 
 
 export default function ONGAnimalDetails({ route }: any) {
@@ -28,7 +28,15 @@ export default function ONGAnimalDetails({ route }: any) {
     }
   };
 
+  const handleApprove = async (animalId: number) => {
+  try {
+    await approveAnimalSubmission(animalId);
+    Alert.alert("Sucesso", "O animal foi aprovado!");
 
+  } catch (error) {
+    Alert.alert("Erro", "Não foi possível aprovar o animal.");
+  }
+};
 
   const photos = animal.photos || [];
 
@@ -184,6 +192,13 @@ export default function ONGAnimalDetails({ route }: any) {
           onPress={handleToggleStatus}
           buttonStyle={{ alignSelf: 'center', margin: 16, borderWidth: 0, width: width * 0.95 }}
         />
+          <CustomButton
+            title="Aprovar Cadastro"
+            onPress={() => handleApprove(animal.id)}
+            buttonStyle={{ alignSelf: 'center', margin: 16, borderWidth: 0, width: width * 0.95 }}
+          />
+        
+
       </ScrollView>
     </>
 
