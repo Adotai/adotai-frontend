@@ -52,21 +52,21 @@ export default function SignInScreen() {
 
       // 2. Decide qual função de busca usar com base na 'role'
       if (result.role === 'ong') {
-        console.log("Login de ONG detectado, buscando dados da ONG...");
+        //console.log("Login de ONG detectado, buscando dados da ONG...");
         loggedInEntity = await fetchLoggedOng();
       } else { // Para 'normal', 'admin', etc.
-        console.log("Login de Usuário detectado, buscando dados do usuário...");
+        //console.log("Login de Usuário detectado, buscando dados do usuário...");
         loggedInEntity = await fetchLoggedUser();
       }
 
-      console.log('Dados da entidade logada:', JSON.stringify(loggedInEntity, null, 2));
+      //console.log('Dados da entidade logada:', JSON.stringify(loggedInEntity, null, 2));
 
       // 3. Se encontrou a entidade (user ou ong), registra o token
       if (loggedInEntity && loggedInEntity.id !== undefined && loggedInEntity.id !== null) {
         
         await AsyncStorage.setItem('user', JSON.stringify(loggedInEntity));
 
-        console.log(`✅ Tentando registrar token para a entidade com ID: ${loggedInEntity.id}`);
+        //console.log(`✅ Tentando registrar token para a entidade com ID: ${loggedInEntity.id}`);
         await registerPushToken(loggedInEntity.id);
 
       } else {
@@ -98,7 +98,7 @@ export default function SignInScreen() {
     }
 
     if (finalStatus !== 'granted') {
-      console.log('Permissão de notificação não concedida.');
+      //console.log('Permissão de notificação não concedida.');
       return;
     }
 
@@ -106,19 +106,19 @@ export default function SignInScreen() {
     try {
       if (Platform.OS === 'android') {
         // Para Android, vamos pegar o token NATIVO direto do FCM.
-        console.log("Tentando obter o token NATIVO do FCM...");
+        //console.log("Tentando obter o token NATIVO do FCM...");
         token = (await Notifications.getDevicePushTokenAsync()).data;
-        console.log("Token NATIVO do FCM obtido:", token);
+        //console.log("Token NATIVO do FCM obtido:", token);
       } else {
         // Para outras plataformas (iOS), continuamos com o token da Expo.
         token = (await Notifications.getExpoPushTokenAsync()).data;
-        console.log("Token do Expo obtido:", token);
+        //console.log("Token do Expo obtido:", token);
       }
     } catch (e) {
         console.error("Falha ao obter o token de notificação:", e);
         // Se a busca pelo token nativo falhar, tentamos o da Expo como fallback.
         token = (await Notifications.getExpoPushTokenAsync()).data;
-        console.log("Usando token do Expo como fallback:", token);
+        //console.log("Usando token do Expo como fallback:", token);
     }
     // --- FIM DO TESTE ---
 
@@ -129,11 +129,11 @@ export default function SignInScreen() {
         await setDoc(doc(db, 'users', String(userId)), {
             expoPushToken: token
         }, { merge: true });
-        console.log(`Token salvo para o usuário ${userId}. Verifique o Firestore.`);
+        //console.log(`Token salvo para o usuário ${userId}. Verifique o Firestore.`);
     }
     
   } else {
-    console.log('Deve ser um dispositivo físico para receber notificações push.');
+    //console.log('Deve ser um dispositivo físico para receber notificações push.');
   }
 }
 

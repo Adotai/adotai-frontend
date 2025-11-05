@@ -3,7 +3,7 @@ import { View, Text, Image, StyleSheet, Dimensions, Pressable, ScrollView, Touch
 import { Theme } from '../../../constants/Themes';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../../types';
+import { Animal, RootStackParamList } from '../../types';
 import { useNavigation } from '@react-navigation/native';
 import CustomButton from '../../Components/CustomButton';
 import { approveAnimalSubmission, updateAnimalStatus } from '../../actions/ongActions';
@@ -28,7 +28,7 @@ export default function ONGAnimalDetails({ route }: any) {
     }
   };
 
-  const handleApprove = async (animalId: number) => {
+  const handleApprove = async (animalId: Animal) => {
   try {
     await approveAnimalSubmission(animalId);
     Alert.alert("Sucesso", "O animal foi aprovado!");

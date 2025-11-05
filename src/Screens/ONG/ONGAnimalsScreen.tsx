@@ -1,106 +1,149 @@
-import React, { useState, useEffect } from 'react'; // 1. Importar useState e useEffect
+import React, { useState, useEffect, useMemo } from 'react'; // 1. Importar useMemo
 import {
   View,
   Text,
   StyleSheet,
   FlatList,
   StatusBar,
-  TouchableOpacity, // 2. Importar TouchableOpacity
-  TextInput,      // 3. Importar TextInput
-  ActivityIndicator // 4. Importar ActivityIndicator
+  TouchableOpacity,
+  TextInput,
+  ActivityIndicator
 } from 'react-native';
-// ... (outras importações)
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { fetchAnimalsByOng } from '../../actions/ongActions';
 import { Theme } from '../../../constants/Themes';
-import { Ionicons } from '@expo/vector-icons'; // 5. Importar Ionicons
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { getLoggedOngId } from '../../actions/userActions';
 import DogCard from '../../Components/DogCard';
 import { RootStackParamList } from '../../types';
 
 export default function ONGAnimalsScreen({ }) {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  // 6. Estados para a lista original, a lista filtrada, e o filtro
-  const [originalAnimals, setOriginalAnimals] = React.useState<any[]>([]); // Guarda a lista completa
-  const [filteredAnimals, setFilteredAnimals] = React.useState<any[]>([]); // Guarda a lista exibida
+  const [originalAnimals, setOriginalAnimals] = React.useState<any[]>([]); // Guarda os aprovados
   const [refreshing, setRefreshing] = React.useState(false);
-  const [loading, setLoading] = React.useState(true); // Estado de loading inicial
-  const [isFilterVisible, setIsFilterVisible] = React.useState(false); // Controla a barra de busca
-  const [searchQuery, setSearchQuery] = React.useState(''); // Controla o texto da busca
+  const [loading, setLoading] = React.useState(true);
+  const [showFilters, setShowFilters] = React.useState(false);
+  const [searchQuery, setSearchQuery] = React.useState('');
+  // 2. Adicionar estado para o filtro de espécie
+  const [activeFilter, setActiveFilter] = React.useState<'all' | 'dog' | 'cat'>('all');
 
   const load = async () => {
     setLoading(true);
     const ongId = await getLoggedOngId();
     if (ongId) {
       const allAnimalsFromApi = await fetchAnimalsByOng(ongId);
-
-      // 1. FILTRAR PARA MOSTRAR SÓ ANIMAIS APROVADOS
-      // Aprovado = solicitationStatus é FALSE
       const approvedAnimals = allAnimalsFromApi.filter(animal =>
         animal.solicitationStatus === false
       );
-
       setOriginalAnimals(approvedAnimals);
-      setFilteredAnimals(approvedAnimals);
     } else {
-      // ...
+      setOriginalAnimals([]);
     }
     setLoading(false);
   };
 
+  // Recarrega quando a tela ganha foco
   React.useEffect(() => {
-    load();
-  }, []);
+    const unsubscribe = navigation.addListener('focus', () => {
+      load();
+    });
+    return unsubscribe;
+  }, [navigation]);
 
   const onRefresh = async () => {
     setRefreshing(true);
     await load();
-    setSearchQuery(''); // Limpa a busca ao atualizar
-    setIsFilterVisible(false); // Fecha o filtro ao atualizar
+    setSearchQuery('');
+    setShowFilters(false);
+    setActiveFilter('all'); // 3. Resetar filtro de espécie no refresh
     setRefreshing(false);
   };
 
-  // 9. Função que filtra a lista (no front-end)
-  const handleSearch = (text: string) => {
-    setSearchQuery(text);
-    if (text === '') {
-      // Se a busca está vazia, mostra todos os animais
-      setFilteredAnimals(originalAnimals);
-    } else {
-      // Filtra a lista original pelo nome
-      const filtered = originalAnimals.filter(animal =>
-        animal.name.toLowerCase().includes(text.toLowerCase())
+  // 4. USAR useMemo para filtragem combinada (copiado da sua tela base)
+  const filteredAnimals = React.useMemo(() => {
+    let tempAnimals = originalAnimals; // Começa com a lista de aprovados
+
+    // 1. Filtra por espécie
+    if (activeFilter === 'dog') {
+      tempAnimals = tempAnimals.filter(animal =>
+        animal.species?.toLowerCase() === 'cachorro' || animal.species?.toLowerCase() === 'dog'
       );
-      setFilteredAnimals(filtered);
+    } else if (activeFilter === 'cat') {
+      tempAnimals = tempAnimals.filter(animal =>
+        animal.species?.toLowerCase() === 'gato' || animal.species?.toLowerCase() === 'cat'
+      );
     }
-  };
+
+    // 2. Filtra o resultado anterior pela busca por nome
+    if (searchQuery !== '') {
+      tempAnimals = tempAnimals.filter(animal =>
+        animal.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    return tempAnimals;
+  }, [activeFilter, originalAnimals, searchQuery]); // 5. Depende dos 3 estados
 
   return (
     <>
       <StatusBar backgroundColor={Theme.TERTIARY} barStyle="light-content" />
       <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: Theme.BACK }}>
-        {/* 10. Header modificado com ícone */}
+        {/* Header */}
         <View style={styles.header}>
           <Text style={styles.headerTitle}>
-            Animais
+            Animais Disponíveis
           </Text>
-          <TouchableOpacity onPress={() => setIsFilterVisible(!isFilterVisible)}>
-            {/* Mostra 'fechar' se o filtro estiver aberto, 'buscar' se estiver fechado */}
-            <Ionicons name={isFilterVisible ? "close" : "search"} size={24} color={Theme.BACK} />
+          <TouchableOpacity onPress={() => setShowFilters(!showFilters)}>
+            {showFilters ? (
+              <MaterialCommunityIcons name="filter-check" size={28} color={Theme.PASTEL} />
+            ) : (
+              <MaterialCommunityIcons name="filter-menu-outline" size={28} color="#fff" />
+            )}
           </TouchableOpacity>
         </View>
 
-        {/* 11. Barra de Filtro (Renderização Condicional) */}
-        {isFilterVisible && (
-          <View style={styles.filterContainer}>
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Buscar por nome do animal..."
-              placeholderTextColor="#888"
-              value={searchQuery}
-              onChangeText={handleSearch} // Chama a função de filtro
-            />
+        {/* 6. Área de Filtro Completa (copiada da sua tela base) */}
+        {showFilters && (
+          <View style={styles.filterAreaContainer}>
+            {/* Barra de Busca */}
+            <View style={styles.searchContainer}>
+              <Ionicons name="search" size={20} color="#888" style={styles.searchIcon} />
+              <TextInput
+                style={styles.searchInput}
+                placeholder="Buscar por nome do animal..."
+                placeholderTextColor="#888"
+                value={searchQuery}
+                onChangeText={(text) => setSearchQuery(text)} // Atualiza o estado da busca
+              />
+              {searchQuery.length > 0 && (
+                <TouchableOpacity onPress={() => setSearchQuery('')}>
+                  <Ionicons name="close-circle" size={20} color="#888" style={styles.searchIcon} />
+                </TouchableOpacity>
+              )}
+            </View>
+
+            {/* Filtros de Espécie */}
+            <View style={styles.filtersRow}>
+              <TouchableOpacity
+                style={activeFilter === 'all' ? styles.activeBarFilter : styles.inactiveBarFilter}
+                onPress={() => setActiveFilter('all')}
+              >
+                <Text style={activeFilter === 'all' ? styles.activeFilterText : styles.inactiveFilterText}>Todos</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={activeFilter === 'cat' ? styles.activeBarFilter : styles.inactiveBarFilter}
+                onPress={() => setActiveFilter('cat')}
+              >
+                <Text style={activeFilter === 'cat' ? styles.activeFilterText : styles.inactiveFilterText}>Gatos</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={activeFilter === 'dog' ? styles.activeBarFilter : styles.inactiveBarFilter}
+                onPress={() => setActiveFilter('dog')}
+              >
+                <Text style={activeFilter === 'dog' ? styles.activeFilterText : styles.inactiveFilterText}>Cachorros</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         )}
 
@@ -109,7 +152,7 @@ export default function ONGAnimalsScreen({ }) {
             <ActivityIndicator size="large" color={Theme.PRIMARY} style={{ marginTop: 50 }} />
           ) : (
             <FlatList
-              data={filteredAnimals} // 12. Usa a lista FILTRADA
+              data={filteredAnimals} // 7. Usa a lista filtrada pelo useMemo
               keyExtractor={item => String(item.id)}
               renderItem={({ item }) => (
                 <DogCard
@@ -121,7 +164,6 @@ export default function ONGAnimalsScreen({ }) {
                   canEdit={true}
                 />
               )}
-              // 13. Mensagem de "vazio" melhorada
               ListEmptyComponent={
                 <Text style={styles.emptyText}>
                   {originalAnimals.length === 0
@@ -140,10 +182,9 @@ export default function ONGAnimalsScreen({ }) {
 }
 
 const styles = StyleSheet.create({
-  container: { // Este estilo não está sendo usado, pode remover se quiser
+  container: {
     flex: 1,
-    padding: 8,
-    backgroundColor: '#fff',
+    backgroundColor: Theme.BACK, // Usando Theme.BACK
   },
   header: {
     width: '100%',
@@ -157,26 +198,73 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 24,
     fontFamily: 'Poppins-Bold',
-    color: Theme.BACK,
+    color: Theme.BACK
   },
-  // 14. Novos estilos adicionados
-  filterContainer: {
+  listContainer: {
+    paddingBottom: 20,
+    paddingHorizontal: 10,
+    paddingTop: 10, // Adiciona um espaço no topo da lista
+  },
+  filterAreaContainer: {
+    padding: 10,
     backgroundColor: '#fff',
-    padding: 8,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
   },
-  searchInput: {
-    height: 40,
-    backgroundColor: Theme.BACK,
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Theme.BACK, // Fundo cinza claro
     borderRadius: 8,
-    paddingHorizontal: 12,
+    paddingHorizontal: 10,
+    marginBottom: 10, // Espaço entre a busca e os botões
+  },
+  searchIcon: {
+    marginRight: 8,
+  },
+  searchInput: {
+    flex: 1,
+    height: 40,
     fontSize: 16,
     fontFamily: 'Poppins-Regular',
   },
-  listContainer: {
-    flex: 1,
-    padding: 8,
+  filtersRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around', // space-around fica melhor
+    alignItems: 'center',
+    // Removido o margin para o container pai controlar
+  },
+  activeBarFilter: {
+    paddingVertical: 8,
+    paddingHorizontal: 8, // Padding horizontal
+    borderWidth: 2,
+    borderRadius: 8,
+    borderColor: Theme.PRIMARY,
+    backgroundColor: Theme.PASTEL,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1, // Faz os botões ocuparem espaço igual
+    marginHorizontal: 4, // Adiciona espaço entre botões
+  },
+  activeFilterText: {
+    fontFamily: "Poppins-SemiBold",
+    color: Theme.PRIMARY
+  },
+  inactiveFilterText: {
+    fontFamily: "Poppins-SemiBold",
+    color: 'grey'
+  },
+  inactiveBarFilter: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderWidth: 2,
+    borderRadius: 8,
+    borderColor: Theme.INPUT,
+    backgroundColor: Theme.BACK,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1, // Faz os botões ocuparem espaço igual
+    marginHorizontal: 4, // Adiciona espaço entre botões
   },
   emptyText: {
     textAlign: 'center',

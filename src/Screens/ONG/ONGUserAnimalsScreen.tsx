@@ -8,45 +8,38 @@ import {
   TextInput,
   ActivityIndicator
 } from 'react-native'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react' 
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { RootStackParamList } from '../../types';
 import { getLoggedOngId } from '../../actions/userActions';
-// 1. Mude a importação de 'fetchUserAnimals' para 'fetchAnimalsByOng'
-import { fetchAnimalsByOng,  fetchUserAnimals } from '../../actions/ongActions'; // Verifique o caminho
+import { fetchUserAnimals } from '../../actions/ongActions';
 import DogCard from '../../Components/DogCard';
 import { Theme } from '../../../constants/Themes';
-import { Ionicons } from '@expo/vector-icons';
-import { Alert } from 'react-native'; // Importar Alert
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function ONGUserAnimalsScreen() {
 
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  const [originalAnimals, setOriginalAnimals] = React.useState<any[]>([]); // Guarda a lista de pendentes
-  const [filteredAnimals, setFilteredAnimals] = React.useState<any[]>([]); // Guarda a lista filtrada
+  const [originalAnimals, setOriginalAnimals] = React.useState<any[]>([]);
   const [refreshing, setRefreshing] = React.useState(false);
   const [loading, setLoading] = React.useState(true);
-  const [isFilterVisible, setIsFilterVisible] = React.useState(false);
+  const [showFilters, setShowFilters] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState('');
+  const [activeFilter, setActiveFilter] = React.useState<'all' | 'dog' | 'cat'>('all');
 
   const load = async () => {
     setLoading(true);
     const ongId = await getLoggedOngId();
     if (ongId) {
-      // 1. Chame a action correta (que o backend já filtra)
       const animalsFromApi = await fetchUserAnimals(ongId);
-
-      // 2. NÃO PRECISA MAIS FILTRAR NO FRONTEND
       setOriginalAnimals(animalsFromApi);
-      setFilteredAnimals(animalsFromApi);
     } else {
-      // ...
+      setOriginalAnimals([]);
     }
     setLoading(false);
   };
 
-  // Recarrega a lista quando a tela recebe foco (ex: após aprovar um animal)
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       load();
@@ -58,45 +51,32 @@ export default function ONGUserAnimalsScreen() {
     setRefreshing(true);
     await load();
     setSearchQuery('');
-    setIsFilterVisible(false);
+    setShowFilters(false);
+    setActiveFilter('all'); 
     setRefreshing(false);
   };
 
-  const handleSearch = (text: string) => {
-    setSearchQuery(text);
-    if (text === '') {
-      setFilteredAnimals(originalAnimals); // Mostra todos os pendentes
-    } else {
-      // Filtra a lista de pendentes pelo nome
-      const filtered = originalAnimals.filter(animal =>
-        animal.name.toLowerCase().includes(text.toLowerCase())
-      );
-      setFilteredAnimals(filtered);
-    }
-  };
+  const filteredAnimals = React.useMemo(() => {
+    let tempAnimals = originalAnimals; 
 
-  // 4. Função para o botão "Aprovar"
-  const handleApprove = async (animal: any) => {
-    Alert.alert(
-      "Aprovar Animal",
-      `Você tem certeza que deseja aprovar "${animal.name}"? Esta ação o tornará público para adoção.`,
-      [
-        { text: "Cancelar", style: "cancel" },
-        {
-          text: "Aprovar",
-          style: "default",
-          onPress: async () => {
-            try {
-            
-              Alert.alert("Ação Incompleta", "A action 'approveAnimalSubmission' precisa ser ajustada para enviar { solicitationStatus: false }.");
-            } catch (error) {
-              console.error("Erro ao aprovar:", error);
-            }
-          }
-        }
-      ]
-    );
-  };
+   if (activeFilter === 'dog') {
+      tempAnimals = tempAnimals.filter(animal =>
+        animal.species?.toLowerCase() === 'cachorro' || animal.species?.toLowerCase() === 'dog'
+      );
+    } else if (activeFilter === 'cat') {
+      tempAnimals = tempAnimals.filter(animal =>
+        animal.species?.toLowerCase() === 'gato' || animal.species?.toLowerCase() === 'cat'
+      );
+    }
+
+    if (searchQuery !== '') {
+      tempAnimals = tempAnimals.filter(animal =>
+        animal.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    return tempAnimals;
+  }, [activeFilter, originalAnimals, searchQuery]); 
 
   return (
     <>
@@ -107,14 +87,17 @@ export default function ONGUserAnimalsScreen() {
           <Text style={styles.headerTitle}>
             Solicitações
           </Text>
-          <TouchableOpacity onPress={() => setIsFilterVisible(!isFilterVisible)}>
-            <Ionicons name={isFilterVisible ? "close" : "search"} size={24} color={Theme.BACK} />
+          <TouchableOpacity onPress={() => setShowFilters(!showFilters)}>
+            {showFilters ? (
+              <MaterialCommunityIcons name="filter-check" size={28} color={Theme.PASTEL} />
+            ) : (
+              <MaterialCommunityIcons name="filter-menu-outline" size={28} color="#fff" />
+            )}
           </TouchableOpacity>
         </View>
 
-        {/* Barra de Filtro */}
-        {isFilterVisible && (
-          <View style={styles.filterContainer}>
+        {showFilters && (
+          <View style={styles.filterAreaContainer}>
             <View style={styles.searchContainer}>
               <Ionicons name="search" size={20} color="#888" style={styles.searchIcon} />
               <TextInput
@@ -122,13 +105,34 @@ export default function ONGUserAnimalsScreen() {
                 placeholder="Buscar por nome do animal..."
                 placeholderTextColor="#888"
                 value={searchQuery}
-                onChangeText={handleSearch}
+                onChangeText={(text) => setSearchQuery(text)} 
               />
               {searchQuery.length > 0 && (
-                <TouchableOpacity onPress={() => handleSearch('')}>
+                <TouchableOpacity onPress={() => setSearchQuery('')}>
                   <Ionicons name="close-circle" size={20} color="#888" style={styles.searchIcon} />
                 </TouchableOpacity>
               )}
+            </View>
+
+            <View style={styles.filtersRow}>
+              <TouchableOpacity
+                style={activeFilter === 'all' ? styles.activeBarFilter : styles.inactiveBarFilter}
+                onPress={() => setActiveFilter('all')}
+              >
+                <Text style={activeFilter === 'all' ? styles.activeFilterText : styles.inactiveFilterText}>Todos</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={activeFilter === 'cat' ? styles.activeBarFilter : styles.inactiveBarFilter}
+                onPress={() => setActiveFilter('cat')}
+              >
+                <Text style={activeFilter === 'cat' ? styles.activeFilterText : styles.inactiveFilterText}>Gatos</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={activeFilter === 'dog' ? styles.activeBarFilter : styles.inactiveBarFilter}
+                onPress={() => setActiveFilter('dog')}
+              >
+                <Text style={activeFilter === 'dog' ? styles.activeFilterText : styles.inactiveFilterText}>Cachorros</Text>
+              </TouchableOpacity>
             </View>
           </View>
         )}
@@ -138,7 +142,7 @@ export default function ONGUserAnimalsScreen() {
             <ActivityIndicator size="large" color={Theme.PRIMARY} style={{ marginTop: 50 }} />
           ) : (
             <FlatList
-              data={filteredAnimals}
+              data={filteredAnimals} 
               keyExtractor={item => String(item.id)}
               renderItem={({ item }) => (
                 <DogCard
@@ -146,17 +150,15 @@ export default function ONGUserAnimalsScreen() {
                   image={item.photos && item.photos.length > 0 ? item.photos[0].photoUrl : ''}
                   location={item.species === 'DOG' ? 'Cachorro' : 'Gato'}
                   onPress={() => navigation.navigate('ONGAnimalDetails', { animal: item })}
-                  status={false} // Dizemos ao card que ele NÃO está adotado
-                  statusText="Pendente" // E passamos o texto que queremos exibir
+                  status={false}
+                  statusText="Pendente"
                   canEdit={true}
-                // Aqui você pode adicionar um botão "Aprovar" no seu DogCard
-                // onApprove={() => handleApprove(item)} 
                 />
               )}
               ListEmptyComponent={
                 <Text style={styles.emptyText}>
                   {originalAnimals.length === 0
-                    ? "Nenhuma solicitação pendente." // Texto atualizado
+                    ? "Nenhuma solicitação pendente."
                     : "Nenhum animal encontrado com esse nome."}
                 </Text>
               }
@@ -171,6 +173,10 @@ export default function ONGUserAnimalsScreen() {
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: Theme.BACK, 
+  },
   header: {
     width: '100%',
     padding: 16,
@@ -185,18 +191,24 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins-Bold',
     color: Theme.BACK
   },
-  filterContainer: {
+  listContainer: {
+    paddingBottom: 20,
+    paddingHorizontal: 10,
+    paddingTop: 10, 
+  },
+  filterAreaContainer: {
+    padding: 10,
     backgroundColor: '#fff',
-    padding: 8,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Theme.BACK,
+    backgroundColor: Theme.BACK, 
     borderRadius: 8,
     paddingHorizontal: 10,
+    marginBottom: 10,
   },
   searchIcon: {
     marginRight: 8,
@@ -204,15 +216,45 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     height: 40,
-    backgroundColor: Theme.BACK,
-    borderRadius: 8,
-    paddingHorizontal: 12,
     fontSize: 16,
     fontFamily: 'Poppins-Regular',
   },
-  listContainer: {
-    flex: 1,
-    padding: 8,
+  filtersRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around', 
+    alignItems: 'center',
+  },
+  activeBarFilter: {
+    paddingVertical: 8,
+    paddingHorizontal: 8,
+    borderWidth: 2,
+    borderRadius: 8,
+    borderColor: Theme.PRIMARY,
+    backgroundColor: Theme.PASTEL,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1, 
+    marginHorizontal: 4, 
+  },
+  activeFilterText: {
+    fontFamily: "Poppins-SemiBold",
+    color: Theme.PRIMARY
+  },
+  inactiveFilterText: {
+    fontFamily: "Poppins-SemiBold",
+    color: 'grey'
+  },
+  inactiveBarFilter: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderWidth: 2,
+    borderRadius: 8,
+    borderColor: Theme.INPUT,
+    backgroundColor: Theme.BACK,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1, 
+    marginHorizontal: 4, 
   },
   emptyText: {
     textAlign: 'center',

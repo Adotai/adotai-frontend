@@ -379,7 +379,6 @@ export default function App() {
                 headerShown: true,
                 headerTitle: 'Chat',
                 headerTintColor: Theme.PRIMARY,
-                headerTitleAlign: 'center',
                 headerTransparent: false,
               }}
             />
