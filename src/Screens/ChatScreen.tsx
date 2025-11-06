@@ -47,7 +47,7 @@ const ChatScreen = () => {
   useEffect(() => {
   
     if (!chatId || !loggedInUserId || !userRole) {
-      console.warn('Aguardando dados', { chatId: !!chatId, loggedInUserId: !!loggedInUserId, userRole: !!userRole }); 
+      //console.warn('Aguardando dados', { chatId: !!chatId, loggedInUserId: !!loggedInUserId, userRole: !!userRole }); 
       return; 
     }
 
@@ -104,7 +104,7 @@ const ChatScreen = () => {
     if (otherRole === 'ong') {
       navigation.navigate('UserONGDetail', { ong: participantObject });
     } else {
-      Alert.alert("Perfil do Usuário", "A visualização de perfis de usuário ainda não está disponível.");
+      navigation.navigate('ONGUserProfile', { user: participantObject });
     }
   };
 

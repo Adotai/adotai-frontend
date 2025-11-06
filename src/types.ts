@@ -91,4 +91,5 @@ export type RootStackParamList = {
     UserAnimalONG: {
         ong: string
     }
+    ONGUserProfile: { user: any };
 }

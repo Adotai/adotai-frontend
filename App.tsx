@@ -37,6 +37,7 @@ import ONGUserAnimalsScreen from './src/Screens/ONG/ONGUserAnimalsScreen';
 import ChatScreen from './src/Screens/ChatScreen';
 import * as Notifications from 'expo-notifications'; 
 import ONGNotificationsScreen from './src/Screens/ONG/ONGNotificationsScreen';
+import ONGUserProfileScreen from './src/Screens/ONG/ONGUserProfileScreen';
 
 
 const Stack = createStackNavigator();
@@ -381,6 +382,16 @@ export default function App() {
                 headerTintColor: Theme.PRIMARY,
                 headerTransparent: false,
               }}
+            />
+
+            <Stack.Screen
+              name="ONGUserProfile"
+              component={ONGUserProfileScreen}
+              options={{
+  headerShown: true,
+                headerTransparent: true,
+                headerTitle: '',
+                headerTintColor: '#FFFFFF',              }}
             />
           </Stack.Navigator>
         </SafeAreaView>
