@@ -9,6 +9,7 @@ import Constants from 'expo-constants';
 import { TextInput } from 'react-native-paper';
 import CustomButton from '../../Components/CustomButton';
 import { deleteOngPhotos, fetchLoggedOng, updateOng } from '../../actions/ongActions';
+import { uploadFileToStorage } from '../../services/uploadFileToStorage';
 
 const { width, height } = Dimensions.get('window');
 
@@ -96,6 +97,29 @@ export default function ONGEditProfileScreen({ route }: any) {
     const handleSave = async () => {
         try {
             if (!ong) return;
+
+             const finalPhotos = [];
+            for (let i = 0; i < photos.length; i++) {
+              const img = photos[i];
+            
+              // Determina qual é a URL/URI atual da imagem
+              const currentPath = img.uri || img.photoUrl;
+            
+              // VERIFICAÇÃO RIGOROSA:
+              // Se começa com 'file://' ou 'content://', É LOCAL e PRECISA de upload.
+              if (currentPath && (currentPath.startsWith('file://') || currentPath.startsWith('content://'))) {
+                  // console.log("Detectada imagem local, fazendo upload:", currentPath);
+                  const path = `users/${ong.id}/profile/${Date.now()}_${i}.jpg`;
+                  const url = await uploadFileToStorage(currentPath, path);
+                  // Adiciona na lista final COM A NOVA URL DO FIREBASE
+                  finalPhotos.push({ photoUrl: url });
+              }
+              // Se já começa com 'http', assume que já está certa no Firebase/S3
+              else if (img.photoUrl && img.photoUrl.startsWith('http')) {
+                  finalPhotos.push({ id: img.id, photoUrl: img.photoUrl });
+              }
+            }
+            
             const updatedAddress = {
                 ...ong.address,
                 street,
@@ -111,10 +135,7 @@ export default function ONGEditProfileScreen({ route }: any) {
                 cnpj: ong.cnpj,
                 email: ong.email,
                 password: '',
-                photos: photos.map((p: any) => ({
-                    id: p.id,
-                    photoUrl: p.photoUrl
-                })),
+                photos: finalPhotos,
                 description,
                 address: updatedAddress
             };
