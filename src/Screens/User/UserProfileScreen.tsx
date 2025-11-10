@@ -117,6 +117,19 @@ export default function UserProfileScreen({ navigation }: any) {
             <Text style={[styles.label]}>Dados pessoais</Text>
             <Ionicons name="chevron-forward" size={20} color={Theme.PRIMARY} style={styles.chevron} />
           </TouchableOpacity>
+
+          {/* NOVA OPÇÃO: Minhas adoções */}
+          <TouchableOpacity
+            style={styles.option}
+            onPress={() => navigation.navigate('UserAdoptions')}
+          >
+            <View style={styles.iconContainer}>
+              <Ionicons name='paw-outline' size={25} color={Theme.PRIMARY} />
+            </View>
+            <Text style={[styles.label]}>Minhas adoções</Text>
+            <Ionicons name="chevron-forward" size={20} color={Theme.PRIMARY} style={styles.chevron} />
+          </TouchableOpacity>
+
           <TouchableOpacity style={styles.option} onPress={() => {setIsPasswordModalVisible(true)}}>
             <View style={styles.iconContainer}>
               <Ionicons name='lock-closed-outline' size={25} color={Theme.PRIMARY} />

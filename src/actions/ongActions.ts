@@ -3,6 +3,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Alert } from 'react-native';
 import Constants from 'expo-constants';
 import { Animal } from '../types';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { db } from '../services/firebaseConfig';
 
 const USER_ROUTE = Constants.expoConfig?.extra?.USER_ROUTE;
 
@@ -232,5 +234,34 @@ export const approveAnimalSubmission = async (animal: Animal): Promise<any> => {
     console.error(`Erro ao aprovar animal ${animal}:`, error.response?.data || error.message);
     Alert.alert("Erro", "Não foi possível aprovar o animal.");
     throw error;
+  }
+};
+
+export const adoptAnimal = async (animal: any, userId: number, userName: string): Promise<void> => {
+  try {
+    const token = await AsyncStorage.getItem('authToken');
+    // ... validações ...
+
+    // 1. Chama o Backend Java (O "oficial")
+    await axios.put(
+      `${USER_ROUTE}/animal/adopt/${animal.id}/${userId}`,
+      {},
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    // 2. Salva no Firestore (Para listagem fácil no app do usuário)
+    await addDoc(collection(db, 'adoptedAnimals'), {
+        animalId: animal.id,
+        animalName: animal.name,
+        animalPhoto: animal.photos?.[0]?.photoUrl || null,
+        userId: userId,
+        userName: userName,
+        ongId: animal.ongId,
+        adoptedAt: serverTimestamp()
+    });
+
+  } catch (error) {
+     console.error("Erro na adoção:", error);
+     throw error;
   }
 };

@@ -219,8 +219,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderBottomWidth: 1, // Linha separadora
     borderBottomColor: '#f0f0f0',
-    elevation: 1
-  },
+    elevation: 1,
+    marginHorizontal: 8,
+    borderRadius: 8,
+    marginVertical: 4,  },
   chatItemText: {
     fontFamily: 'Poppins-SemiBold',
     fontSize: 16,

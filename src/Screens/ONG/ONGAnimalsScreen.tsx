@@ -91,9 +91,17 @@ export default function ONGAnimalsScreen({ }) {
       <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: Theme.BACK }}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>
-            Animais Disponíveis
-          </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+            <Text style={styles.headerTitle}>Animais</Text>
+          </View>
+          {/* Ícone de filtro */}
+          <TouchableOpacity
+              onPress={() => navigation.navigate('CreateAnimal')}
+              style={{ marginRight: 12,  borderRadius: 8, padding: 8, flexDirection: 'row', alignItems: 'center' }}
+            >
+              {/* <Text style={styles.createAnimalText}>Cadastrar</Text> */}
+             <Ionicons name="add-circle-outline" size={28} color="#fff" />
+            </TouchableOpacity>
           <TouchableOpacity onPress={() => setShowFilters(!showFilters)}>
             {showFilters ? (
               <MaterialCommunityIcons name="filter-check" size={28} color={Theme.PASTEL} />
@@ -198,6 +206,11 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 24,
     fontFamily: 'Poppins-Bold',
+    color: Theme.BACK
+  },
+  createAnimalText: {
+    fontSize: 14,
+    fontFamily: 'Poppins-Regular',
     color: Theme.BACK
   },
   listContainer: {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, Dimensions, Pressable, ScrollView, TouchableOpacity, Alert, StatusBar } from 'react-native';
 import { Theme } from '../../../constants/Themes';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -7,6 +7,9 @@ import { Animal, RootStackParamList } from '../../types';
 import { useNavigation } from '@react-navigation/native';
 import CustomButton from '../../Components/CustomButton';
 import { approveAnimalSubmission, updateAnimalStatus } from '../../actions/ongActions';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import { db } from '../../services/firebaseConfig';
 
 
 export default function ONGAnimalDetails({ route }: any) {
@@ -17,26 +20,30 @@ export default function ONGAnimalDetails({ route }: any) {
   const { width, height } = Dimensions.get('window');
   const [current, setCurrent] = useState(0);
   const [animalStatus, setAnimalStatus] = useState(animal.status);
+  const [likeCount, setLikeCount] = useState(0);
 
-  const handleToggleStatus = async () => {
-    try {
-      await updateAnimalStatus(animal, !animalStatus);
-      setAnimalStatus(!animalStatus);
-      Alert.alert('Sucesso', `Animal ${!animalStatus ? 'disponível para adoção' : 'marcado como adotado'}!`);
-    } catch (e) {
-      Alert.alert('Erro', 'Não foi possível atualizar o status.');
-    }
-  };
+  useEffect(() => {
+    const q = query(
+      collection(db, 'userLikes'),
+      where('animalId', '==', animal.id)
+    );
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setLikeCount(snapshot.size);
+    }, (error) => {
+        console.error("Erro ao buscar likes:", error);
+    });
+    return () => unsubscribe();
+  }, [animal.id]);
 
   const handleApprove = async (animalId: Animal) => {
-  try {
-    await approveAnimalSubmission(animalId);
-    Alert.alert("Sucesso", "O animal foi aprovado!");
+    try {
+      await approveAnimalSubmission(animalId);
+      Alert.alert("Sucesso", "O animal foi aprovado!");
 
-  } catch (error) {
-    Alert.alert("Erro", "Não foi possível aprovar o animal.");
-  }
-};
+    } catch (error) {
+      Alert.alert("Erro", "Não foi possível aprovar o animal.");
+    }
+  };
 
   const photos = animal.photos || [];
 
@@ -51,155 +58,163 @@ export default function ONGAnimalDetails({ route }: any) {
   return (
     <>
       <StatusBar backgroundColor='transparent' barStyle="dark-content" />
-      <ScrollView style={{ flex: 1 }}>
-        <View style={{ width, height: height * 0.55, position: 'relative', alignSelf: 'center', justifyContent: 'center', alignItems: 'center' }}>
-          {photos.length > 0 ? (
-            <>
-              <Image
-                source={{ uri: photos[current]?.photoUrl }}
-                style={{ width, height: "100%", }}
-              />
-              <Pressable
-                style={{ position: 'absolute', left: 0, top: 0, width: width / 2, height: '100%' }}
-                onPress={handlePrev}
-              />
-              <Pressable
-                style={{ position: 'absolute', right: 0, top: 0, width: width / 2, height: '100%' }}
-                onPress={handleNext}
-              />
-              <View style={[styles.progressBarContainer, { position: 'absolute', bottom: 64, left: 0, right: 0 }]}>
-                {photos.map((_: any, idx: number) => (
-                  <View
-                    key={idx}
-                    style={[
-                      styles.progressBar,
-                      idx === current
-                        ? styles.progressBarActive
-                        : styles.progressBarInactive,
-                    ]}
-                  />
-                ))}
+      <SafeAreaView style={{ flex: 1, backgroundColor: Theme.BACK }} edges={['bottom']}>
+
+        <ScrollView style={{ flex: 1 }}>
+          <View style={{ width, height: height * 0.55, position: 'relative', alignSelf: 'center', justifyContent: 'center', alignItems: 'center' }}>
+            {photos.length > 0 ? (
+              <>
+                <Image
+                  source={{ uri: photos[current]?.photoUrl }}
+                  style={{ width, height: "100%", }}
+                />
+                <Pressable
+                  style={{ position: 'absolute', left: 0, top: 0, width: width / 2, height: '100%' }}
+                  onPress={handlePrev}
+                />
+                <Pressable
+                  style={{ position: 'absolute', right: 0, top: 0, width: width / 2, height: '100%' }}
+                  onPress={handleNext}
+                />
+                <View style={[styles.progressBarContainer, { position: 'absolute', bottom: 64, left: 0, right: 0 }]}>
+                  {photos.map((_: any, idx: number) => (
+                    <View
+                      key={idx}
+                      style={[
+                        styles.progressBar,
+                        idx === current
+                          ? styles.progressBarActive
+                          : styles.progressBarInactive,
+                      ]}
+                    />
+                  ))}
+                </View>
+              </>
+            ) : (
+              <View style={{ width: '100%', height: height * 0.5, justifyContent: 'center', alignItems: 'center', borderRadius: 12 }}>
+                <Text style={{ color: '#888', fontSize: 18 }}>Nenhuma foto disponível</Text>
               </View>
-            </>
-          ) : (
-            <View style={{ width: '100%', height: height * 0.5, justifyContent: 'center', alignItems: 'center', borderRadius: 12 }}>
-              <Text style={{ color: '#888', fontSize: 18 }}>Nenhuma foto disponível</Text>
+            )}
+          </View>
+          <View style={{ flex: 1 }} >
+            <View style={[styles.info, { marginTop: -50 }]}>
+              <View style={styles.headerRow}>
+                  <Text style={styles.name}>{animal.name}</Text>
+                  
+                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                      {!animalStatus && (
+                        <View style={styles.adoptedBadge}>
+                          <Text style={styles.adoptedText}>Adotado</Text>
+                        </View>
+                      )}
+                     {animal.solicitationStatus === false ? (
+                         <View style={styles.likeContainer}>
+                          <Ionicons name="heart" size={24} color={Theme.PRIMARY} />
+                          <Text style={styles.likeCountText}>
+                            {likeCount} {likeCount === 1 ? 'like' : 'likes'}
+                          </Text>
+                      </View>
+                      ) : null}
+                     
+                  </View>
+              </View>
+              <View style={[{ flexDirection: 'row', padding: 16, paddingBottom: 8, paddingTop: 0 }]}>
+                <Ionicons name="paw-outline" size={24} color={'#555'} />
+                <Text style={[styles.value, { marginLeft: 8 }]}>{animal.species === 'DOG' ? 'Cachorro' : 'Gato'}</Text>
+                <Text style={styles.value}> - </Text>
+                <Text style={styles.value}>{animal.breed}</Text>
+              </View>
+              <View style={[{ paddingLeft: 16, paddingBottom: 8, flexDirection: 'row' }]}>
+                <Ionicons
+                  name={animal.gender === 'male' ? 'male' : 'female'}
+                  size={24}
+                  color={'#555'}
+                />
+                <Text style={[styles.value, { marginLeft: 8 }]}>{animal.gender === 'male' ? 'Macho' : 'Fêmea'}</Text>
+              </View>
             </View>
+            <View style={[styles.info, { paddingLeft: 16, paddingTop: 16, paddingBottom: 16 }]}>
+              <Text style={{ fontFamily: 'Poppins-Bold', fontSize: 20, color: Theme.TERTIARY }}>Sobre o Animal</Text>
+              <View style={[styles.row, { flexDirection: 'column' }]}>
+                <Text style={[styles.label]}>Descrição do animal:</Text>
+                <Text style={styles.value}>{animal.animalDescription}</Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.label}>Cor:</Text>
+                <Text style={styles.value}>{animal.color}</Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.label}>Idade:</Text>
+                <Text style={styles.value}>{animal.age} anos</Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.label}>Saúde:</Text>
+                <Text style={styles.value}>
+                  {animal.health === 'healthy' && 'Saudável'}
+                  {animal.health === 'sick' && 'Doente'}
+                  {animal.health === 'disabled' && 'Deficiente'}
+                  {animal.health === 'recovering' && 'Recuperando'}
+                  {animal.health === 'unknown' && 'Desconhecido'}
+                </Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.label}>Temperamento:</Text>
+                <Text style={styles.value}>
+                  {animal.temperament === 'calm' && 'Calmo'}
+                  {animal.temperament === 'playful' && 'Brincalhão'}
+                  {animal.temperament === 'aggressive' && 'Agressivo'}
+                  {animal.temperament === 'shy' && 'Tímido'}
+                  {animal.temperament === 'protective' && 'Protetor'}
+                  {animal.temperament === 'sociable' && 'Sociável'}
+                  {animal.temperament === 'independent' && 'Independente'}
+                  {animal.temperament === 'unknown' && 'Indefinido'}
+                </Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.label}>Porte:</Text>
+                <Text style={styles.value}>
+                  {animal.size === 'medio' && 'Médio'}
+                  {animal.size === 'pequeno' && 'Pequeno'}
+                  {animal.size === 'grande' && 'Grande'}
+                </Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.label}>Vacinado:</Text>
+                <Text style={styles.value}>{animal.vaccinated ? 'Sim' : 'Não'}</Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.label}>Castrado:</Text>
+                <Text style={styles.value}>{animal.neutered ? 'Sim' : 'Não'}</Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.label}>Vermifugado:</Text>
+                <Text style={styles.value}>{animal.dewormed ? 'Sim' : 'Não'}</Text>
+              </View>
+            </View>
+
+          </View>
+
+        </ScrollView>
+        <View style={styles.footer}>
+          {animal.solicitationStatus === true ? (
+            <CustomButton
+              color={Theme.TERTIARY}
+              title='Aprovar Cadastro'
+              onPress={() => handleApprove(animal.id)}
+              buttonStyle={styles.footerButton} 
+              textStyle={{ fontSize: 16, fontFamily: 'Poppins-SemiBold', color: Theme.BACK }}
+            />
+          ) : (
+            <CustomButton
+              title="Registrar Adoção"
+              color={Theme.TERTIARY}
+              onPress={() => navigation.navigate('SelectAdopter', { animal: animal })}
+              buttonStyle={styles.footerButton} 
+              textStyle={{ fontSize: 16, fontFamily: 'Poppins-SemiBold', color: Theme.BACK }}
+            />
           )}
         </View>
-        <View style={{ flex: 1 }} >
-          <View style={[styles.info, { marginTop: -50 }]}>
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              <Text style={styles.name}>{animal.name}</Text>
-              {!animalStatus && (
-                <View style={{
-                  borderWidth: 2,
-                  borderColor: Theme.TERTIARY,
-                  borderRadius: 6,
-                  
-                  padding: 4,
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}>
-                  <Text style={{
-                    color: Theme.TERTIARY,
-                    fontFamily: 'Poppins-SemiBold',
-                    fontSize: 14
-                  }}>
-                    Adotado
-                  </Text>
-                </View>
-              )}
-            </View>
-            <View style={[{ flexDirection: 'row', padding: 16, paddingBottom: 8, paddingTop: 0 }]}>
-              <Ionicons name="paw-outline" size={24} color={'#555'} />
-              <Text style={[styles.value, { marginLeft: 8 }]}>{animal.species === 'DOG' ? 'Cachorro' : 'Gato'}</Text>
-              <Text style={styles.value}> - </Text>
-              <Text style={styles.value}>{animal.breed}</Text>
-            </View>
-            <View style={[{ paddingLeft: 16, paddingBottom: 8, flexDirection: 'row' }]}>
-              <Ionicons
-                name={animal.gender === 'male' ? 'male' : 'female'}
-                size={24}
-                color={'#555'}
-              />
-              <Text style={[styles.value, { marginLeft: 8 }]}>{animal.gender === 'male' ? 'Macho' : 'Fêmea'}</Text>
-            </View>
-          </View>
-          <View style={[styles.info, { paddingLeft: 16, paddingTop: 16, paddingBottom: 16 }]}>
-            <Text style={{ fontFamily: 'Poppins-Bold', fontSize: 20, color: Theme.TERTIARY }}>Sobre o Animal</Text>
-            <View style={[styles.row, { flexDirection: 'column' }]}>
-              <Text style={[styles.label]}>Descrição do animal:</Text>
-              <Text style={styles.value}>{animal.animalDescription}</Text>
-            </View>
-            <View style={styles.row}>
-              <Text style={styles.label}>Cor:</Text>
-              <Text style={styles.value}>{animal.color}</Text>
-            </View>
-            <View style={styles.row}>
-              <Text style={styles.label}>Idade:</Text>
-              <Text style={styles.value}>{animal.age} anos</Text>
-            </View>
-            <View style={styles.row}>
-              <Text style={styles.label}>Saúde:</Text>
-              <Text style={styles.value}>
-                {animal.health === 'healthy' && 'Saudável'}
-                {animal.health === 'sick' && 'Doente'}
-                {animal.health === 'disabled' && 'Deficiente'}
-                {animal.health === 'recovering' && 'Recuperando'}
-                {animal.health === 'unknown' && 'Desconhecido'}
-              </Text>
-            </View>
-            <View style={styles.row}>
-              <Text style={styles.label}>Temperamento:</Text>
-              <Text style={styles.value}>
-                {animal.temperament === 'calm' && 'Calmo'}
-                {animal.temperament === 'playful' && 'Brincalhão'}
-                {animal.temperament === 'aggressive' && 'Agressivo'}
-                {animal.temperament === 'shy' && 'Tímido'}
-                {animal.temperament === 'protective' && 'Protetor'}
-                {animal.temperament === 'sociable' && 'Sociável'}
-                {animal.temperament === 'independent' && 'Independente'}
-                {animal.temperament === 'unknown' && 'Indefinido'}
-              </Text>
-            </View>
-            <View style={styles.row}>
-              <Text style={styles.label}>Porte:</Text>
-              <Text style={styles.value}>
-                {animal.size === 'medio' && 'Médio'}
-                {animal.size === 'pequeno' && 'Pequeno'}
-                {animal.size === 'grande' && 'Grande'}
-              </Text>
-            </View>
-            <View style={styles.row}>
-              <Text style={styles.label}>Vacinado:</Text>
-              <Text style={styles.value}>{animal.vaccinated ? 'Sim' : 'Não'}</Text>
-            </View>
-            <View style={styles.row}>
-              <Text style={styles.label}>Castrado:</Text>
-              <Text style={styles.value}>{animal.neutered ? 'Sim' : 'Não'}</Text>
-            </View>
-            <View style={styles.row}>
-              <Text style={styles.label}>Vermifugado:</Text>
-              <Text style={styles.value}>{animal.dewormed ? 'Sim' : 'Não'}</Text>
-            </View>
-          </View>
-
-        </View>
-        <CustomButton
-          title={animalStatus ? "Marcar como Adotado" : "Disponibilizar para Adoção"}
-          color={animalStatus ? Theme.PRIMARY : "#B9B9B9"}
-          onPress={handleToggleStatus}
-          buttonStyle={{ alignSelf: 'center', margin: 16, borderWidth: 0, width: width * 0.95 }}
-        />
-          <CustomButton
-            title="Aprovar Cadastro"
-            onPress={() => handleApprove(animal.id)}
-            buttonStyle={{ alignSelf: 'center', margin: 16, borderWidth: 0, width: width * 0.95 }}
-          />
-        
-
-      </ScrollView>
+      </SafeAreaView>
     </>
 
   );
@@ -211,6 +226,62 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     height: 8,
+  },
+  headerRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between', // Separa o nome dos badges/likes
+      paddingRight: 16, // Espaço na direita
+  },
+
+  adoptedBadge: {
+      borderWidth: 2,
+      borderColor: Theme.TERTIARY,
+      borderRadius: 6,
+      paddingVertical: 2,
+      paddingHorizontal: 6,
+      marginRight: 8, // Espaço entre o badge e os likes
+  },
+  adoptedText: {
+      color: Theme.TERTIARY,
+      fontFamily: 'Poppins-SemiBold',
+      fontSize: 12
+  },
+  likeContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: Theme.PASTEL, // Um fundinho para destacar
+      paddingVertical: 4,
+      paddingHorizontal: 8,
+      borderRadius: 12
+  },
+  likeCountText: {
+    fontSize: 16,
+    color: Theme.TERTIARY, // Ou outra cor que destaque
+    marginLeft: 8,
+    fontFamily: 'Poppins-Medium',
+  },
+  footer: {
+    flexDirection: 'row', 
+    padding: 16,
+    backgroundColor: '#fff', 
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+    justifyContent: 'space-between', 
+    alignItems: 'center',
+    alignSelf: 'center',
+    elevation: 10, 
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  footerButton: {
+    flex: 1, // Cada botão ocupa metade do espaço
+    marginHorizontal: 6, // Espacinho entre eles
+    height: 50, // Altura fixa para ficarem alinhados
+    justifyContent: 'center',
+    borderColor: 'transparent'
   },
   progressBar: {
     height: 7,
@@ -239,7 +310,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins-SemiBold',
     padding: 16,
     paddingBottom: 0,
-
+    flex:1
   },
   row: {
     flexDirection: 'row',

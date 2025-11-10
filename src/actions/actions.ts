@@ -41,6 +41,36 @@ export const createChatRoom = async (userId: number, ongId: number) => {
   }
 };
 
+export const fetchAnimalById = async (animalId: number): Promise<any | null> => {
+  try {
+    const token = await AsyncStorage.getItem('authToken');
+    if (!token || !USER_ROUTE) {
+        console.error("Token ou rota não definidos para buscar animal.");
+        return null;
+    }
+
+    // Usa o endpoint correto que já consertamos: /animal/id/{id}
+    const response = await axios.get(`${USER_ROUTE}/animal/id/${animalId}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    // Verifica a estrutura da resposta (geralmente está em response.data.data)
+    if (response.data && response.data.data) {
+      return response.data.data;
+    } else if (response.data) {
+       // Fallback caso a API mude e retorne direto no raiz
+       return response.data;
+    } else {
+      console.warn(`Dados do animal ${animalId} não encontrados na resposta da API.`);
+      return null;
+    }
+  } catch (err: any) {
+    console.error(`Erro ao buscar animal completo ${animalId}:`, err.response?.data || err.message);
+    return null;
+  }
+};
+
+
 // Buscar todos os chats do usuário/ong
 export const fetchChatsByAccount = async (accountId: number) => {
   try {

@@ -71,7 +71,8 @@ export default function ONGAnimalEditScreen({ route }: any) {
   const [otherBreed, setOtherBreed] = React.useState('');
   const [currentColor, setCurrentColor] = React.useState('');
   const [colorOther, setColorOther] = React.useState('');
-
+  const [status, setStatus] = useState(animal.status);
+  
   useEffect(() => {
     if (species === 'Dog') {
       setCurrentBreeds(DOG_BREEDS);
@@ -176,6 +177,8 @@ export default function ONGAnimalEditScreen({ route }: any) {
           photoObjs.push({ id: img.id, photoUrl: img.photoUrl });
         }
       }
+      
+      console.log("status do animla", animal.status)
 
       const animalObj = {
         id: animal.id,
@@ -193,8 +196,9 @@ export default function ONGAnimalEditScreen({ route }: any) {
         neutered,
         dewormed,
         photos: photoObjs,
-        status: animal.status,
+        status: status,
         ongId: animal.ongId,
+        solicitationStatus: false
       };
 
       await updateAnimal(animalObj);

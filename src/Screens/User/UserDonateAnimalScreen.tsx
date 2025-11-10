@@ -11,6 +11,8 @@ import { createAnimal } from '../../actions/ongActions';
 import { uploadFileToStorage } from '../../services/uploadFileToStorage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fetchLoggedUser } from '../../actions/userActions';
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { db } from '../../services/firebaseConfig';
 
 const inputTheme = {
   colors: {
@@ -186,6 +188,24 @@ export default function UserDonateAnimalScreen({ navigation, route }: any) {
       console.log('Animal a ser criado:', animalObj);
 
       await createAnimal(animalObj);
+
+      try {
+          const userString = await AsyncStorage.getItem('user');
+          const userData = userString ? JSON.parse(userString) : {};
+          const userName = userData.name || 'Um usuário';
+
+          await addDoc(collection(db, 'animalSubmissions'), {
+              ongId: String(ongId),
+              userId: String(userId),
+              userName: userName,         
+              animalName: name,           
+              submittedAt: serverTimestamp(),
+              type: 'donation'            
+          });
+          console.log("Gatilho de notificação de doação criado.");
+      } catch (firestoreError) {
+          console.error("Erro ao criar gatilho de notificação:", firestoreError);
+      }
       Alert.alert('Sucesso', 'Animal enviado para análise!');
       navigation.goBack();
     } catch (e) {

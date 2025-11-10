@@ -1,8 +1,10 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Alert } from 'react-native';
 import Constants from 'expo-constants';
-import { Animal } from '../types';
+import { Animal, UpdateUserPayload } from '../types';
+import * as FileSystem from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
+import { Alert, Platform } from 'react-native';
 
 const USER_ROUTE = Constants.expoConfig?.extra?.USER_ROUTE;
 
@@ -180,7 +182,81 @@ export const fetchAnimalsByState = async (uf: string): Promise<any[]> => {
   }
 };
 
-export const fetchLoggedUser = async (): Promise<{ id?: number, name?: string, city?: string, state?: string, email?: string, cpf?: string , phone?: string, address?: any } | null> => {
+export const downloadCertificate = async (animalId: number, ongId: number) => {
+  try {
+    const token = await AsyncStorage.getItem('authToken');
+    const userString = await AsyncStorage.getItem('user');
+
+    if (!token || !USER_ROUTE || !userString) {
+        Alert.alert("Erro", "Você precisa estar logado.");
+        return;
+    }
+    
+    const user = JSON.parse(userString);
+    const userIdNum = Number(user.id);
+    const animalIdNum = Number(animalId);
+    const ongIdNum = Number(ongId);
+
+    console.log(`Baixando certificado...`);
+
+    // 1. Requisição POST
+    const response = await fetch(`${USER_ROUTE}/pdf`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ idUser: userIdNum, idAnimal: animalIdNum, idOng: ongIdNum })
+    });
+
+    if (!response.ok) throw new Error("Falha ao gerar PDF no servidor.");
+
+    // 2. Processa o Blob
+    const blob = await response.blob();
+    const reader = new FileReader();
+    reader.readAsDataURL(blob);
+    reader.onloadend = async () => {
+        try {
+            const base64data = reader.result as string;
+            const base64Content = base64data.split(',')[1];
+            const filename = `certificado_${animalIdNum}.pdf`;
+            const fileUri = `${FileSystem.documentDirectory}${filename}`;
+
+            // 3. Salva no cache do app
+            await FileSystem.writeAsStringAsync(fileUri, base64Content, {
+                encoding: FileSystem.EncodingType.Base64,
+            });
+
+            // 4. Abre o menu de compartilhar (Funciona bem em ambos)
+            if (Platform.OS === 'android') {
+                try {
+                    // Tenta compartilhar o arquivo diretamente
+                    await Sharing.shareAsync(fileUri, {
+                        mimeType: 'application/pdf',
+                        dialogTitle: 'Salvar Certificado',
+                        UTI: 'com.adobe.pdf' // Ajuda a definir o tipo de arquivo
+                    });
+                } catch (error) {
+                    Alert.alert("Erro", "Não foi possível abrir o menu de compartilhamento.");
+                }
+            } else {
+                Alert.alert("Erro", "Compartilhamento não disponível neste dispositivo.");
+            }
+
+        } catch (e) {
+            console.error("Erro ao salvar/compartilhar:", e);
+            Alert.alert("Erro", "Não foi possível salvar o arquivo.");
+        }
+    };
+
+  } catch (error) {
+    console.error("Erro geral:", error);
+    Alert.alert("Erro", "Falha ao baixar o certificado.");
+  }
+};
+
+
+export const fetchLoggedUser = async (): Promise<any | null> => {
   try {
     const token = await AsyncStorage.getItem('authToken');
     const email = await AsyncStorage.getItem('userEmail');
@@ -190,9 +266,11 @@ export const fetchLoggedUser = async (): Promise<{ id?: number, name?: string, c
       headers: { Authorization: `Bearer ${token}` }
     });
 
+    // Encontra o usuário logado na lista
     const user = response.data.data?.find((u: any) => u.email === email);
     if (!user) return null;
 
+    // Retorna o objeto COMPLETO, incluindo os novos campos
     return {
       id: user.id,
       name: user.name,
@@ -201,7 +279,16 @@ export const fetchLoggedUser = async (): Promise<{ id?: number, name?: string, c
       phone: user.telephone,
       city: user.address?.city,
       state: user.address?.state,
-      address: user.address, 
+      address: user.address,
+      // ▼▼▼ NOVOS CAMPOS ADICIONADOS ▼▼▼
+      birthDate: user.birthDate,
+      gender: user.gender,
+      houseType: user.houseType,
+      houseSize: user.houseSize,
+      animalsQuantity: user.animalsQuantity,
+      description: user.description,
+      photos: user.photos
+      // ▲▲▲ FIM DOS NOVOS CAMPOS ▲▲▲
     };
   } catch (err) {
     console.error('Erro ao buscar dados do usuário:', err);
@@ -209,16 +296,7 @@ export const fetchLoggedUser = async (): Promise<{ id?: number, name?: string, c
   }
 };
 
-export const updateUser = async (user: {
-  id: number;
-  name?: string;
-  email?: string;
-  cpf?: string;
-  password?: string;
-  telephone?: string;
-  address?: any;
-  addressId?: number;
-}) => {
+export const updateUser = async (user: UpdateUserPayload) => {
   try {
     const token = await AsyncStorage.getItem('authToken');
     const response = await axios.put(`${USER_ROUTE}/user`, user, {
@@ -272,4 +350,18 @@ export const fetchAnimalById = async (animalId: number): Promise<Animal | null> 
     console.error(`Erro ao buscar animal ${animalId}:`, err.response?.data || err.message);
     return null;
   }
+};
+
+export const deleteUserPhotos = async (userId: number, photoIdsToDelete: number[]) => {
+  try {
+    const token = await AsyncStorage.getItem('authToken');
+    if (!token || !USER_ROUTE) return null;
+    await axios.post(
+      `${USER_ROUTE}/user/delete-photo`,
+      { id: userId, photoIdsToDelete },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+  } catch (err: any) {
+      console.error(`Erro ao deletar fotos do usuário:`, err.response?.data || err.message);
+    return null; }
 };

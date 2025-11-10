@@ -35,9 +35,12 @@ import UserAnimalONGScreen from './src/Screens/User/UserAnimalONGScreen';
 import UserDonateAnimalScreen from './src/Screens/User/UserDonateAnimalScreen';
 import ONGUserAnimalsScreen from './src/Screens/ONG/ONGUserAnimalsScreen';
 import ChatScreen from './src/Screens/ChatScreen';
-import * as Notifications from 'expo-notifications'; 
+import * as Notifications from 'expo-notifications';
 import ONGNotificationsScreen from './src/Screens/ONG/ONGNotificationsScreen';
 import ONGUserProfileScreen from './src/Screens/ONG/ONGUserProfileScreen';
+import UserFavoritesScreen from './src/Screens/User/UserFavoritesScreen';
+import ONGSelectAdopterScreen from './src/Screens/ONG/ONGSelectAdopterScreen';
+import UserAdoptionsScreen from './src/Screens/User/UserAdoptionsScreen';
 
 
 const Stack = createStackNavigator();
@@ -46,7 +49,7 @@ const Tab = createBottomTabNavigator();
 SplashScreen.preventAutoHideAsync();
 
 
-  Notifications.setNotificationHandler({
+Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true, // Isso faz o banner aparecer em primeiro plano
     shouldPlaySound: true,
@@ -78,7 +81,7 @@ export default function App() {
     if (fontsLoaded || error) SplashScreen.hideAsync();
   }, [fontsLoaded, error]);
 
-    useEffect(() => {
+  useEffect(() => {
     // Listener acionado quando a notificação é recebida (app aberto/primeiro plano)
     const receivedListener = Notifications.addNotificationReceivedListener(notification => {
       console.log('Notificação Recebida (App Aberto):', notification);
@@ -102,7 +105,7 @@ export default function App() {
       Notifications.removeNotificationSubscription(responseListener);
     };
   }, []);
-  
+
   if (!fontsLoaded && !error) return null;
 
   // Defina a tela inicial conforme a role
@@ -288,17 +291,18 @@ export default function App() {
                   headerTitle: '',
                   headerTintColor: '#FFFFFF',
                   headerRight: () => (
-                    <TouchableOpacity  onPress={() => {
+                    params.animal.solicitationStatus === false ? (
+                      <TouchableOpacity onPress={() => {
                         navigation.navigate('ONGAnimalEdit', { animal: params.animal });
                       }}>
-                    <Ionicons
-                      name="pencil"
-                      size={24}
-                      color="#FFFFFF"
-                      style={{ marginRight: 16 }}
-                     
-                    />
-                    </TouchableOpacity>
+                        <Ionicons
+                          name="pencil"
+                          size={24}
+                          color="#FFFFFF"
+                          style={{ marginRight: 16 }}
+                        />
+                      </TouchableOpacity>
+                    ) : null
                   ),
                 };
               }}
@@ -354,19 +358,19 @@ export default function App() {
               }}
             />
             <Stack.Screen
-              name= "ONGUserAnimals"
+              name="ONGUserAnimals"
               component={ONGUserAnimalsScreen}
-               options={{
+              options={{
                 headerShown: false,
                 headerTransparent: true,
                 headerTitle: '',
                 headerTintColor: '#FFFFFF',
               }}
             />
-             <Stack.Screen
-              name= "ONGNotifications"
+            <Stack.Screen
+              name="ONGNotifications"
               component={ONGNotificationsScreen}
-               options={{
+              options={{
                 headerShown: false,
                 headerTransparent: true,
                 headerTitle: '',
@@ -388,11 +392,36 @@ export default function App() {
               name="ONGUserProfile"
               component={ONGUserProfileScreen}
               options={{
-  headerShown: true,
+                headerShown: true,
                 headerTransparent: true,
                 headerTitle: '',
-                headerTintColor: '#FFFFFF',              }}
+                headerTintColor: '#FFFFFF',
+              }}
             />
+            <Stack.Screen
+              name="UserFavorites"
+              component={UserFavoritesScreen}
+              options={{ headerShown: false }} 
+            />
+            <Stack.Screen
+              name="SelectAdopter"
+              component={ONGSelectAdopterScreen}
+              options={{
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+             name="UserAdoptions"
+             component={UserAdoptionsScreen}
+             options={{
+                headerShown: true,
+                headerTransparent: true,
+                headerTitle: '',
+                headerTintColor: '#FFFFFF',
+             }}
+           >
+              
+            </Stack.Screen>
           </Stack.Navigator>
         </SafeAreaView>
       </NavigationContainer>

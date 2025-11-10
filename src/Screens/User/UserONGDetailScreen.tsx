@@ -31,161 +31,179 @@ export default function UserONGDetailScreen({ route }: any) {
   };
 
 
+  const chatWithOng = async () => {
 
-  const handleWhatsApp = () => {
-    // Número da ONG (exemplo: DDD + número, só números)
-    const phone = ong?.phone?.replace(/\D/g, ''); // remove caracteres não numéricos
-    // Mensagem personalizada
-    const message = `Olá, Tudo bem ? Estava utilizando o aplicativo Adotai e dando uma olhada na ONG e tenho interesse em ser voluntário.`;
-    // Monta o link do WhatsApp
-    const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-    Linking.openURL(url);
-  };
+    try {
+
+      const userJson = await AsyncStorage.getItem('user');
+
+      console.log(userJson);
+
+      const user = userJson ? JSON.parse(userJson) : null;
+
+      if (!user?.id) {
+
+        Alert.alert('Erro', 'Usuário não encontrado.');
+
+        return;
+
+      }
+
+      const chatRoom = await createChatRoom(user.id, ong.id);
+
+      if (chatRoom?.id) {
+
+        navigation.navigate('Chat', { chatId: String(chatRoom.id), loggedInUserId: user.id });
+
+      } else {
+
+        Alert.alert('Erro', 'Não foi possível criar o chat.');
+
+      }
+
+    } catch (e) {
+
+      Alert.alert('Erro', 'Não foi possível criar o chat.');
+
+    }
+
+  }
 
   return (
 
     <>
-        <StatusBar backgroundColor='transparent' barStyle="dark-content" />
-    
-    <ScrollView style={{ flex: 1 }}>
-      <View style={{ width, height: height * 0.55, position: 'relative', alignSelf: 'center', justifyContent: 'center', alignItems: 'center' }}>
-        {photos.length > 0 ? (
-          <>
-            <Image
-              source={{ uri: photos[current]?.photoUrl }}
-              style={{ width, height: '100%' }}
-            />
-            <Pressable
-              style={{ position: 'absolute', left: 0, top: 0, width: width / 2, height: '100%' }}
-              onPress={handlePrev}
-            />
-            <Pressable
-              style={{ position: 'absolute', right: 0, top: 0, width: width / 2, height: '100%' }}
-              onPress={handleNext}
-            />
-            <View style={[styles.progressBarContainer, { position: 'absolute', bottom: 64, left: 0, right: 0 }]}>
-              {photos.map((_: any, idx: number) => (
-                <View
-                  key={idx}
-                  style={[
-                    styles.progressBar,
-                    idx === current
-                      ? styles.progressBarActive
-                      : styles.progressBarInactive,
-                  ]}
+      <StatusBar backgroundColor='transparent' barStyle="dark-content" />
+      <SafeAreaView style={{ flex: 1, backgroundColor: Theme.BACK }} edges={['bottom']}>
+
+        <ScrollView style={{ flex: 1 }}>
+          <View style={{ width, height: height * 0.55, position: 'relative', alignSelf: 'center', justifyContent: 'center', alignItems: 'center' }}>
+            {photos.length > 0 ? (
+              <>
+                <Image
+                  source={{ uri: photos[current]?.photoUrl }}
+                  style={{ width, height: '100%' }}
                 />
-              ))}
+                <Pressable
+                  style={{ position: 'absolute', left: 0, top: 0, width: width / 2, height: '100%' }}
+                  onPress={handlePrev}
+                />
+                <Pressable
+                  style={{ position: 'absolute', right: 0, top: 0, width: width / 2, height: '100%' }}
+                  onPress={handleNext}
+                />
+                <View style={[styles.progressBarContainer, { position: 'absolute', bottom: 64, left: 0, right: 0 }]}>
+                  {photos.map((_: any, idx: number) => (
+                    <View
+                      key={idx}
+                      style={[
+                        styles.progressBar,
+                        idx === current
+                          ? styles.progressBarActive
+                          : styles.progressBarInactive,
+                      ]}
+                    />
+                  ))}
+                </View>
+              </>
+            ) : (
+              <View style={{ backgroundColor: Theme.INPUT, width: '100%', height: height * 0.5, justifyContent: 'center', alignItems: 'center', borderRadius: 12 }}>
+                <Text style={{ color: '#888', fontSize: 18 }}>Nenhuma foto disponível</Text>
+              </View>
+            )}
+          </View>
+          <View style={[{ flex: 1 }]}>
+            <View style={[styles.info, { marginTop: -50 }]}>
+              <Text style={styles.name}>{ong.name}</Text>
+              <View style={{ flexDirection: 'row', padding: 16, paddingBottom: 0, paddingTop: 0 }}>
+                <Ionicons name="location-outline" size={24} color={'#555'} style={{ marginRight: 8 }} />
+                <Text style={styles.value}>{ong.address.city}/{ong.address.state}</Text>
+              </View>
+              <View style={{ flexDirection: 'row', padding: 16, paddingBottom: 16, paddingTop: 16 }}>
+                <Ionicons name="cash-outline" size={24} color={'#555'} style={{ marginRight: 8 }} />
+                <Text style={styles.label}>Pix:</Text>
+
+                <Text style={styles.value}>{ong.pix}</Text>
+              </View>
             </View>
-          </>
-        ) : (
-          <View style={{ backgroundColor: Theme.INPUT, width: '100%', height: height * 0.5, justifyContent: 'center', alignItems: 'center', borderRadius: 12 }}>
-            <Text style={{ color: '#888', fontSize: 18 }}>Nenhuma foto disponível</Text>
-          </View>
-        )}
-      </View>
-      <View style={[{ flex: 1 }]}>
-        <View style={[styles.info, { marginTop: -50 }]}>
-          <Text style={styles.name}>{ong.name}</Text>
-          <View style={{ flexDirection: 'row', padding: 16, paddingBottom: 0, paddingTop: 0 }}>
-            <Ionicons name="location-outline" size={24} color={'#555'} style={{ marginRight: 8 }} />
-            <Text style={styles.value}>{ong.address.city}/{ong.address.state}</Text>
-          </View>
-          <View style={{ flexDirection: 'row', padding: 16, paddingBottom: 16, paddingTop: 16 }}>
-            <Ionicons name="cash-outline" size={24} color={'#555'} style={{ marginRight: 8 }} />
-            <Text style={styles.label}>Pix:</Text>
 
-            <Text style={styles.value}>{ong.pix}</Text>
-          </View>
-        </View>
-
-        <TouchableOpacity onPress={() => {
-          if (ong) {
-            navigation.navigate('UserAnimalONG', { ong });
-          } else {
-            Alert.alert('ONG não encontrada', 'A ONG associada a este animal não foi encontrada.');
-          }
-        }} style={[styles.info, { flexDirection: 'row', alignItems: 'center' }]}>
-          <View style={{ backgroundColor: Theme.PASTEL, borderRadius: 10, margin: 8, padding: 16 }}>
-            <Ionicons name="paw-outline" size={22} color={Theme.PRIMARY} style={{}} />
-          </View>
-          <Text style={[styles.value, { color: 'black', width: '75%' }]}>Animais desta ONG</Text>
-          <Ionicons name="chevron-forward" size={22} color={Theme.PRIMARY} style={{}} />
-        </TouchableOpacity>
-
-        <View style={[styles.info, { paddingTop: 16, paddingBottom: 24 }]}>
-          <View style={[styles.row, { flexDirection: 'column' }]}>
-            <Text style={{ fontFamily: 'Poppins-Bold', fontSize: 20, color: Theme.TERTIARY }}>Sobre a ONG</Text>
-            <Text style={styles.label}>Descrição da ONG:</Text>
-            <Text style={[styles.value]}>
-              {ong.description}
-            </Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.label}>E-mail:</Text>
-            <Text style={styles.value}>{ong.email}</Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.label}>Telefone:</Text>
-            <Text style={styles.value}>{ong.phone}</Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.label}>CNPJ:</Text>
-            <Text style={styles.value}>{ong.cnpj}</Text>
-
-          </View>
-
-          <View style={[styles.row, { flexDirection: 'column' }]}>
-            <Text style={styles.label}>Endereço:</Text>
-            <Text style={[styles.value]}>
-              {ong.address.street}, {ong.address.number}
-            </Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.label}>CEP:</Text>
-            <Text style={styles.value}>{ong.address.zipCode}</Text>
-          </View>
-        </View>
-         <CustomButton
-          color={'transparent'}
-          textColor={Theme.PRIMARY}
-          borderColor={Theme.PRIMARY}
-          title='Quero doar um animal'
-          onPress={() => {
-              navigation.navigate('UserDonateAnimal', { ongId: ong.id });
-            }}
-          buttonStyle={{ alignSelf: 'center', marginVertical: 16, width: width * 0.95 }}
-        />
-        <CustomButton
-          color={Theme.PRIMARY}
-          title='Quero ser voluntário'
-          onPress={async () => {
-            try {
-              const userJson = await AsyncStorage.getItem('user');
-              console.log(userJson);
-              const user = userJson ? JSON.parse(userJson) : null;
-              if (!user?.id) {
-                Alert.alert('Erro', 'Usuário não encontrado.');
-                return;
-              }
-              const chatRoom = await createChatRoom(user.id, ong.id);
-              if (chatRoom?.id) {
-                navigation.navigate('Chat', { chatId: String(chatRoom.id), loggedInUserId: user.id }); 
+            <TouchableOpacity onPress={() => {
+              if (ong) {
+                navigation.navigate('UserAnimalONG', { ong });
               } else {
-                Alert.alert('Erro', 'Não foi possível criar o chat.');
+                Alert.alert('ONG não encontrada', 'A ONG associada a este animal não foi encontrada.');
               }
-            } catch (e) {
-              Alert.alert('Erro', 'Não foi possível criar o chat.');
-            }
-          }}
-          buttonStyle={{ alignSelf: 'center', marginVertical: 16, width: width * 0.95 }}
-        />
-       
-      </View>
+            }} style={[styles.info, { flexDirection: 'row', alignItems: 'center' }]}>
+              <View style={{ backgroundColor: Theme.PASTEL, borderRadius: 10, margin: 8, padding: 16 }}>
+                <Ionicons name="paw-outline" size={22} color={Theme.PRIMARY} style={{}} />
+              </View>
+              <Text style={[styles.value, { color: 'black', width: '75%' }]}>Animais desta ONG</Text>
+              <Ionicons name="chevron-forward" size={22} color={Theme.PRIMARY} style={{}} />
+            </TouchableOpacity>
+
+            <View style={[styles.info, { paddingTop: 16, paddingBottom: 24 }]}>
+              <View style={[styles.row, { flexDirection: 'column' }]}>
+                <Text style={{ fontFamily: 'Poppins-Bold', fontSize: 20, color: Theme.TERTIARY }}>Sobre a ONG</Text>
+                <Text style={styles.label}>Descrição da ONG:</Text>
+                <Text style={[styles.value]}>
+                  {ong.description}
+                </Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.label}>E-mail:</Text>
+                <Text style={styles.value}>{ong.email}</Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.label}>Telefone:</Text>
+                <Text style={styles.value}>{ong.phone}</Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.label}>CNPJ:</Text>
+                <Text style={styles.value}>{ong.cnpj}</Text>
+
+              </View>
+
+              <View style={[styles.row, { flexDirection: 'column' }]}>
+                <Text style={styles.label}>Endereço:</Text>
+                <Text style={[styles.value]}>
+                  {ong.address.street}, {ong.address.number}
+                </Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.label}>CEP:</Text>
+                <Text style={styles.value}>{ong.address.zipCode}</Text>
+              </View>
+            </View>
+
+           
+
+          </View>
 
 
-    </ScrollView>
-</>
-    
+        </ScrollView>
+         <View style={styles.footer}>
+              <CustomButton
+                color={Theme.BACK}
+                textColor={Theme.PRIMARY}
+                borderColor={Theme.PRIMARY}
+                title='Doar animal'
+                onPress={() => {
+                  navigation.navigate('UserDonateAnimal', { ongId: ong.id });
+                }}
+                buttonStyle={styles.footerButton}
+                textStyle={{ fontSize: 14, fontFamily: 'Poppins-SemiBold' }}
+
+              />
+              <CustomButton
+                color={Theme.TERTIARY}
+                title='Conversar com ONG'
+                onPress={chatWithOng}
+                buttonStyle={styles.footerButton}
+                textStyle={{ fontSize: 14, fontFamily: 'Poppins-SemiBold' }}
+              />
+            </View>
+      </SafeAreaView>
+    </>
+
   );
 }
 
@@ -195,6 +213,27 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     height: 8,
+  },
+  footer: {
+    flexDirection: 'row', // Botões lado a lado
+    padding: 16,
+    backgroundColor: '#fff', // Fundo branco para destacar
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+    justifyContent: 'space-between', // Espaço entre os botões
+    alignItems: 'center',
+    elevation: 10, // Sombra para ficar "flutuando" sobre o conteúdo
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  footerButton: {
+    flex: 1, // Cada botão ocupa metade do espaço
+    marginHorizontal: 6, // Espacinho entre eles
+    height: 50, // Altura fixa para ficarem alinhados
+    justifyContent: 'center',
+    borderColor: 'transparent'
   },
   progressBar: {
     height: 7,

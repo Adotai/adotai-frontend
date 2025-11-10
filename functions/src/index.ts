@@ -150,3 +150,66 @@ export const notifyAdoptionRequest = functions.firestore
 
     return null;
   });
+
+
+
+  export const notifyAnimalSubmission = functions.firestore
+  .document('animalSubmissions/{submissionId}')
+  .onCreate(async (snap, context) => {
+
+    console.log("--- NOVA DOAÇÃO DETECTADA ---");
+    const data = snap.data();
+
+    if (!data || !data.ongId || !data.animalName) {
+        console.error("Dados da doação incompletos.");
+        return null;
+    }
+
+    const ongId = data.ongId;
+    const userName = data.userName || 'Um usuário';
+    const animalName = data.animalName || 'um animal';
+
+    // 1. Busca o token da ONG
+    try {
+        const ongDoc = await db.collection('users').doc(String(ongId)).get();
+        const fcmToken = ongDoc.data()?.expoPushToken;
+
+        if (!fcmToken) {
+            console.log(`ONG ${ongId} não tem token de notificação.`);
+            return null;
+        }
+
+        // 2. Monta a mensagem
+        const message = {
+            token: fcmToken,
+            notification: {
+                title: "Chegou um novo bichinho para análise!",
+                body: `${userName} enviou o animal "${animalName}" para análise.`,
+            },
+            data: {
+                type: 'donation_submission',
+                submissionId: context.params.submissionId
+            }
+        };
+
+        // 3. Envia a notificação
+        await admin.messaging().send(message);
+        console.log(`Notificação de doação enviada para ONG ${ongId}`);
+
+        // 4. (Opcional) Salva no histórico da ONG para aparecer na tela de Notificações
+        await db.collection('users').doc(String(ongId)).collection('notifications').add({
+            title: message.notification.title,
+            body: message.notification.body,
+            timestamp: admin.firestore.FieldValue.serverTimestamp(),
+            read: false,
+            type: 'donation',
+            animalName: animalName,
+            userId: data.userId
+        });
+
+    } catch (error) {
+        console.error("Erro ao enviar notificação de doação:", error);
+    }
+
+    return null;
+});
