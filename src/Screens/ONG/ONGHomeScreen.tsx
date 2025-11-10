@@ -16,6 +16,7 @@ export default function ONGHomeScreen() {
   return (
 
     <Tab.Navigator
+    initialRouteName="Animais"
       screenOptions={({ route }) => ({
         tabBarIcon: ({ color, size }) => {
           const iconName = (() => {

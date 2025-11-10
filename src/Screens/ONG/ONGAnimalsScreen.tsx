@@ -27,6 +27,7 @@ export default function ONGAnimalsScreen({ }) {
   const [searchQuery, setSearchQuery] = React.useState('');
   // 2. Adicionar estado para o filtro de espécie
   const [activeFilter, setActiveFilter] = React.useState<'all' | 'dog' | 'cat'>('all');
+  const [adoptionFilter, setAdoptionFilter] = React.useState<'all' | 'adopted' | 'notAdopted'>('all');
 
   const load = async () => {
     setLoading(true);
@@ -61,10 +62,10 @@ export default function ONGAnimalsScreen({ }) {
   };
 
   // 4. USAR useMemo para filtragem combinada (copiado da sua tela base)
-  const filteredAnimals = React.useMemo(() => {
-    let tempAnimals = originalAnimals; // Começa com a lista de aprovados
+  const filteredAnimals = useMemo(() => {
+    let tempAnimals = originalAnimals;
 
-    // 1. Filtra por espécie
+    // Filtro de espécie
     if (activeFilter === 'dog') {
       tempAnimals = tempAnimals.filter(animal =>
         animal.species?.toLowerCase() === 'cachorro' || animal.species?.toLowerCase() === 'dog'
@@ -75,7 +76,14 @@ export default function ONGAnimalsScreen({ }) {
       );
     }
 
-    // 2. Filtra o resultado anterior pela busca por nome
+    // Filtro de adoção
+    if (adoptionFilter === 'adopted') {
+      tempAnimals = tempAnimals.filter(animal => animal.status === false);
+    } else if (adoptionFilter === 'notAdopted') {
+      tempAnimals = tempAnimals.filter(animal => animal.status === true);
+    }
+
+    // Filtro de busca
     if (searchQuery !== '') {
       tempAnimals = tempAnimals.filter(animal =>
         animal.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -83,7 +91,7 @@ export default function ONGAnimalsScreen({ }) {
     }
 
     return tempAnimals;
-  }, [activeFilter, originalAnimals, searchQuery]); // 5. Depende dos 3 estados
+  }, [activeFilter, originalAnimals, searchQuery, adoptionFilter]); // 5. Depende dos 3 estados
 
   return (
     <>
@@ -96,12 +104,12 @@ export default function ONGAnimalsScreen({ }) {
           </View>
           {/* Ícone de filtro */}
           <TouchableOpacity
-              onPress={() => navigation.navigate('CreateAnimal')}
-              style={{ marginRight: 12,  borderRadius: 8, padding: 8, flexDirection: 'row', alignItems: 'center' }}
-            >
-              {/* <Text style={styles.createAnimalText}>Cadastrar</Text> */}
-             <Ionicons name="add-circle-outline" size={28} color="#fff" />
-            </TouchableOpacity>
+            onPress={() => navigation.navigate('CreateAnimal')}
+            style={{ marginRight: 12, borderRadius: 8, padding: 8, flexDirection: 'row', alignItems: 'center' }}
+          >
+            {/* <Text style={styles.createAnimalText}>Cadastrar</Text> */}
+            <Ionicons name="add-circle-outline" size={28} color="#fff" />
+          </TouchableOpacity>
           <TouchableOpacity onPress={() => setShowFilters(!showFilters)}>
             {showFilters ? (
               <MaterialCommunityIcons name="filter-check" size={28} color={Theme.PASTEL} />
@@ -132,6 +140,7 @@ export default function ONGAnimalsScreen({ }) {
             </View>
 
             {/* Filtros de Espécie */}
+            <Text style={{padding: 8, fontFamily: 'Poppins-SemiBold', color: Theme.TERTIARY}}>Espécies:</Text>
             <View style={styles.filtersRow}>
               <TouchableOpacity
                 style={activeFilter === 'all' ? styles.activeBarFilter : styles.inactiveBarFilter}
@@ -150,6 +159,28 @@ export default function ONGAnimalsScreen({ }) {
                 onPress={() => setActiveFilter('dog')}
               >
                 <Text style={activeFilter === 'dog' ? styles.activeFilterText : styles.inactiveFilterText}>Cachorros</Text>
+              </TouchableOpacity>
+            </View>
+            
+            <Text style={{padding: 8, fontFamily: 'Poppins-SemiBold', color: Theme.TERTIARY}}>Status:</Text>
+            <View style={[styles.filtersRow]}>
+              <TouchableOpacity
+                style={adoptionFilter === 'all' ? styles.activeBarFilter : styles.inactiveBarFilter}
+                onPress={() => setAdoptionFilter('all')}
+              >
+                <Text style={adoptionFilter === 'all' ? styles.activeFilterText : styles.inactiveFilterText}>Todos</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={adoptionFilter === 'notAdopted' ? styles.activeBarFilter : styles.inactiveBarFilter}
+                onPress={() => setAdoptionFilter('notAdopted')}
+              >
+                <Text style={adoptionFilter === 'notAdopted' ? styles.activeFilterText : styles.inactiveFilterText}>Disponíveis</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={adoptionFilter === 'adopted' ? styles.activeBarFilter : styles.inactiveBarFilter}
+                onPress={() => setAdoptionFilter('adopted')}
+              >
+                <Text style={adoptionFilter === 'adopted' ? styles.activeFilterText : styles.inactiveFilterText}>Adotados</Text>
               </TouchableOpacity>
             </View>
           </View>
