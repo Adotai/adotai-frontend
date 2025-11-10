@@ -8,7 +8,7 @@ import { useNavigation } from '@react-navigation/native';
 import CustomButton from '../../Components/CustomButton';
 import { approveAnimalSubmission, updateAnimalStatus } from '../../actions/ongActions';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import { collection, query, where, getDocs, limit, onSnapshot } from 'firebase/firestore'; // Adicione getDocs, limit
 import { db } from '../../services/firebaseConfig';
 
 
@@ -21,6 +21,32 @@ export default function ONGAnimalDetails({ route }: any) {
   const [current, setCurrent] = useState(0);
   const [animalStatus, setAnimalStatus] = useState(animal.status);
   const [likeCount, setLikeCount] = useState(0);
+  const [adopter, setAdopter] = useState<any>(null);
+
+  useEffect(() => {
+    if (animalStatus === false) { // Só busca se estiver adotado
+        const fetchAdopter = async () => {
+            try {
+                const q = query(
+                    collection(db, 'adoptedAnimals'),
+                    where('animalId', '==', animal.id),
+                    limit(1) // Só precisamos de 1 registro
+                );
+                const snapshot = await getDocs(q);
+                if (!snapshot.empty) {
+                    const adopterData = snapshot.docs[0].data();
+                    setAdopter(adopterData);
+                }
+            } catch (error) {
+                console.error("Erro ao buscar adotante:", error);
+            }
+        };
+        fetchAdopter();
+    } else {
+        setAdopter(null); // Limpa se ficar disponível novamente
+    }
+  }, [animalStatus, animal.id]);
+
 
   useEffect(() => {
     const q = query(
@@ -30,7 +56,7 @@ export default function ONGAnimalDetails({ route }: any) {
     const unsubscribe = onSnapshot(q, (snapshot) => {
       setLikeCount(snapshot.size);
     }, (error) => {
-        console.error("Erro ao buscar likes:", error);
+      console.error("Erro ao buscar likes:", error);
     });
     return () => unsubscribe();
   }, [animal.id]);
@@ -99,24 +125,24 @@ export default function ONGAnimalDetails({ route }: any) {
           <View style={{ flex: 1 }} >
             <View style={[styles.info, { marginTop: -50 }]}>
               <View style={styles.headerRow}>
-                  <Text style={styles.name}>{animal.name}</Text>
-                  
-                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                      {!animalStatus && (
-                        <View style={styles.adoptedBadge}>
-                          <Text style={styles.adoptedText}>Adotado</Text>
-                        </View>
-                      )}
-                     {animal.solicitationStatus === false ? (
-                         <View style={styles.likeContainer}>
-                          <Ionicons name="heart" size={24} color={Theme.PRIMARY} />
-                          <Text style={styles.likeCountText}>
-                            {likeCount} {likeCount === 1 ? 'like' : 'likes'}
-                          </Text>
-                      </View>
-                      ) : null}
-                     
-                  </View>
+                <Text style={styles.name}>{animal.name}</Text>
+
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  {!animalStatus && (
+                    <View style={styles.adoptedBadge}>
+                      <Text style={styles.adoptedText}>Adotado</Text>
+                    </View>
+                  )}
+                  {animal.solicitationStatus === false ? (
+                    <View style={styles.likeContainer}>
+                      <Ionicons name="heart" size={24} color={Theme.PRIMARY} />
+                      <Text style={styles.likeCountText}>
+                        {likeCount} {likeCount === 1 ? 'like' : 'likes'}
+                      </Text>
+                    </View>
+                  ) : null}
+
+                </View>
               </View>
               <View style={[{ flexDirection: 'row', padding: 16, paddingBottom: 8, paddingTop: 0 }]}>
                 <Ionicons name="paw-outline" size={24} color={'#555'} />
@@ -133,6 +159,28 @@ export default function ONGAnimalDetails({ route }: any) {
                 <Text style={[styles.value, { marginLeft: 8 }]}>{animal.gender === 'male' ? 'Macho' : 'Fêmea'}</Text>
               </View>
             </View>
+            {adopter && (
+                <View style={[styles.info, styles.adopterCard]}>
+                    <Text style={styles.sectionTitle}>Adotado por</Text>
+                    <TouchableOpacity 
+                        style={styles.adopterRow}
+                        onPress={() => {
+                            navigation.navigate('ONGUserProfile', { user: adopter.userId });                           
+                        }}
+                    >
+                        <View style={styles.adopterAvatar}>
+                            <Ionicons name="person" size={30} color={Theme.PRIMARY} />
+                        </View>
+                        <View>
+                            <Text style={styles.adopterName}>{adopter.userName}</Text>
+                            <Text style={styles.adoptedDate}>
+                                em {adopter.adoptedAt?.toDate().toLocaleDateString('pt-BR') || '-'}
+                            </Text>
+                        </View>
+                        <Ionicons name="chevron-forward" size={24} color="#ccc" style={{ marginLeft: 'auto' }} />
+                    </TouchableOpacity>
+                </View>
+            )}
             <View style={[styles.info, { paddingLeft: 16, paddingTop: 16, paddingBottom: 16 }]}>
               <Text style={{ fontFamily: 'Poppins-Bold', fontSize: 20, color: Theme.TERTIARY }}>Sobre o Animal</Text>
               <View style={[styles.row, { flexDirection: 'column' }]}>
@@ -196,22 +244,24 @@ export default function ONGAnimalDetails({ route }: any) {
 
         </ScrollView>
         <View style={styles.footer}>
-          {animal.solicitationStatus === true ? (
-            <CustomButton
-              color={Theme.TERTIARY}
-              title='Aprovar Cadastro'
-              onPress={() => handleApprove(animal.id)}
-              buttonStyle={styles.footerButton} 
-              textStyle={{ fontSize: 16, fontFamily: 'Poppins-SemiBold', color: Theme.BACK }}
-            />
-          ) : (
-            <CustomButton
-              title="Registrar Adoção"
-              color={Theme.TERTIARY}
-              onPress={() => navigation.navigate('SelectAdopter', { animal: animal })}
-              buttonStyle={styles.footerButton} 
-              textStyle={{ fontSize: 16, fontFamily: 'Poppins-SemiBold', color: Theme.BACK }}
-            />
+          {animal.status === false ? <View style= {{width:'100%'}}></View> : (
+            animal.solicitationStatus === true ? (
+              <CustomButton
+                color={Theme.TERTIARY}
+                title='Aprovar Cadastro'
+                onPress={() => handleApprove(animal.id)}
+                buttonStyle={styles.footerButton}
+                textStyle={{ fontSize: 16, fontFamily: 'Poppins-SemiBold', color: Theme.BACK }}
+              />
+            ) : (
+              <CustomButton
+                title="Registrar Adoção"
+                color={Theme.TERTIARY}
+                onPress={() => navigation.navigate('SelectAdopter', { animal: animal })}
+                buttonStyle={styles.footerButton}
+                textStyle={{ fontSize: 16, fontFamily: 'Poppins-SemiBold', color: Theme.BACK }}
+              />
+            )
           )}
         </View>
       </SafeAreaView>
@@ -226,34 +276,70 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     height: 8,
+  },sectionTitle: {
+      fontFamily: 'Poppins-Bold',
+      fontSize: 18,
+      color: Theme.TERTIARY,
+      marginBottom: 12,
+      marginLeft: 16,
+      marginTop: 16
   },
-  headerRow: {
+  adopterCard: {
+      padding: 0, // Remove padding padrão para controlar melhor internamente
+      overflow: 'hidden' // Para o ripple effect se usar Pressable
+  },
+  adopterRow: {
       flexDirection: 'row',
       alignItems: 'center',
-      justifyContent: 'space-between', // Separa o nome dos badges/likes
-      paddingRight: 16, // Espaço na direita
+      padding: 16,
+      backgroundColor: '#fff' // Garante fundo branco
+  },
+  adopterAvatar: {
+      width: 50,
+      height: 50,
+      borderRadius: 25,
+      backgroundColor: Theme.PASTEL,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: 16
+  },
+  adopterName: {
+      fontSize: 18,
+      fontFamily: 'Poppins-SemiBold',
+      color: '#333'
+  },
+  adoptedDate: {
+      fontSize: 14,
+      color: '#888',
+      fontFamily: 'Poppins-Regular'
+  },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between', // Separa o nome dos badges/likes
+    paddingRight: 16, // Espaço na direita
   },
 
   adoptedBadge: {
-      borderWidth: 2,
-      borderColor: Theme.TERTIARY,
-      borderRadius: 6,
-      paddingVertical: 2,
-      paddingHorizontal: 6,
-      marginRight: 8, // Espaço entre o badge e os likes
+    borderWidth: 2,
+    borderColor: Theme.TERTIARY,
+    borderRadius: 6,
+    paddingVertical: 2,
+    paddingHorizontal: 6,
+    marginRight: 8, // Espaço entre o badge e os likes
   },
   adoptedText: {
-      color: Theme.TERTIARY,
-      fontFamily: 'Poppins-SemiBold',
-      fontSize: 12
+    color: Theme.TERTIARY,
+    fontFamily: 'Poppins-SemiBold',
+    fontSize: 12
   },
   likeContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: Theme.PASTEL, // Um fundinho para destacar
-      paddingVertical: 4,
-      paddingHorizontal: 8,
-      borderRadius: 12
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Theme.PASTEL, // Um fundinho para destacar
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 12
   },
   likeCountText: {
     fontSize: 16,
@@ -262,15 +348,15 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins-Medium',
   },
   footer: {
-    flexDirection: 'row', 
+    flexDirection: 'row',
     padding: 16,
-    backgroundColor: '#fff', 
+    backgroundColor: '#fff',
     borderTopWidth: 1,
     borderTopColor: '#eee',
-    justifyContent: 'space-between', 
+    justifyContent: 'space-between',
     alignItems: 'center',
     alignSelf: 'center',
-    elevation: 10, 
+    elevation: 10,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.1,
@@ -310,7 +396,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins-SemiBold',
     padding: 16,
     paddingBottom: 0,
-    flex:1
+    flex: 1
   },
   row: {
     flexDirection: 'row',

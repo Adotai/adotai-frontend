@@ -33,7 +33,7 @@ const OnboardingScreen = () => {
           <View style={styles.formContainer}>
             <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
             <View>
-              <Text style={styles.text2}>Já é um adotante?</Text>
+              {/* <Text style={styles.text2}>Já é um adotante?</Text> */}
               <CustomButton
                 title="Entrar"
                 color={Theme.PRIMARY}
@@ -44,7 +44,7 @@ const OnboardingScreen = () => {
               />
             </View>
             <View>
-              <Text style={styles.text2}>É novo por aqui?</Text>
+              {/* <Text style={styles.text2}>É novo por aqui?</Text> */}
               <CustomButton
                 title="Cadastrar"
                 borderColor='transparent'
@@ -56,7 +56,7 @@ const OnboardingScreen = () => {
               />
             </View>
             <View>
-              <Text style={styles.text2}>É uma ONG interessada?</Text>
+              {/* <Text style={styles.text2}>É uma ONG interessada?</Text> */}
               <CustomButton
                 title="Cadastro de ONG"
                 color={'transparent'}
