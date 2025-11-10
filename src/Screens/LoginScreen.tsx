@@ -40,17 +40,14 @@ export default function SignInScreen() {
       return;
     }
 
-    // 1. Faz o login e obtém o 'role'
     const result = await handleLogin(email, password);
 
     if (result.success && result.role) {
-      // Variável para armazenar os dados, seja de user ou ong
     let loggedInEntity: {
-        id?: number; // Aqui o id é opcional
+        id?: number; 
         [key: string]: any;
     } | null = null;
 
-      // 2. Decide qual função de busca usar com base na 'role'
       if (result.role === 'ong') {
         //console.log("Login de ONG detectado, buscando dados da ONG...");
         loggedInEntity = await fetchLoggedOng();
@@ -61,7 +58,6 @@ export default function SignInScreen() {
 
       //console.log('Dados da entidade logada:', JSON.stringify(loggedInEntity, null, 2));
 
-      // 3. Se encontrou a entidade (user ou ong), registra o token
       if (loggedInEntity && loggedInEntity.id !== undefined && loggedInEntity.id !== null) {
         
         await AsyncStorage.setItem('user', JSON.stringify(loggedInEntity));
@@ -73,7 +69,6 @@ export default function SignInScreen() {
         console.error(`❌ ERRO: Não foi possível obter os dados (ou o ID) para a role: ${result.role}`);
       }
 
-      // 4. Navega para a tela correta
       if (result.role === 'admin') {
         navigation.navigate('AdminScreen');
       } else if (result.role === 'ong') {
@@ -102,29 +97,22 @@ export default function SignInScreen() {
       return;
     }
 
-    // --- TESTE DE DIAGNÓSTICO ---
     try {
       if (Platform.OS === 'android') {
-        // Para Android, vamos pegar o token NATIVO direto do FCM.
         //console.log("Tentando obter o token NATIVO do FCM...");
         token = (await Notifications.getDevicePushTokenAsync()).data;
         //console.log("Token NATIVO do FCM obtido:", token);
       } else {
-        // Para outras plataformas (iOS), continuamos com o token da Expo.
         token = (await Notifications.getExpoPushTokenAsync()).data;
         //console.log("Token do Expo obtido:", token);
       }
     } catch (e) {
         console.error("Falha ao obter o token de notificação:", e);
-        // Se a busca pelo token nativo falhar, tentamos o da Expo como fallback.
         token = (await Notifications.getExpoPushTokenAsync()).data;
         //console.log("Usando token do Expo como fallback:", token);
     }
-    // --- FIM DO TESTE ---
 
 
-    // O resto da função continua igual.
-    // O nome do campo no Firestore pode continuar o mesmo para não ter que mudar a Cloud Function.
     if (token) {
         await setDoc(doc(db, 'users', String(userId)), {
             expoPushToken: token

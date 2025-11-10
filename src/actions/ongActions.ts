@@ -210,15 +210,13 @@ export const approveAnimalSubmission = async (animal: Animal): Promise<any> => {
       throw new Error('Token ou Rota de API não encontrados');
     }
 
-    // Corpo de "APROVADO"
     const requestBody = {
-      status: true,             // Torna o animal VISÍVEL/DISPONÍVEL
-      solicitationStatus: false // Remove da lista de PENDENTES
+      status: true,            
+      solicitationStatus: false 
     };
 
-    // Chama o endpoint PUT /animal/{id}
     const response = await axios.put(
-      `${USER_ROUTE}/animal/status/${animal}`, // Chama o endpoint que você arrumou
+      `${USER_ROUTE}/animal/status/${animal}`, 
       requestBody, 
       {
         headers: { 
@@ -240,16 +238,15 @@ export const approveAnimalSubmission = async (animal: Animal): Promise<any> => {
 export const adoptAnimal = async (animal: any, userId: number, userName: string): Promise<void> => {
   try {
     const token = await AsyncStorage.getItem('authToken');
-    // ... validações ...
-
-    // 1. Chama o Backend Java (O "oficial")
+    if (!token || !USER_ROUTE) {
+      throw new Error('Token ou Rota de API não encontrados');
+    }
     await axios.put(
       `${USER_ROUTE}/animal/adopt/${animal.id}/${userId}`,
       {},
       { headers: { Authorization: `Bearer ${token}` } }
     );
 
-    // 2. Salva no Firestore (Para listagem fácil no app do usuário)
     await addDoc(collection(db, 'adoptedAnimals'), {
         animalId: animal.id,
         animalName: animal.name,

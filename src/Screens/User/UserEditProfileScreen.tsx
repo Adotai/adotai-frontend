@@ -97,8 +97,6 @@ export default function UserEditProfileScreen() {
   const [userId, setUserId] = React.useState<number | null>(null);
   const [userAddressId, setUserAddressId] = React.useState<number | null>(null);
   const [userAddress, setUserAddress] = React.useState<any>(null);
-  const [birthDate, setBirthDate] = useState<Date | null>(null);
-  const [birthDateText, setBirthDateText] = useState('');
   const [gender, setGender] = useState('');
   const [houseType, setHouseType] = useState('');
   const [houseSize, setHouseSize] = useState('');
@@ -120,19 +118,7 @@ export default function UserEditProfileScreen() {
         setCpf(maskCpf(userData.cpf || ''));
         setUserCity(userData.address?.city || '');
         setUserState(userData.address?.state || '');
-
-        // Novos campos (assumindo que fetchLoggedUser retorna tudo)
-        if (userData.birthDate) {
-          // Se vier como string AAAA-MM-DD do backend, precisamos ajustar
-          // O jeito mais seguro se vier '2025-11-09' é fazer split direto para não ter problema de fuso
-          const parts = new Date(userData.birthDate).toISOString().split('T')[0].split('-');
-          if (parts.length === 3) {
-            setBirthDateText(`${parts[2]}/${parts[1]}/${parts[0]}`);
-          } else {
-            // Fallback
-            setBirthDateText(new Date(userData.birthDate).toLocaleDateString('pt-BR'));
-          }
-        } setGender(userData.gender || '');
+        setGender(userData.gender || '');
         setHouseType(userData.houseType || '');
         setHouseSize(userData.houseSize || '');
         setAnimalsQuantity(userData.animalsQuantity || '');
@@ -145,65 +131,57 @@ export default function UserEditProfileScreen() {
 
 
   const handleSave = async () => {
-    if (!userId) {
-      Alert.alert('Erro', 'Usuário não identificado.');
-      return;
-    }
+    if (!userId) return;
     setLoading(true);
     try {
-      // 1. Upload das novas imagens
-      const uploadedPhotos = [];
-      for (let i = 0; i < images.length; i++) {
-        const img = images[i];
-        // Se tem 'uri' e 'isNew', precisa fazer upload
-        if (img.uri && img.isNew) {
-          const url = await uploadFileToStorage(
-            img.uri,
-            `users/${userId}/profile/${Date.now()}_${i}.jpg`
-          );
-          uploadedPhotos.push({ photoUrl: url });
-        } else {
-          // Se já era uma foto existente (tem photoUrl ou id), mantém
-          // Ajuste conforme o formato que seu backend espera para MANTER fotos
-          uploadedPhotos.push(img);
-        }
-      }
+      // 1. Processa uploads de novas imagens
+     const finalPhotos = [];
+for (let i = 0; i < images.length; i++) {
+  const img = images[i];
 
-      const addressToSend = {
-        ...userAddress,
-        city: userCity,
-        state: userState,
-      };
+  // Determina qual é a URL/URI atual da imagem
+  const currentPath = img.uri || img.photoUrl;
 
+  // VERIFICAÇÃO RIGOROSA:
+  // Se começa com 'file://' ou 'content://', É LOCAL e PRECISA de upload.
+  if (currentPath && (currentPath.startsWith('file://') || currentPath.startsWith('content://'))) {
+      // console.log("Detectada imagem local, fazendo upload:", currentPath);
+      const path = `users/${userId}/profile/${Date.now()}_${i}.jpg`;
+      const url = await uploadFileToStorage(currentPath, path);
+      // Adiciona na lista final COM A NOVA URL DO FIREBASE
+      finalPhotos.push({ photoUrl: url });
+  }
+  // Se já começa com 'http', assume que já está certa no Firebase/S3
+  else if (img.photoUrl && img.photoUrl.startsWith('http')) {
+      finalPhotos.push({ id: img.id, photoUrl: img.photoUrl });
+  }
+}
+
+      // 2. Monta payload
       const payload = {
         id: userId,
         name: userName,
         email: userEmail,
-        cpf: unmaskCpf(userCpf),
-        telephone: unmaskPhone(userPhone),
-        address: addressToSend,
-        addressId: userAddressId !== null ? userAddressId : 0,
+        cpf: userCpf.replace(/\D/g, ''), // Remove máscara
+        telephone: userPhone.replace(/\D/g, ''), // Remove máscara
+        address: userAddress,
+        addressId: userAddress?.id || 0,
         gender,
         houseType,
         houseSize,
         animalsQuantity,
         description,
-        photos: uploadedPhotos 
+        photos: finalPhotos
       };
 
-      console.log("PAYLOAD SENDO ENVIADO:", JSON.stringify(payload, null, 2));
-
-      // Chama a atualização usando a variável payload
+      // 3. Envia atualização
       await updateUser(payload);
-
       Alert.alert('Sucesso', 'Perfil atualizado!');
       navigation.goBack();
 
-    } catch (err: any) {
-      // ▼▼▼ 3. LOG PARA VER A RESPOSTA EXATA DO BACKEND (O MOTIVO DO 400) ▼▼▼
-      console.error("ERRO DETALHADO DO BACKEND:", err.response?.data);
-
-      Alert.alert('Erro', err.response?.data?.message || 'Não foi possível atualizar os dados.');
+    } catch (error: any) {
+      console.error("Erro ao atualizar perfil:", error);
+      Alert.alert('Erro', 'Falha ao atualizar perfil.');
     } finally {
       setLoading(false);
     }
@@ -224,24 +202,22 @@ export default function UserEditProfileScreen() {
   };
 
 
-  const handleRemove = async (idx: number) => {
-    const photoToDelete = images[idx];
-    
-    // Se a foto já existe no backend (tem ID), deleta de lá
-    if (photoToDelete.id && userId) {
-        try {
-            await deleteUserPhotos(userId, [photoToDelete.id]);
-             // Só remove do estado se o backend confirmar (ou remove otimista e volta se der erro)
-            setImages(images.filter((_, i) => i !== idx));
-        } catch (error) {
-            Alert.alert("Erro", "Não foi possível excluir a foto.");
-        }
-    } else {
-        // Se é uma foto nova (ainda não salva), só remove do estado local
+  const handleRemoveImage = async (idx: number) => {
+    const img = images[idx];
+    // Se tem ID, está no servidor -> deleta de lá
+    if (img.id && userId) {
+      try {
+        // Chama sua action de deletar foto do usuário
+        await deleteUserPhotos(userId, [img.id]);
         setImages(images.filter((_, i) => i !== idx));
+      } catch (error) {
+        Alert.alert('Erro', 'Não foi possível remover a foto do servidor.');
+      }
+    } else {
+      // Se não tem ID, é local -> só remove do estado
+      setImages(images.filter((_, i) => i !== idx));
     }
-  };
-
+  };
   return (
     <SafeAreaView style={styles.overlay} edges={['bottom']}>
       <ScrollView contentContainerStyle={{ flexGrow: 1, alignItems: 'center', paddingVertical: 20 }} keyboardShouldPersistTaps="handled">
@@ -250,8 +226,8 @@ export default function UserEditProfileScreen() {
         <View style={{ flexDirection: 'row', marginBottom: 16, justifyContent: 'center', alignItems: 'center' }}>
           {images.map((img, idx) => (
             <View key={idx} style={{ margin: 4, alignItems: 'center' }}>
-              <Image source={{ uri: img.photoUrl }} style={{ width: width * 0.25, height: height * 0.20, borderRadius: 8 }} />
-              <TouchableOpacity onPress={() => handleRemove(idx)}>
+              <Image source={{ uri: img.uri || img.photoUrl }} style={{ width: width * 0.25, height: height * 0.20, borderRadius: 8 }} />
+              <TouchableOpacity onPress={() => handleRemoveImage(idx)}>
                 <Text style={{ color: '#d33', fontSize: 12 }}>Remover</Text>
               </TouchableOpacity>
             </View>

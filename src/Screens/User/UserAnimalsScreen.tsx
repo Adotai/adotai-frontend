@@ -8,11 +8,12 @@ import {
   FlatList,
   StatusBar,
   TouchableOpacity,
-  TextInput // 1. Importar TextInput
+  TextInput, // 1. Importar TextInput
+  ActivityIndicator
 } from 'react-native'
 import React, { useState, useEffect } from 'react' // 2. Importar useState/useEffect (já estava)
 import DogCard from '../../Components/DogCard'
-import { fetchAnimalsByState, fetchLoggedUser, fetchOngs } from '../../actions/userActions';
+import { fetchAnimalsByBreedPaged, fetchAnimalsByState, fetchLoggedUser, fetchOngs } from '../../actions/userActions';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../../types';
 import { Picker } from '@react-native-picker/picker';
@@ -40,6 +41,53 @@ export default function UserAnimalsScreen() {
   const [activeFilter, setActiveFilter] = React.useState<'all' | 'dog' | 'cat'>('all');
   // 3. Adicionar estado para a query de busca
   const [searchQuery, setSearchQuery] = React.useState('');
+  const [breedQuery, setBreedQuery] = React.useState('');
+  const [isBreedMode, setIsBreedMode] = React.useState(false);
+  const [breedAnimals, setBreedAnimals] = React.useState<any[]>([]);
+  const [breedPage, setBreedPage] = React.useState(0);
+  const [isLoadingBreed, setIsLoadingBreed] = React.useState(false);
+  const [isListEnd, setIsListEnd] = React.useState(false);  
+
+  const loadBreedAnimals = async (page: number, shouldRefresh: boolean = false) => {
+    if (isLoadingBreed) return;
+    if (!shouldRefresh && isListEnd) return;
+
+    setIsLoadingBreed(true);
+
+    // Lembre-se de importar fetchAnimalsByBreedPaged do seu userActions
+    const data = await fetchAnimalsByBreedPaged(breedQuery, page, 10);
+
+    if (data && data.content) {
+      if (shouldRefresh) {
+        setBreedAnimals(data.content);
+      } else {
+        setBreedAnimals(prev => [...prev, ...data.content]);
+      }
+      setIsListEnd(data.last); // 'last' é uma propriedade comum do Spring Page
+      setBreedPage(page);
+    } else {
+       setIsListEnd(true);
+    }
+
+    setIsLoadingBreed(false);
+  };
+
+  // Efeito para disparar a busca quando o usuário para de digitar (Debounce simples)
+  React.useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      if (breedQuery.trim().length > 0) {
+        setIsBreedMode(true);
+        setBreedPage(0);
+        setIsListEnd(false);
+        loadBreedAnimals(0, true); // True para limpar a lista anterior
+      } else {
+        setIsBreedMode(false);
+        setBreedAnimals([]);
+      }
+    }, 500); // Espera 500ms após o usuário parar de digitar
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [breedQuery]);
 
   React.useEffect(() => {
     if (selectedState && value !== selectedState) {
@@ -108,9 +156,11 @@ export default function UserAnimalsScreen() {
 
   // 5. Atualizar o useMemo para incluir a busca por nome
   const filteredAnimals = React.useMemo(() => {
-    let tempAnimals = animals; // Começa com a lista completa do estado
+    // SE estiver no modo raça, a lista base é a breedAnimals
+    // SE NÃO, a lista base é animals (filtro por estado)
+    let tempAnimals = isBreedMode ? breedAnimals : animals;
 
-    // 1. Filtra por espécie (lógica que já existia)
+    // 1. Filtra por espécie (aplica-se a ambos os modos)
     if (activeFilter === 'dog') {
       tempAnimals = tempAnimals.filter(animal =>
         animal.species?.toLowerCase() === 'cachorro' || animal.species?.toLowerCase() === 'dog'
@@ -120,9 +170,9 @@ export default function UserAnimalsScreen() {
         animal.species?.toLowerCase() === 'gato' || animal.species?.toLowerCase() === 'cat'
       );
     }
-    // Se for 'all', não faz nada
 
-    // 2. Filtra o resultado anterior pela busca por nome
+    // 2. Filtra por NOME (client-side)
+    // Nota: Se estiver no modo raça, isso filtrará apenas os resultados JÁ carregados daquela raça.
     if (searchQuery !== '') {
       tempAnimals = tempAnimals.filter(animal =>
         animal.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -130,7 +180,7 @@ export default function UserAnimalsScreen() {
     }
 
     return tempAnimals;
-  }, [activeFilter, animals, searchQuery]); // 6. Adiciona searchQuery às dependências
+  }, [activeFilter, animals, breedAnimals, isBreedMode, searchQuery]);  // 6. Adiciona searchQuery às dependências
 
 
   return (
@@ -182,6 +232,21 @@ export default function UserAnimalsScreen() {
                 </TouchableOpacity>
               )}
             </View>
+            <View style={styles.searchContainer}>
+               <MaterialIcons name="pets" size={20} color="#888" style={styles.searchIcon} />
+              <TextInput
+                style={styles.searchInput}
+                placeholder="Filtrar por raça (ex: Golden)..."
+                placeholderTextColor="#888"
+                value={breedQuery}
+                onChangeText={setBreedQuery}
+              />
+              {breedQuery.length > 0 && (
+                <TouchableOpacity onPress={() => setBreedQuery('')}>
+                  <Ionicons name="close-circle" size={20} color="#888" style={styles.searchIcon} />
+                </TouchableOpacity>
+              )}
+            </View>
 
             {/* Filtros de Espécie */}
             <View style={styles.filtersRow}>
@@ -210,27 +275,44 @@ export default function UserAnimalsScreen() {
         {/* 8. Lista agora usa filteredAnimals */}
         <FlatList
           data={filteredAnimals}
-          keyExtractor={item => String(item.id)}
+          keyExtractor={(item, index) => String(item.id) + index} // + index ajuda a evitar chaves duplicadas se a API falhar
           renderItem={({ item }) => (
-            <DogCard
-              name={item.name}
-              image={item.photos && item.photos.length > 0 ? item.photos[0].photoUrl : ''}
-              location={getOngLocation(item.ongId)}
-              onPress={() => navigation.navigate('UserAnimalDetails', { animal: item, city: getOngLocation(item.ongId), ongName: getOngName(item.ongId), ongs, fromOngList: false })}
-              status={item.status === false}
-            />
+             // ... seu renderItem atual (DogCard) ...
+             <DogCard
+               name={item.name}
+               image={item.photos && item.photos.length > 0 ? item.photos[0].photoUrl : ''}
+               location={getOngLocation(item.ongId)}
+               onPress={() => navigation.navigate('UserAnimalDetails', { animal: item, city: getOngLocation(item.ongId), ongName: getOngName(item.ongId), ongs, fromOngList: false })}
+               status={item.status === false}
+             />
           )}
-          // 9. Mensagem de vazio atualizada
           ListEmptyComponent={
             <Text style={styles.emptyText}>
-              {animals.length === 0
-                ? "Nenhum animal encontrado para esta região."
-                : "Nenhum animal corresponde aos filtros."}
+              {isLoadingBreed ? "Buscando raças..." :
+               (isBreedMode && breedAnimals.length === 0) ? "Nenhuma raça encontrada." :
+               animals.length === 0 ? "Nenhum animal para esta região." :
+               "Nenhum animal corresponde aos filtros."}
             </Text>
           }
           refreshing={refreshing}
           onRefresh={onRefresh}
           contentContainerStyle={styles.listContainer}
+
+          // NOVAS PROPS PARA PAGINAÇÃO
+          // Só ativa a paginação se estiver no modo de raça
+          onEndReachedThreshold={0.2} // Carrega quando chegar a 20% do fim da lista
+          onEndReached={() => {
+            if (isBreedMode && !isLoadingBreed && !isListEnd) {
+              loadBreedAnimals(breedPage + 1);
+            }
+          }}
+          ListFooterComponent={
+             (isBreedMode && isLoadingBreed && breedAnimals.length > 0) ? (
+               <View style={{ padding: 20 }}>
+                 <ActivityIndicator size="small" color={Theme.PRIMARY} />
+               </View>
+             ) : null
+          }
         />
       </SafeAreaView>
     </>

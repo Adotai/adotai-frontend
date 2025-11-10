@@ -99,11 +99,11 @@ export default function UserAnimalDetailsScreen({ route }: any) {
       // ----------------------------------
 
       // 3. Buscar o Nome do Animal via Action (pois não temos ele completo aqui às vezes)
-      console.log("Buscando nome do animal via action...");
+      // console.log("Buscando nome do animal via action...");
       // Certifique-se de importar fetchAnimalNameById
       const fetchedAnimalName = await fetchAnimalNameById(animalId);
       const animalName = fetchedAnimalName || animal.name || 'um animal';
-      console.log(`Nomes confirmados: User='${userName}', Animal='${animalName}'`);
+      // console.log(`Nomes confirmados: User='${userName}', Animal='${animalName}'`);
 
       // 4. Preparar dados para Firestore
       const requestData = {
@@ -182,7 +182,7 @@ export default function UserAnimalDetailsScreen({ route }: any) {
 
       const userJson = await AsyncStorage.getItem('user');
 
-      console.log(userJson);
+      // console.log(userJson);
 
       const user = userJson ? JSON.parse(userJson) : null;
 

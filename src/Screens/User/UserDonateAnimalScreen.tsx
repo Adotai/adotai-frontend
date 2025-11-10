@@ -185,7 +185,7 @@ export default function UserDonateAnimalScreen({ navigation, route }: any) {
         solicitationStatus: true
       };
 
-      console.log('Animal a ser criado:', animalObj);
+      // console.log('Animal a ser criado:', animalObj);
 
       await createAnimal(animalObj);
 
@@ -202,14 +202,14 @@ export default function UserDonateAnimalScreen({ navigation, route }: any) {
               submittedAt: serverTimestamp(),
               type: 'donation'            
           });
-          console.log("Gatilho de notificação de doação criado.");
+          // console.log("Gatilho de notificação de doação criado.");
       } catch (firestoreError) {
           console.error("Erro ao criar gatilho de notificação:", firestoreError);
       }
       Alert.alert('Sucesso', 'Animal enviado para análise!');
       navigation.goBack();
     } catch (e) {
-      console.log('Erro ao doar animal:', e);
+      // console.log('Erro ao doar animal:', e);
       Alert.alert('Erro', 'Falha ao doar animal.');
     }
     finally {

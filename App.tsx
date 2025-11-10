@@ -51,7 +51,7 @@ SplashScreen.preventAutoHideAsync();
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
-    shouldShowAlert: true, // Isso faz o banner aparecer em primeiro plano
+    shouldShowAlert: true, 
     shouldPlaySound: true,
     shouldSetBadge: false,
   }),
@@ -82,21 +82,14 @@ export default function App() {
   }, [fontsLoaded, error]);
 
   useEffect(() => {
-    // Listener acionado quando a notificação é recebida (app aberto/primeiro plano)
     const receivedListener = Notifications.addNotificationReceivedListener(notification => {
-      console.log('Notificação Recebida (App Aberto):', notification);
-      // Você pode adicionar lógica aqui para atualizar o chat ou mostrar um alerta customizado
+      //console.log('Notificação Recebida (App Aberto):', notification);
     });
-
-    // Listener acionado quando o usuário clica na notificação
     const responseListener = Notifications.addNotificationResponseReceivedListener(response => {
-      console.log('Notificação Clicada:', response);
-      // Aqui você idealmente adicionaria a lógica para navegar para a tela de Chat
+      //console.log('Notificação Clicada:', response);
       const chatId = response.notification.request.content.data.chatId;
       if (chatId) {
         // Exemplo: navigation.navigate('Chat', { chatId: chatId, ... });
-        // Para usar o 'navigation' aqui, você precisaria de um hook fora do container, 
-        // mas por enquanto, apenas o listener já resolve a exibição.
       }
     });
 
@@ -108,7 +101,6 @@ export default function App() {
 
   if (!fontsLoaded && !error) return null;
 
-  // Defina a tela inicial conforme a role
   let initialRoute = "Onboarding";
   if (isAuthenticated) {
     if (userRole === "admin") initialRoute = "AdminScreen";

@@ -59,7 +59,7 @@ export default function ONGNotificationsScreen() {
   useEffect(() => {
     // ▼▼▼ LOG 2: VERIFICAR SE O LISTENER ESTÁ SENDO CONFIGURADO ▼▼▼
     if (!ongId) {
-        console.log("ONGNotificationsScreen - Aguardando ongId...");
+        // console.log("ONGNotificationsScreen - Aguardando ongId...");
         return; 
     }
     //console.log(`ONGNotificationsScreen - Configurando listener para: users/${ongId}/notifications`); 
@@ -94,9 +94,9 @@ export default function ONGNotificationsScreen() {
      try {
          const notifDocRef = doc(db, 'users', ongId, 'notifications', notificationId);
          await updateDoc(notifDocRef, { read: true });
-         console.log(`Notificação ${notificationId} marcada como lida.`);
+        //  console.log(`Notificação ${notificationId} marcada como lida.`);
      } catch (error) {
-         console.error("Erro ao marcar notificação como lida:", error);
+        //  console.error("Erro ao marcar notificação como lida:", error);
      }
   };
 
@@ -111,9 +111,9 @@ export default function ONGNotificationsScreen() {
   try {
     const notifDocRef = doc(db, 'users', ongId, 'notifications', notificationId);
     await deleteDoc(notifDocRef);
-    console.log(`Notificação ${notificationId} excluída.`);
+    // console.log(`Notificação ${notificationId} excluída.`);
   } catch (error) {
-    console.error("Erro ao excluir notificação:", error);
+    // console.error("Erro ao excluir notificação:", error);
   }
 };
 

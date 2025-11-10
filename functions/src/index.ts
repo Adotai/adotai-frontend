@@ -1,16 +1,13 @@
 import * as functions from "firebase-functions/v1";
 import * as admin from "firebase-admin";
-// admin.initializeApp({
-//   credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
-//   projectId: "tcc-adotai", 
-// });
+
 admin.initializeApp();
 
 
 const db = admin.firestore();
 
 export const notifyNewMessage = functions.firestore
-  .document('chats/{chatId}/messages/{messageId}') // <--- ESCUTA O CAMINHO CORRETO
+  .document('chats/{chatId}/messages/{messageId}') 
   .onCreate(async (snap, context) => {
 
     console.log("--- EXECUTANDO A VERSÃO FINAL DA FUNÇÃO ---");
@@ -18,9 +15,8 @@ export const notifyNewMessage = functions.firestore
     const newMessage = snap.data();
     const chatId = context.params.chatId;
 
-    if (!newMessage || !newMessage.userId) return null; // userId é o remetente
+    if (!newMessage || !newMessage.userId) return null; 
 
-    // 1. Busca o documento do CHAT para identificar o DESTINATÁRIO
     const chatDoc = await db.collection('chats').doc(chatId).get();
     const chatData = chatDoc.data();
 
@@ -29,17 +25,12 @@ export const notifyNewMessage = functions.firestore
       return null;
     }
 
-    // Identifica o ID do destinatário (o outro participante do chat)
     const senderId = String(newMessage.userId);
     const recipientId = (senderId === String(chatData.userId)) ? chatData.ongId : chatData.userId;
 
-    // 2. Busca o token do destinatário na coleção 'users'
-    // Aqui assumimos que o ID do seu banco de dados (armazenado em userId/ongId) 
-    // é a chave do documento na coleção 'users'.
     const userDoc = await db.collection('users').doc(String(recipientId)).get();
     const userData = userDoc.data();
 
-    // O campo é 'expoPushToken' ou 'fcmToken' - vamos usar 'expoPushToken' para ser explícito
     const fcmToken = userData?.expoPushToken;
 
     if (!fcmToken) {
@@ -51,7 +42,7 @@ export const notifyNewMessage = functions.firestore
       : "Você recebeu uma nova mensagem";
 
     const message: admin.messaging.Message = {
-      token: fcmToken, // O token vai aqui dentro
+      token: fcmToken, 
       notification: {
         title: `Nova Mensagem!`,
         body: messageBody.length > 50 ? messageBody.substring(0, 47) + "..." : messageBody,
@@ -61,7 +52,6 @@ export const notifyNewMessage = functions.firestore
       }
     };
 
-    // Use o método .send() que é mais moderno
     await admin.messaging().send(message);
     console.log(`Notificação enviada para o chat ${chatId}.`);
     return null;
@@ -73,16 +63,14 @@ export const notifyAdoptionRequest = functions.firestore
   .onCreate(async (snap, context) => {
     
     console.log("--- NOVA SOLICITAÇÃO (LÓGICA SIMPLIFICADA) ---");
-    const requestData = snap.data(); // Pega os dados salvos pelo App
+    const requestData = snap.data(); 
     const requestId = context.params.requestId;
 
-    // Valida dados essenciais (incluindo os nomes que o app salvou)
     if (!requestData || !requestData.userId || !requestData.ongId || !requestData.animalId || !requestData.userName || !requestData.animalName) {
       console.error(`Dados incompletos na solicitação ${requestId} (sem nomes?):`, requestData);
       return null; 
     }
 
-    // Pega os IDs E OS NOMES diretamente do documento
     const requesterId = requestData.userId;
     const ongId = requestData.ongId;
     const animalId = requestData.animalId;
@@ -91,24 +79,20 @@ export const notifyAdoptionRequest = functions.firestore
 
     console.log(`Dados lidos: Usuário ${userName} (${requesterId}) solicitou ${animalName} (${animalId}) para ONG ${ongId}`);
 
-    // --- Busca Token da ONG (Firestore - continua igual) ---
-    // *** AJUSTE 'users' se o token da ONG estiver em 'ongs' ***
     const ongDocRef = db.collection('users').doc(String(ongId));
     let fcmToken: string | null = null;
     try {
         const ongDoc = await ongDocRef.get();
         if (!ongDoc.exists) { console.log(`Doc ONG ${ongId} não encontrado.`); return null; }
-        fcmToken = ongDoc.data()?.expoPushToken; // *** AJUSTE 'expoPushToken' se necessário ***
+        fcmToken = ongDoc.data()?.expoPushToken; 
         if (!fcmToken) { console.log(`ONG ${ongId} sem token.`); return null; }
     } catch (dbError) { console.error(`Erro ao buscar ONG ${ongId}:`, dbError); return null;}
-    // --- Fim Busca Token ---
 
-    // --- Montagem da Mensagem (Usa nomes do requestData) ---
     const message: admin.messaging.Message = {
       token: fcmToken,
       notification: {
         title: "Nova Solicitação de Adoção!",
-        body: `${userName} tem interesse em adotar ${animalName}.`, // <-- USA OS NOMES CORRETOS!
+        body: `${userName} tem interesse em adotar ${animalName}.`, 
       },
       data: { 
         requestId: requestId,
@@ -117,16 +101,14 @@ export const notifyAdoptionRequest = functions.firestore
         type: 'adoption_request'
       }
     };
-    // --- Fim Montagem ---
-
-    // --- Envio e Salvamento no Histórico ---
+    
     try {
       await admin.messaging().send(message);
       console.log(`Notificação PUSH enviada para ONG ${ongId}.`);
       
       const notificationData = {
           title: message.notification?.title || "Nova Solicitação de Adoção!",
-          body: message.notification?.body || `${userName} tem interesse em adotar ${animalName}.`, // Usa nomes corretos
+          body: message.notification?.body || `${userName} tem interesse em adotar ${animalName}.`, 
           timestamp: admin.firestore.FieldValue.serverTimestamp(),
           read: false,
           requestId: requestId,
@@ -135,7 +117,6 @@ export const notifyAdoptionRequest = functions.firestore
           type: 'adoption_request'
       };
       
-      // *** AJUSTE 'users' se o histórico da ONG for em 'ongs' ***
       await db.collection('users').doc(String(ongId)).collection('notifications').add(notificationData);
       console.log(`Notificação salva no histórico da ONG ${ongId} com os nomes corretOS.`);
 
@@ -146,7 +127,6 @@ export const notifyAdoptionRequest = functions.firestore
             await ongDocRef.update({ expoPushToken: admin.firestore.FieldValue.delete() });
          }
     }
-    // --- Fim Envio/Salvamento ---
 
     return null;
   });
@@ -169,7 +149,6 @@ export const notifyAdoptionRequest = functions.firestore
     const userName = data.userName || 'Um usuário';
     const animalName = data.animalName || 'um animal';
 
-    // 1. Busca o token da ONG
     try {
         const ongDoc = await db.collection('users').doc(String(ongId)).get();
         const fcmToken = ongDoc.data()?.expoPushToken;
@@ -179,7 +158,6 @@ export const notifyAdoptionRequest = functions.firestore
             return null;
         }
 
-        // 2. Monta a mensagem
         const message = {
             token: fcmToken,
             notification: {
@@ -192,11 +170,9 @@ export const notifyAdoptionRequest = functions.firestore
             }
         };
 
-        // 3. Envia a notificação
         await admin.messaging().send(message);
         console.log(`Notificação de doação enviada para ONG ${ongId}`);
 
-        // 4. (Opcional) Salva no histórico da ONG para aparecer na tela de Notificações
         await db.collection('users').doc(String(ongId)).collection('notifications').add({
             title: message.notification.title,
             body: message.notification.body,

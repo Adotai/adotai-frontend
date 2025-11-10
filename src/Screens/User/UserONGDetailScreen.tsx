@@ -37,7 +37,7 @@ export default function UserONGDetailScreen({ route }: any) {
 
       const userJson = await AsyncStorage.getItem('user');
 
-      console.log(userJson);
+      // console.log(userJson);
 
       const user = userJson ? JSON.parse(userJson) : null;
 

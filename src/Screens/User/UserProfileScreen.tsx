@@ -46,7 +46,7 @@ export default function UserProfileScreen({ navigation }: any) {
     try {
       // Usamos o 'userId' que já está no estado do componente
       if (userId) {
-        console.log(`Limpando token de notificação para o usuário ${userId}...`);
+        // console.log(`Limpando token de notificação para o usuário ${userId}...`);
         
         // Acessa o documento do usuário no Firestore
         const userDocRef = doc(db, 'users', String(userId));
@@ -56,7 +56,7 @@ export default function UserProfileScreen({ navigation }: any) {
           expoPushToken: deleteField() 
         });
 
-        console.log("Token de notificação limpo com sucesso do Firestore.");
+        // console.log("Token de notificação limpo com sucesso do Firestore.");
       }
 
       // Limpa os dados locais da sessão

@@ -13,7 +13,6 @@
         telephone?: string;
         address?: any;
         addressId?: number;
-        // ▼▼▼ NOVOS CAMPOS ADICIONADOS ▼▼▼
         birthDate?: string | null;
         gender?: string;
         animalsQuantity?: string;

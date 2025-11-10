@@ -22,17 +22,17 @@ const CustomButton: React.FC<CustomButtonProps> = ({
     color = Theme.PRIMARY,
     textColor = 'white',
     borderColor = Theme.PRIMARY,
-    disabled = false, // Definindo valor padrão como false
+    disabled = false, 
     textStyle,
-    buttonStyle, // Novo: Permitir estilo customizado para o botão
+    buttonStyle, 
 }) => {
     return (
         <TouchableOpacity 
             style={[
                 styles.button, 
                 { backgroundColor: color, borderColor: borderColor },
-                buttonStyle, // Aplica estilos customizados passados como props
-                disabled && styles.disabledButton // Aplica estilo de desativado se o botão estiver desativado
+                buttonStyle, 
+                disabled && styles.disabledButton 
             ]}
             onPress={onPress}
             disabled={disabled}

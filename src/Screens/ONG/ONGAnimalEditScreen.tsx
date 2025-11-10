@@ -178,7 +178,7 @@ export default function ONGAnimalEditScreen({ route }: any) {
         }
       }
       
-      console.log("status do animla", animal.status)
+      // console.log("status do animla", animal.status)
 
       const animalObj = {
         id: animal.id,

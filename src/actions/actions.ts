@@ -10,7 +10,6 @@ if (!USER_ROUTE) {
   console.error('USER_ROUTE is not defined in app.json');
 }
 
-// Criar novo chat entre usuário e ONG
 export const createChatRoom = async (userId: number, ongId: number) => {
   try {
     const token = await AsyncStorage.getItem('authToken');
@@ -49,16 +48,13 @@ export const fetchAnimalById = async (animalId: number): Promise<any | null> => 
         return null;
     }
 
-    // Usa o endpoint correto que já consertamos: /animal/id/{id}
     const response = await axios.get(`${USER_ROUTE}/animal/id/${animalId}`, {
       headers: { Authorization: `Bearer ${token}` }
     });
 
-    // Verifica a estrutura da resposta (geralmente está em response.data.data)
     if (response.data && response.data.data) {
       return response.data.data;
     } else if (response.data) {
-       // Fallback caso a API mude e retorne direto no raiz
        return response.data;
     } else {
       console.warn(`Dados do animal ${animalId} não encontrados na resposta da API.`);
@@ -71,7 +67,6 @@ export const fetchAnimalById = async (animalId: number): Promise<any | null> => 
 };
 
 
-// Buscar todos os chats do usuário/ong
 export const fetchChatsByAccount = async (accountId: number) => {
   try {
     const token = await AsyncStorage.getItem('authToken');
@@ -81,7 +76,7 @@ export const fetchChatsByAccount = async (accountId: number) => {
         headers: { Authorization: `Bearer ${token}` }
       }
     );
-    return response.data; // Array de ChatRoomDTO
+    return response.data; 
   } catch (error) {
     console.error('Erro ao buscar chats:', error);
     throw error;
@@ -91,18 +86,15 @@ export const fetchChatsByAccount = async (accountId: number) => {
 export const getOrCreateChatRoom = async (userId: number, ongId: number) => {
   try {
     const token = await AsyncStorage.getItem('authToken');
-    // Buscar todos os chats da ONG
     const response = await axios.get(
       `${USER_ROUTE}/chat/rooms/account/${ongId}`,
       { headers: { Authorization: `Bearer ${token}` } }
     );
     const chats = response.data as any[];
-    // Procura chat entre userId e ongId
     let chatRoom = chats.find(
       c => (c.userId === userId && c.ongId === ongId) || (c.userId === ongId && c.ongId === userId)
     );
     if (!chatRoom) {
-      // Se não existe, cria
       const createResponse = await axios.post(
         `${USER_ROUTE}/chat/room`,
         { id: 0, userId, ongId },
@@ -115,7 +107,6 @@ export const getOrCreateChatRoom = async (userId: number, ongId: number) => {
       );
       chatRoom = createResponse.data;
     }
-    // Garante que o Firestore tem o chat com o ID correto
     await setDoc(doc(db, "chats", String(chatRoom.id)), {
       userId: Number(userId),
       ongId: Number(ongId)

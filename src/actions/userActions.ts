@@ -197,9 +197,8 @@ export const downloadCertificate = async (animalId: number, ongId: number) => {
     const animalIdNum = Number(animalId);
     const ongIdNum = Number(ongId);
 
-    console.log(`Baixando certificado...`);
+    // console.log(`Baixando certificado...`);
 
-    // 1. Requisição POST
     const response = await fetch(`${USER_ROUTE}/pdf`, {
         method: 'POST',
         headers: {
@@ -211,7 +210,6 @@ export const downloadCertificate = async (animalId: number, ongId: number) => {
 
     if (!response.ok) throw new Error("Falha ao gerar PDF no servidor.");
 
-    // 2. Processa o Blob
     const blob = await response.blob();
     const reader = new FileReader();
     reader.readAsDataURL(blob);
@@ -222,19 +220,16 @@ export const downloadCertificate = async (animalId: number, ongId: number) => {
             const filename = `certificado_${animalIdNum}.pdf`;
             const fileUri = `${FileSystem.documentDirectory}${filename}`;
 
-            // 3. Salva no cache do app
             await FileSystem.writeAsStringAsync(fileUri, base64Content, {
                 encoding: FileSystem.EncodingType.Base64,
             });
 
-            // 4. Abre o menu de compartilhar (Funciona bem em ambos)
             if (Platform.OS === 'android') {
                 try {
-                    // Tenta compartilhar o arquivo diretamente
                     await Sharing.shareAsync(fileUri, {
                         mimeType: 'application/pdf',
                         dialogTitle: 'Salvar Certificado',
-                        UTI: 'com.adobe.pdf' // Ajuda a definir o tipo de arquivo
+                        UTI: 'com.adobe.pdf' 
                     });
                 } catch (error) {
                     Alert.alert("Erro", "Não foi possível abrir o menu de compartilhamento.");
@@ -266,11 +261,9 @@ export const fetchLoggedUser = async (): Promise<any | null> => {
       headers: { Authorization: `Bearer ${token}` }
     });
 
-    // Encontra o usuário logado na lista
     const user = response.data.data?.find((u: any) => u.email === email);
     if (!user) return null;
 
-    // Retorna o objeto COMPLETO, incluindo os novos campos
     return {
       id: user.id,
       name: user.name,
@@ -280,7 +273,6 @@ export const fetchLoggedUser = async (): Promise<any | null> => {
       city: user.address?.city,
       state: user.address?.state,
       address: user.address,
-      // ▼▼▼ NOVOS CAMPOS ADICIONADOS ▼▼▼
       birthDate: user.birthDate,
       gender: user.gender,
       houseType: user.houseType,
@@ -288,7 +280,6 @@ export const fetchLoggedUser = async (): Promise<any | null> => {
       animalsQuantity: user.animalsQuantity,
       description: user.description,
       photos: user.photos
-      // ▲▲▲ FIM DOS NOVOS CAMPOS ▲▲▲
     };
   } catch (err) {
     console.error('Erro ao buscar dados do usuário:', err);
@@ -316,14 +307,12 @@ export const fetchAnimalNameById = async (animalId: number): Promise<string | nu
       headers: { Authorization: `Bearer ${token}` }
     });
 
-    // ▼▼▼ A CORREÇÃO ESTÁ AQUI ▼▼▼
-    // Verifique a estrutura: response.data -> .data -> .name
+ 
     if (response.data && response.data.data && response.data.data.name) {
-      return response.data.data.name; // <-- Pega o nome de dentro do objeto aninhado
+      return response.data.data.name;
     } else {
-    // ▲▲▲ FIM DA CORREÇÃO ▲▲▲
       console.warn(`Nome não encontrado na resposta da API (estrutura inesperada) para animal ${animalId}`);
-      console.log("Estrutura recebida:", JSON.stringify(response.data)); 
+      // console.log("Estrutura recebida:", JSON.stringify(response.data)); 
       return null;
     }
   } catch (err: any) {
@@ -365,3 +354,30 @@ export const deleteUserPhotos = async (userId: number, photoIdsToDelete: number[
       console.error(`Erro ao deletar fotos do usuário:`, err.response?.data || err.message);
     return null; }
 };
+
+export const fetchAnimalsByBreedPaged = async (
+  filter: string,
+  page: number = 0,
+  size: number = 10
+): Promise<{ content: any[], last: boolean, totalPages: number } | null> => {
+  try {
+    const token = await AsyncStorage.getItem('authToken');
+    const url = `${USER_ROUTE}/animal/breed?filter=${encodeURIComponent(filter)}&page=${page}&size=${size}&sort=id&direction=asc`;
+
+    const response = await axios.get(url, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (response.data && response.data.data) {
+      return response.data.data;
+    }
+    return null;
+  } catch (error: any) {
+    if (error.response?.status === 404) {
+       return { content: [], last: true, totalPages: 0 };
+    }
+    console.error('Erro ao buscar animais por raça:', error);
+    return null;
+  }
+};
+

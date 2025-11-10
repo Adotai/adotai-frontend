@@ -24,7 +24,7 @@ export async function uploadFileToStorage(fileUri: string, path: string) {
   try {
     const response = await fetch(fileUri);
     const blob = await response.blob();
-    console.log('Blob size:', blob.size);
+    // console.log('Blob size:', blob.size);
 
     const storageBucket = Constants.expoConfig?.extra?.firebaseStorageBucket;
     const uploadUrl = `https://firebasestorage.googleapis.com/v0/b/${storageBucket}/o?uploadType=media&name=${encodeURIComponent(path)}`;
@@ -40,7 +40,7 @@ export async function uploadFileToStorage(fileUri: string, path: string) {
     const result = await uploadResponse.json();
 
     if (!uploadResponse.ok) {
-      console.log('Firebase error payload:', result);
+      // console.log('Firebase error payload:', result);
       throw new Error(result.error?.message || 'Erro ao enviar arquivo');
     }
 

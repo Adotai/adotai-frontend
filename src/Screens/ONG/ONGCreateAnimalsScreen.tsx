@@ -193,7 +193,7 @@ export default function ONGCreateAnimalsScreen({ navigation }: any) {
       Alert.alert('Sucesso', 'Animal criado com sucesso!');
       navigation.goBack();
     } catch (e) {
-      console.log('Erro ao criar animal:', e);
+      // console.log('Erro ao criar animal:', e);
       Alert.alert('Erro', 'Falha ao criar animal.');
     }
     finally {

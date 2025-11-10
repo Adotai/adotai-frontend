@@ -9,7 +9,7 @@ import {
   where, 
   getDocs, 
   serverTimestamp,
-  getCountFromServer // <--- IMPORTANTE
+  getCountFromServer 
 } from 'firebase/firestore';
 
 export const toggleLikeAnimal = async (userId: number, animal: any, city?: string) => {
@@ -20,7 +20,7 @@ export const toggleLikeAnimal = async (userId: number, animal: any, city?: strin
     const likeDoc = await getDoc(likeRef);
     if (likeDoc.exists()) {
       await deleteDoc(likeRef);
-      return false; // Descurtiu
+      return false; 
     } else {
       await setDoc(likeRef, {
         userId: userId,
@@ -31,7 +31,7 @@ export const toggleLikeAnimal = async (userId: number, animal: any, city?: strin
         likedAt: serverTimestamp(),
         animalLocation: city || 'Localização não informada',
       });
-      return true; // Curtiu
+      return true; 
     }
   } catch (error) {
     console.error("Erro no toggleLike:", error);
@@ -39,7 +39,6 @@ export const toggleLikeAnimal = async (userId: number, animal: any, city?: strin
   }
 };
 
-// Verifica se já está curtido (para mostrar o coração certo ao abrir a tela)
 export const checkIsLiked = async (userId: number, animalId: number) => {
   if (!userId || !animalId) return false;
   try {

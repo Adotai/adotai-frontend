@@ -24,12 +24,10 @@ export default function DogCard({ name, image, location, onPress, status, canEdi
       style={styles.card} 
       activeOpacity={0.8} 
       onPress={onPress} 
-      // 3. Ajuste na lógica de desabilitar (desabilita se adotado E não pode editar)
       disabled={status && !canEdit}
     >
       <Image source={{ uri: image }} style={[styles.image]} resizeMode="cover"/>
       
-      {/* 4. Mostra o overlay se 'showOverlay' for true */}
       {showOverlay && (
         <View style={styles.grayscaleOverlay} pointerEvents="none" />
       )}
@@ -42,19 +40,15 @@ export default function DogCard({ name, image, location, onPress, status, canEdi
       <View style={styles.infoRow}>
         <View style={styles.infoText}>
 
-          {/* 5. LÓGICA DE EXIBIÇÃO DO STATUS (ATUALIZADA) */}
           {statusText ? (
-            // Se 'statusText' foi passado (ex: "Pendente"), mostra ele
             <View style = {styles.statusBadge}>
               <Text style={styles.adoptedText}>{statusText}</Text>
             </View>
           ) : status ? (
-            // Senão, se 'status' for true, mostra "Adotado" (lógica antiga)
             <View style = {styles.statusBadge}>
               <Text style={styles.adoptedText}>Adotado</Text>
             </View>
           ) : null} 
-          {/* Se nenhum dos dois, não mostra nada */}
           
           <Text style={styles.name}>{name}</Text>
           <Text style={styles.location}>{location}</Text>
@@ -77,15 +71,15 @@ const styles = StyleSheet.create({
   statusBadge: {
     backgroundColor: Theme.PASTEL,
     borderRadius: 6,
-    paddingVertical: 2, // Um pouco de padding
-    paddingHorizontal: 10, // Um pouco de padding
+    paddingVertical: 2, 
+    paddingHorizontal: 10, 
     alignItems: 'center',
-    alignSelf: 'flex-start', // Para não esticar
-    marginBottom: 4, // Espaço abaixo do badge
+    alignSelf: 'flex-start', 
+    marginBottom: 4, 
   },
   adoptedText: {
     color: Theme.PRIMARY,
-    fontSize: 14, // Um pouco menor para caber "Pendente de Aprovação"
+    fontSize: 14, 
     fontFamily: 'Poppins-SemiBold',
   },
   card: {
