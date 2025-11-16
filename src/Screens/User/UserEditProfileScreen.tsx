@@ -158,13 +158,23 @@ for (let i = 0; i < images.length; i++) {
 }
 
       // 2. Monta payload
+      // Atualiza o campo city do endereço antes de enviar
+      const updatedAddress = {
+        ...userAddress,
+        city: userCity,
+        state: userState,
+        zipCode: userAddress?.zipCode,
+        street: userAddress?.street,
+        number: userAddress?.number
+      };
+
       const payload = {
         id: userId,
         name: userName,
         email: userEmail,
-        cpf: userCpf.replace(/\D/g, ''), // Remove máscara
-        telephone: userPhone.replace(/\D/g, ''), // Remove máscara
-        address: userAddress,
+        cpf: userCpf.replace(/\D/g, ''),
+        telephone: userPhone.replace(/\D/g, ''),
+        address: updatedAddress,
         addressId: userAddress?.id || 0,
         gender,
         houseType,

@@ -24,7 +24,7 @@ export default function ONGAnimalDetails({ route }: any) {
   const [adopter, setAdopter] = useState<any>(null);
 
   useEffect(() => {
-    if (animalStatus === false) { // Só busca se estiver adotado
+    if (animalStatus === false) { // Só busca se estiver ado
         const fetchAdopter = async () => {
             try {
                 const q = query(
@@ -181,7 +181,7 @@ export default function ONGAnimalDetails({ route }: any) {
                     </TouchableOpacity>
                 </View>
             )}
-            <View style={[styles.info, { paddingLeft: 16, paddingTop: 16, paddingBottom: 16 }]}>
+            <View style={[styles.info, { paddingLeft: 16, paddingTop: 16, paddingBottom: 16, backgroundColor: '#fff' }]}>
               <Text style={{ fontFamily: 'Poppins-Bold', fontSize: 20, color: Theme.TERTIARY }}>Sobre o Animal</Text>
               <View style={[styles.row, { flexDirection: 'column' }]}>
                 <Text style={[styles.label]}>Descrição do animal:</Text>
@@ -286,7 +286,9 @@ const styles = StyleSheet.create({
   },
   adopterCard: {
       padding: 0, // Remove padding padrão para controlar melhor internamente
-      overflow: 'hidden' // Para o ripple effect se usar Pressable
+      overflow: 'hidden', // Para o ripple effect se usar Pressable
+            backgroundColor: '#fff' // Garante fundo branco
+
   },
   adopterRow: {
       flexDirection: 'row',
@@ -388,7 +390,7 @@ const styles = StyleSheet.create({
     elevation: 3,
     padding: 8,
     borderRadius: 10,
-    backgroundColor: Theme.CARD
+          backgroundColor: '#fff' // Garante fundo branco
   },
   name: {
     fontSize: 22,

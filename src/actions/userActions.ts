@@ -52,6 +52,14 @@ export const handleSignUp = async (
     city: string;
     state: string;
     zipCode: string;
+  },
+  extras?: {
+    gender?: string;
+    houseType?: string;
+    houseSize?: string;
+    animalsQuantity?: string;
+    description?: string;
+    photos?: any[];
   }
 ): Promise<boolean> => {
   try {
@@ -64,7 +72,7 @@ export const handleSignUp = async (
 
     const addressId = addressResponse.data.data.id;
 
-    const userResponse = await axios.post(`${USER_ROUTE}/user`, {
+    const userPayload: any = {
       name,
       email,
       telephone,
@@ -72,7 +80,11 @@ export const handleSignUp = async (
       password,
       addressId,
       role: 'normal',
-    });
+      birthDate: '1900-01-01',
+      ...extras // Adiciona os campos extras
+    };
+
+    const userResponse = await axios.post(`${USER_ROUTE}/user`, userPayload);
 
     if (userResponse.status === 200) {
       Alert.alert('Sucesso', 'Usuário cadastrado com sucesso!');

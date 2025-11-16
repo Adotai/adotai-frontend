@@ -28,7 +28,7 @@ function maskCep(value: string) {
 }
 
 export default function AddressScreen({ route, navigation }: any) {
-  const { name, email, telephone, cpf, password, fromOng } = route.params || {};
+  const { name, email, telephone, cpf, password, fromOng, gender, houseType, houseSize, animalsQuantity, description, photos } = route.params || {};
 
   if (!name || !email || !telephone || !cpf || !password) {
     Alert.alert('Erro', 'Informações de usuário ausentes. Por favor, volte e preencha todos os campos.');
@@ -40,7 +40,7 @@ export default function AddressScreen({ route, navigation }: any) {
   const [city, setCity] = React.useState('');
   const [address, setAddress] = React.useState(''); 
   const [number, setNumber] = React.useState('');
-  const [houseType, setHouseType] = React.useState(''); 
+  const [houseTypeState, setHouseType] = React.useState(''); 
 
   const states = [
     'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA',
@@ -80,7 +80,14 @@ export default function AddressScreen({ route, navigation }: any) {
       number: parseInt(number, 10),
       city,
       state,
-      zipCode: cep.replace(/\D/g, ''), 
+      zipCode: cep.replace(/\D/g, ''),
+    }, {
+      gender,
+      houseType,
+      houseSize,
+      animalsQuantity,
+      description,
+      photos
     });
 
     if (success) {

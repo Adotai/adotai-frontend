@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, ScrollView, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, Alert, KeyboardAvoidingView, Platform, Image } from 'react-native';
 import React, { useState } from 'react';
 import { Theme } from '../../../constants/Themes';
 import { TextInput } from 'react-native-paper';
@@ -48,6 +48,8 @@ export default function UserExtraScreen() {
 
   return (
     <View style={styles.container}>
+            <Image style={styles.backgroundImage} source={require('../../../assets/images/background-home.png')} />
+      
       <View style={styles.overlay}>
         <View style={styles.formContainer}>
           <Text style={styles.loginText}>Informações adicionais</Text>
@@ -153,6 +155,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     position: 'relative',
     backgroundColor: Theme.BACK,
+  },
+   backgroundImage: {
+    width: '100%',
+    height: '100%',
+    position: 'absolute',
   },
   overlay: {
     flex: 1,
