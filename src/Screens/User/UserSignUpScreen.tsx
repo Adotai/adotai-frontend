@@ -168,7 +168,7 @@ export default function UserSignUpScreen() {
                   Alert.alert('Erro', 'Telefone inválido. Certifique-se de que possui 11 dígitos (incluindo DDD).');
                   return;
                 }
-                navigation.navigate('Address', {
+                navigation.navigate('UserExtra', {
                   name,
                   email,
                   telephone: phone,

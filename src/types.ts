@@ -1,4 +1,4 @@
-    export type Animal = {
+export type Animal = {
         id: number;
         name: string;
         [key: string]: any;
@@ -55,6 +55,12 @@
             cpf: string;
             password: string;
             fromOng: boolean;
+            gender?: string;
+            houseType?: string;
+            houseSize?: string;
+            animalsQuantity?: string;
+            description?: string;
+            photos?: string[];
         };
         AdminScreen: undefined;
         ONGInfos: {
@@ -98,6 +104,14 @@
         SelectAdopter: {
             animal: Animal
         };
+        UserExtra: {
+            name: string;
+            email: string;
+            telephone: string;
+            cpf: string;
+            password: string;
+            fromOng: boolean;
+        };
         UserAdoptionsScreen: undefined;
         UserAnimalONG: {
             ong: string
@@ -105,4 +119,3 @@
         ONGUserProfile: { user: any };
     }
 
-    

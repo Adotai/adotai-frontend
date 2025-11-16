@@ -41,6 +41,7 @@ import ONGUserProfileScreen from './src/Screens/ONG/ONGUserProfileScreen';
 import UserFavoritesScreen from './src/Screens/User/UserFavoritesScreen';
 import ONGSelectAdopterScreen from './src/Screens/ONG/ONGSelectAdopterScreen';
 import UserAdoptionsScreen from './src/Screens/User/UserAdoptionsScreen';
+import UserExtraScreen from './src/Screens/User/UserExtraScreen';
 
 
 const Stack = createStackNavigator();
@@ -411,9 +412,18 @@ export default function App() {
                 headerTitle: '',
                 headerTintColor: '#FFFFFF',
              }}
-           >
-              
-            </Stack.Screen>
+           />
+              <Stack.Screen
+             name="UserExtra"
+             component={UserExtraScreen}
+             options={{
+                headerShown: true,
+                headerTransparent: true,
+                headerTitle: '',
+                headerTintColor: '#FFFFFF',
+             }}
+           />
+
           </Stack.Navigator>
         </SafeAreaView>
       </NavigationContainer>
