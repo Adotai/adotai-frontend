@@ -20,6 +20,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../types';
 import { Alert } from 'react-native';
 import { fetchAnimalById } from '../../actions/actions'; // Ajuste o caminho se necessário
+import { fetchOngs } from '../../actions/userActions'; // Ajuste o caminho se necessário
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'; // Importe os ícones
 
 export default function UserFavoritesScreen() {
@@ -95,15 +96,19 @@ export default function UserFavoritesScreen() {
     }, [favorites, searchQuery, activeFilter]);
 
     const handlePress = async (animalId: number) => {
-        // ... (sua lógica de navegação existente)
         try {
             const fullAnimalData = await fetchAnimalById(animalId);
             if (fullAnimalData) {
+                // Busque todas as ONGs
+                const allOngs = await fetchOngs();
+                // Ache a ONG deste animal
+                const ongData = allOngs.find((o: { id: any; }) => o.id === fullAnimalData.ongId);
+
                 navigation.navigate('UserAnimalDetails', {
                     animal: fullAnimalData,
-                    city: fullAnimalData.ong?.address?.city || 'Cidade não disponível',
-                    ongName: fullAnimalData.ong?.name || 'ONG',
-                    ongs: [],
+                    city: ongData?.address?.city || 'Cidade não disponível',
+                    ongName: ongData?.name || 'ONG',
+                    ongs: allOngs, // Passe a lista completa!
                     fromOngList: false
                 });
             } else {

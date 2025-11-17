@@ -187,6 +187,7 @@ export default function ONGCreateAnimalsScreen({ navigation }: any) {
         temperament: temperament,
         photos,
         animalDescription,
+        solicitationStatus: false
       };
 
       await createAnimal(animalObj);

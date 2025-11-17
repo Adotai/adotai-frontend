@@ -5,7 +5,7 @@ import CustomButton from '../Components/CustomButton';
 import { Theme } from '../../constants/Themes';
 import { TextInput } from 'react-native-paper';
 import { handleSignUp } from '../actions/userActions';
-
+import { maskCep } from '../utils/masks';
 
 const { width, height } = Dimensions.get('window');
 
@@ -20,12 +20,7 @@ const inputTheme = {
   roundness: 10,
 };
 
-function maskCep(value: string) {
-  return value
-    .replace(/\D/g, '') // Remove tudo que não é dígito
-    .replace(/^(\d{5})(\d)/, '$1-$2') // Coloca o hífen depois do 5º dígito
-    .slice(0, 9); // Limita a 9 caracteres (XXXXX-XXX)
-}
+
 
 export default function AddressScreen({ route, navigation }: any) {
   const { name, email, telephone, cpf, password, fromOng, gender, houseType, houseSize, animalsQuantity, description, photos } = route.params || {};

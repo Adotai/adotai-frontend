@@ -69,7 +69,7 @@ export default function UserAdoptionsScreen({navigation}: any) {
                    animal: fullAnimalData,
                    city: ongData?.address?.city || 'Cidade não disponível', 
                    ongName: ongData?.name || 'ONG',
-                   ongs: [], // Não precisa da lista completa aqui
+                   ongs: allOngs, // <-- Passe a lista completa aqui!
                    fromOngList: false
                });
           } else {

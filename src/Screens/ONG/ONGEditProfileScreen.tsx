@@ -10,7 +10,7 @@ import { TextInput } from 'react-native-paper';
 import CustomButton from '../../Components/CustomButton';
 import { deleteOngPhotos, fetchLoggedOng, updateOng } from '../../actions/ongActions';
 import { uploadFileToStorage } from '../../services/uploadFileToStorage';
-
+import { maskPhone, maskCnpj } from '../../utils/masks';
 const { width, height } = Dimensions.get('window');
 
 const inputTheme = {
@@ -179,7 +179,7 @@ export default function ONGEditProfileScreen({ route }: any) {
                 <TextInput
                     style={styles.input}
                     value={phone}
-                    onChangeText={setPhone}
+                    onChangeText={text => setPhone(maskPhone(text))}
                     placeholder="Telefone"
                     label="Telefone"
                     keyboardType="phone-pad"
@@ -199,7 +199,7 @@ export default function ONGEditProfileScreen({ route }: any) {
                 <TextInput
                     style={styles.input}
                     value={cnpj}
-                    onChangeText={setCnpj}
+                    onChangeText={text => setCnpj(maskCnpj(text))}
                     placeholder="CNPJ"
                     label="CNPJ"
                     keyboardType="numeric"

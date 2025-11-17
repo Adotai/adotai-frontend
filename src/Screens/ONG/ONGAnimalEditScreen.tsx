@@ -9,6 +9,8 @@ import * as ImagePicker from 'expo-image-picker';
 import { uploadFileToStorage } from '../../services/uploadFileToStorage';
 import { updateAnimal, deleteAnimalPhoto } from '../../actions/ongActions';
 import { RootStackParamList } from '../../types';
+import { collection, query, where, getDocs, updateDoc, doc } from "firebase/firestore";
+import { db } from '../../services/firebaseConfig';
 
 const { width, height } = Dimensions.get('window');
 
@@ -204,6 +206,29 @@ export default function ONGAnimalEditScreen({ route }: any) {
       await updateAnimal(animalObj);
       Alert.alert('Sucesso', 'Animal atualizado!');
       navigation.navigate('ONGHome');
+
+      // Atualiza nome nas adoções do Firebase
+      try {
+        // adoptedAnimals
+        const adoptedQ = query(
+          collection(db, 'adoptedAnimals'),
+          where('animalId', '==', animal.id)
+        );
+        const adoptedSnap = await getDocs(adoptedQ);
+        for (const d of adoptedSnap.docs) {
+          await updateDoc(doc(db, 'adoptedAnimals', d.id), { animalName: name });
+        }
+        const requestsQ = query(
+          collection(db, 'adoptionRequests'),
+          where('animalId', '==', String(animal.id))
+        );
+        const requestsSnap = await getDocs(requestsQ);
+        for (const d of requestsSnap.docs) {
+          await updateDoc(doc(db, 'adoptionRequests', d.id), { animalName: name });
+        }
+      } catch (e) {
+        console.warn('Falha ao atualizar nome do animal no Firebase:', e);
+      }
     } catch (e) {
       Alert.alert('Erro', 'Erro ao atualizar animal.');
     }

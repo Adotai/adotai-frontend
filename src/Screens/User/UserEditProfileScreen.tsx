@@ -13,6 +13,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 import { uploadFileToStorage } from '../../services/uploadFileToStorage'; // Importe a função de upload
 import { Picker } from '@react-native-picker/picker';
+import { maskPhone, maskCpf, maskCep } from '../../utils/masks';
 
 const { width, height } = Dimensions.get('window');
 
@@ -26,61 +27,6 @@ const inputTheme = {
   },
   roundness: 10,
 };
-
-function maskDate(value: string) {
-  return value
-    .replace(/\D/g, '') // Remove não-números
-    .replace(/(\d{2})(\d)/, '$1/$2') // Adiciona a primeira barra
-    .replace(/(\d{2})(\d)/, '$1/$2') // Adiciona a segunda barra
-    .slice(0, 10); // Limita a 10 caracteres
-}
-
-// Converte DD/MM/AAAA para Date (para salvar no estado original se precisar)
-// Ou converte direto para YYYY-MM-DD para o backend
-function convertToBackendDate(dateString: string): string | null {
-  if (dateString.length !== 10) return null;
-  const parts = dateString.split('/');
-  // Espera DD/MM/AAAA e transforma em AAAA-MM-DD
-  return `${parts[2]}-${parts[1]}-${parts[0]}`;
-}
-
-// Formata uma data vinda do backend (AAAA-MM-DD ou objeto Date) para DD/MM/AAAA para exibir no input
-function formatDateToDisplay(date: string | Date | null): string {
-  if (!date) return '';
-  const d = new Date(date);
-  // Ajusta o fuso horário se necessário, mas para data de nascimento simples:
-  return d.toLocaleDateString('pt-BR');
-}
-
-function maskPhone(value: string) {
-  return value
-    .replace(/\D/g, '')
-    .replace(/^(\d{2})(\d)/g, '($1) $2')
-    .replace(/(\d{5})(\d)/, '$1-$2')
-    .replace(/(-\d{4})\d+?$/, '$1');
-}
-
-function maskCpf(value: string) {
-  return value
-    .replace(/\D/g, '')
-    .replace(/(\d{3})(\d)/, '$1.$2')
-    .replace(/(\d{3})(\d)/, '$1.$2')
-    .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-}
-function unmaskCpf(value: string) {
-  return value.replace(/\D/g, '');
-}
-function unmaskPhone(value: string) {
-  return value.replace(/\D/g, '');
-}
-
-function maskCep(value: string) {
-  return value
-    .replace(/\D/g, '')
-    .replace(/^(\d{5})(\d)/, '$1-$2')
-    .slice(0, 9);
-}
-
 
 
 export default function UserEditProfileScreen() {

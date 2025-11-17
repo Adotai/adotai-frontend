@@ -5,7 +5,7 @@ import CustomButton from '../../Components/CustomButton';
 import { Theme } from '../../../constants/Themes';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../../types';
-
+import { maskPhone, maskCnpj } from '../../utils/masks';
 const { width, height } = Dimensions.get('window');
 
 const inputTheme = {
@@ -19,23 +19,6 @@ const inputTheme = {
   roundness: 10,
 };
 
-function maskPhone(value: string) {
-  return value
-    .replace(/\D/g, '') // Remove tudo que não é dígito
-    .replace(/^(\d{2})(\d)/g, '($1) $2') // Adiciona parênteses ao DDD
-    .replace(/(\d{5})(\d)/, '$1-$2') // Adiciona hífen após o 5º dígito do número
-    .replace(/(-\d{4})\d+?$/, '$1'); // Garante que não tenha mais que 4 dígitos depois do hífen
-}
-
-function maskCnpj(value: string) {
-  return value
-    .replace(/\D/g, '') // Remove tudo que não é dígito
-    .replace(/^(\d{2})(\d)/, '$1.\$2') // Adiciona ponto após o 2º dígito
-    .replace(/^(\d{2})\.(\d{3})(\d)/, '$1.\$2.\$3') // Adiciona ponto após o 5º dígito
-    .replace(/\.(\d{3})(\d)/, '.\$1/\$2') // Adiciona barra após o 8º dígito
-    .replace(/(\d{4})(\d)/, '$1-\$2') // Adiciona hífen após o 12º dígito
-    .slice(0, 18); // Limita a 18 caracteres (XX.XXX.XXX/XXXX-XX)
-}
 
 export default function ONGSignUpScreen() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();

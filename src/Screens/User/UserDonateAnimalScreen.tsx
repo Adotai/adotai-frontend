@@ -130,7 +130,7 @@ export default function UserDonateAnimalScreen({ navigation, route }: any) {
       }
 
       const parsedAge = parseInt(age, 10);
-      if (isNaN(parsedAge) || parsedAge <= 0) {
+      if (isNaN(parsedAge)) {
         Alert.alert('Erro', 'Idade inválida. Por favor, insira um número positivo.');
         return;
       }
